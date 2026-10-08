@@ -1,0 +1,417 @@
+{
+  "schemaVersion": "1.0.0",
+  "narrators": [
+    {
+      "id": "prophet",
+      "displayName": "رسول الله ﷺ",
+      "category": "prophet",
+      "tabaqa": null,
+      "gradeText": null,
+      "death": null,
+      "sigla": null,
+      "entry": null
+    },
+    {
+      "id": "umar_bin_khattab",
+      "displayName": "عمر بن الخطاب",
+      "category": "companion",
+      "tabaqa": null,
+      "gradeText": "أمير المؤمنين مشهور جم المناقب",
+      "death": {
+        "text": "استشهد في ذي الحجة سنة ثلاث وعشرين",
+        "yearHijri": 23,
+        "derivation": "explicit"
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة عمر بن الخطاب",
+        "text": "عمر ابن الخطاب ابن نفيل بنون وفاء مصغر ابن عبد العزى ابن رياح بتحتانية ابن عبد الله ابن قرط بضم القاف ابن رزاح براء ثم زاي خفيفة ابن عدي ابن كعب القرشي العدوي [يقال له: الفاروق] أمير المؤمنين مشهور جم المناقب استشهد في ذي الحجة سنة ثلاث وعشرين وولي الخلافة عشر سنين ونصفا ع"
+      }
+    },
+    {
+      "id": "abdullah_bin_umar",
+      "displayName": "عبد الله بن عمر بن الخطاب",
+      "category": "companion",
+      "tabaqa": null,
+      "gradeText": "وهو أحد المكثرين من الصحابة والعبادلة وكان من أشد الناس اتباعا للأثر",
+      "death": {
+        "text": "مات سنة ثلاث وسبعين في آخرها أو أول التي تليها",
+        "yearHijri": 73,
+        "derivation": "explicit"
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة عبد الله بن عمر بن الخطاب",
+        "text": "عبد الله ابن عمر ابن الخطاب العدوي أبو عبد الرحمن ولد بعد المبعث بيسير واستصغر يوم أحد وهو ابن أربع عشرة [سنة] وهو أحد المكثرين من الصحابة والعبادلة وكان من أشد الناس اتباعا للأثر مات سنة ثلاث وسبعين في آخرها أو أول التي تليها ع"
+      }
+    },
+    {
+      "id": "abu_hurayrah",
+      "displayName": "أبو هريرة الدوسي",
+      "category": "companion",
+      "tabaqa": null,
+      "gradeText": "الصحابي الجليل حافظ الصحابة",
+      "death": {
+        "text": "مات سنة سبع وقيل سنة ثمان وقيل تسع وخمسين",
+        "yearHijri": 57,
+        "derivation": "explicit"
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة أبو هريرة الدوسي",
+        "text": "أبو هريرة الدوسي الصحابي الجليل حافظ الصحابة اختلف في اسمه واسم أبيه قيل عبد الرحمن ابن صخر وقيل ابن غنم وقيل عبد الله ابن عائذ وقيل ابن عامر وقيل ابن عمرو وقيل سكين ابن ودمة [وذمة، وقيل] ابن هانئ وقيل ابن مل وقيل ابن صخر وقيل عامر ابن عبد شمس وقيل ابن عمير وقيل يزيد ابن عشرقة وقيل عبد نهم وقيل عبد شمس وقيل غنم وقيل عبيد ابن غنم وقيل عمرو ابن غنم وقيل ابن عامر وقيل سعيد ابن الحارث هذا الذي وقفنا عليه من الاختلاف في ذلك ونقطع بأن عبد شمس وعبدنهم غير بعد أن أسلم واختلف في أيها أرجح فذهب كثيرون إلى الأول وذهب جمع من النسابين إلى عمرو ابن عامر مات سنة سبع وقيل سنة ثمان وقيل تسع وخمسين وهو ابن ثمان وسبعين سنة ع"
+      }
+    },
+    {
+      "id": "alqamah_bin_waqqas",
+      "displayName": "علقمة بن وقاص الليثي",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 2,
+        "qualifier": null,
+        "text": "من الثانية"
+      },
+      "gradeText": "ثقة ثبت",
+      "death": {
+        "text": "مات في خلافة عبد الملك",
+        "yearHijri": null,
+        "derivation": null
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة علقمة بن وقاص الليثي",
+        "text": "علقمة ابن وقاص بتشديد القاف الليثي المدني ثقة ثبت من الثانية أخطأ من زعم أن له صحبة وقيل إنه ولد في عهد النبي صلى الله عليه وسلم مات في خلافة عبد الملك ع"
+      }
+    },
+    {
+      "id": "muhammad_bin_ibrahim_taymi",
+      "displayName": "محمد بن إبراهيم التيمي",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 4,
+        "qualifier": null,
+        "text": "من الرابعة"
+      },
+      "gradeText": "ثقة له أفراد",
+      "death": {
+        "text": "مات سنة عشرين على الصحيح",
+        "yearHijri": 120,
+        "derivation": "taqrib_century_rule"
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة محمد بن إبراهيم التيمي",
+        "text": "محمد ابن إبراهيم ابن الحارث ابن خالد التيمي أبو عبد الله المدني ثقة له أفراد من الرابعة مات سنة عشرين على الصحيح ع"
+      }
+    },
+    {
+      "id": "yahya_bin_said_ansari",
+      "displayName": "يحيى بن سعيد الأنصاري",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 5,
+        "qualifier": null,
+        "text": "من الخامسة"
+      },
+      "gradeText": "ثقة ثبت",
+      "death": {
+        "text": "مات سنة أربع وأربعين أو بعدها",
+        "yearHijri": 144,
+        "derivation": "taqrib_century_rule"
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة يحيى بن سعيد الأنصاري",
+        "text": "يحيى ابن سعيد ابن قيس الأنصاري المدني أبو سعيد القاضي ثقة ثبت من الخامسة مات سنة أربع وأربعين أو بعدها ع"
+      }
+    },
+    {
+      "id": "sufyan_bin_uyaynah",
+      "displayName": "سفيان بن عيينة",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 8,
+        "qualifier": "head",
+        "text": "من رؤوس الطبقة الثامنة"
+      },
+      "gradeText": "ثقة حافظ فقيه إمام حجة إلا أنه تغير حفظه بأخرة وكان ربما دلس لكن عن الثقات",
+      "death": {
+        "text": "مات في رجب سنة ثمان وتسعين وله إحدى وتسعون سنة",
+        "yearHijri": 198,
+        "derivation": "taqrib_century_rule"
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة سفيان بن عيينة",
+        "text": "سفيان ابن عيينة ابن أبي عمران ميمون الهلالي أبو محمد الكوفي ثم المكي ثقة حافظ فقيه إمام حجة إلا أنه تغير حفظه بأخرة وكان ربما دلس لكن عن الثقات من رؤوس الطبقة الثامنة وكان أثبت الناس في عمرو ابن دينار مات في رجب سنة ثمان وتسعين وله إحدى وتسعون سنة ع"
+      }
+    },
+    {
+      "id": "humaydi",
+      "displayName": "عبد الله بن الزبير الحميدي",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 10,
+        "qualifier": null,
+        "text": "من العاشرة"
+      },
+      "gradeText": "ثقة حافظ فقيه أجل أصحاب ابن عيينة",
+      "death": {
+        "text": "مات بمكة سنة تسع عشرة وقيل بعدها",
+        "yearHijri": 219,
+        "derivation": "taqrib_century_rule"
+      },
+      "sigla": "خ م د ت س فق",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة عبد الله بن الزبير الحميدي",
+        "text": "عبد الله ابن الزبير ابن عيسى القرشي الأسدي الحميدي المكي أبو بكر ثقة حافظ فقيه أجل أصحاب ابن عيينة من العاشرة مات بمكة سنة تسع عشرة وقيل بعدها قال الحاكم كان البخاري إذا وجد الحديث عند الحميدي لا يعدوه إلى غيره خ م د ت س فق"
+      }
+    },
+    {
+      "id": "malik_bin_anas",
+      "displayName": "مالك بن أنس",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 7,
+        "qualifier": null,
+        "text": "من السابعة"
+      },
+      "gradeText": "إمام دار الهجرة رأس المتقنين وكبير المتثبتين",
+      "death": {
+        "text": "مات سنة تسع وسبعين وكان مولده سنة ثلاث وتسعين",
+        "yearHijri": 179,
+        "derivation": "taqrib_century_rule"
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة مالك بن أنس",
+        "text": "مالك ابن أنس ابن مالك ابن أبي عامر ابن عمرو الأصبحي أبو عبد الله المدني الفقيه إمام دار الهجرة رأس المتقنين وكبير المتثبتين حتى قال البخاري أصح الأسانيد كلها مالك عن نافع عن ابن عمر من السابعة مات سنة تسع وسبعين وكان مولده سنة ثلاث وتسعين وقال الواقدي بلغ تسعين سنة ع"
+      }
+    },
+    {
+      "id": "qanabi",
+      "displayName": "عبد الله بن مسلمة القعنبي",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 9,
+        "qualifier": "junior",
+        "text": "من صغار التاسعة"
+      },
+      "gradeText": "ثقة عابد",
+      "death": {
+        "text": "مات في [أول] سنة إحدى وعشرين بمكة",
+        "yearHijri": 221,
+        "derivation": "taqrib_century_rule"
+      },
+      "sigla": "خ م د ت س",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة عبد الله بن مسلمة القعنبي",
+        "text": "عبد الله ابن مسلمة ابن قعنب القعنبي الحارثي أبو عبد الرحمن البصري أصله من المدينة وسكنها مدة ثقة عابد كان ابن معين وابن المديني لا يقدمان عليه في الموطأ أحدا من صغار التاسعة مات في [أول] سنة إحدى وعشرين بمكة خ م د ت س"
+      }
+    },
+    {
+      "id": "bukhari",
+      "displayName": "محمد بن إسماعيل البخاري",
+      "category": "compiler",
+      "tabaqa": {
+        "number": 11,
+        "qualifier": null,
+        "text": "من الحادية عشرة"
+      },
+      "gradeText": "جبل الحفظ وإمام الدنيا في فقه الحديث",
+      "death": {
+        "text": "مات سنة ست وخمسين في شوال وله اثنتان وستون سنة",
+        "yearHijri": 256,
+        "derivation": "taqrib_century_rule"
+      },
+      "sigla": "ت س",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة محمد بن إسماعيل البخاري",
+        "text": "محمد ابن إسماعيل ابن إبراهيم ابن المغيرة الجعفي أبو عبد الله البخاري جبل الحفظ وإمام الدنيا في فقه الحديث من الحادية عشرة مات سنة ست وخمسين في شوال وله اثنتان وستون سنة ت س"
+      }
+    },
+    {
+      "id": "muslim",
+      "displayName": "مسلم بن الحجاج",
+      "category": "compiler",
+      "tabaqa": null,
+      "gradeText": "ثقة حافظ إمام مصنف عالم بالفقه",
+      "death": {
+        "text": "مات سنة إحدى وستين وله سبع وخمسون سنة",
+        "yearHijri": null,
+        "derivation": null
+      },
+      "sigla": "ت",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة مسلم بن الحجاج",
+        "text": "مسلم ابن الحجاج ابن مسلم القشيري النيسابوري ثقة حافظ إمام مصنف عالم بالفقه مات سنة إحدى وستين وله سبع وخمسون سنة ت"
+      }
+    },
+    {
+      "id": "yahya_bin_yamar",
+      "displayName": "يحيى بن يعمر",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 3,
+        "qualifier": null,
+        "text": "من الثالثة"
+      },
+      "gradeText": "ثقة فصيح وكان يرسل",
+      "death": {
+        "text": "مات قبل المائة وقيل بعدها",
+        "yearHijri": null,
+        "derivation": null
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة يحيى بن يعمر",
+        "text": "يحيى ابن يعمر بفتح التحتانية والميم بينهما مهملة [ساكنة] البصري نزيل مرو وقاضيها ثقة فصيح وكان يرسل من الثالثة مات قبل المائة وقيل بعدها ع"
+      }
+    },
+    {
+      "id": "abdullah_bin_buraydah",
+      "displayName": "عبد الله بن بريدة",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 3,
+        "qualifier": null,
+        "text": "من الثالثة"
+      },
+      "gradeText": "ثقة",
+      "death": {
+        "text": "مات سنة خمس ومائة وقيل بل خمس عشرة وله مائة سنة",
+        "yearHijri": 105,
+        "derivation": "explicit"
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة عبد الله بن بريدة",
+        "text": "عبد الله ابن بريدة ابن الخصيب الأسلمي أبو سهل المروزي قاضيها ثقة من الثالثة مات سنة خمس ومائة وقيل بل خمس عشرة وله مائة سنة ع"
+      }
+    },
+    {
+      "id": "kahmas_bin_hasan",
+      "displayName": "كهمس بن الحسن",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 5,
+        "qualifier": null,
+        "text": "من الخامسة"
+      },
+      "gradeText": "ثقة",
+      "death": {
+        "text": "مات سنة تسع وأربعين",
+        "yearHijri": 149,
+        "derivation": "taqrib_century_rule"
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة كهمس بن الحسن",
+        "text": "كهمس ابن الحسن التميمي أبو الحسن البصري ثقة من الخامسة مات سنة تسع وأربعين ع"
+      }
+    },
+    {
+      "id": "waki_bin_jarrah",
+      "displayName": "وكيع بن الجراح",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 9,
+        "qualifier": "senior",
+        "text": "من كبار التاسعة"
+      },
+      "gradeText": "ثقة حافظ عابد",
+      "death": {
+        "text": "مات في آخر سنة ست و [أو] أول سنة سبع وتسعين [ومائة] وله سبعون سنة",
+        "yearHijri": 196,
+        "derivation": "explicit"
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة وكيع بن الجراح",
+        "text": "وكيع ابن الجراح ابن مليح الرؤاسي بضم الراء وهمزة ثم مهملة أبو سفيان الكوفي ثقة حافظ عابد من كبار التاسعة مات في آخر سنة ست و [أو] أول سنة سبع وتسعين [ومائة] وله سبعون سنة ع"
+      }
+    },
+    {
+      "id": "zuhayr_bin_harb",
+      "displayName": "زهير بن حرب (أبو خيثمة)",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 10,
+        "qualifier": null,
+        "text": "من العاشرة"
+      },
+      "gradeText": "ثقة ثبت",
+      "death": {
+        "text": "مات سنة أربع وثلاثين وهو ابن أربع وسبعين",
+        "yearHijri": 234,
+        "derivation": "taqrib_century_rule"
+      },
+      "sigla": "خ م د س ق",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة زهير بن حرب (أبو خيثمة)",
+        "text": "زهير ابن حرب ابن شداد أبو خثيمة [خيثمة] النسائي نزيل بغداد ثقة ثبت روى عنه مسلم أكثر من ألف حديث من العاشرة مات سنة أربع وثلاثين وهو ابن أربع وسبعين خ م د س ق"
+      }
+    },
+    {
+      "id": "muadh_bin_muadh",
+      "displayName": "معاذ بن معاذ العنبري",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 9,
+        "qualifier": "senior",
+        "text": "من كبار التاسعة"
+      },
+      "gradeText": "ثقة متقن",
+      "death": {
+        "text": "مات سنة ست وتسعين [ومائة]",
+        "yearHijri": 196,
+        "derivation": "explicit"
+      },
+      "sigla": "ع",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة معاذ بن معاذ العنبري",
+        "text": "معاذ ابن معاذ ابن نصر ابن حسان العنبري أبو المثنى البصري القاضي ثقة متقن من كبار التاسعة مات سنة ست وتسعين [ومائة] ع"
+      }
+    },
+    {
+      "id": "ubaydullah_bin_muadh",
+      "displayName": "عبيد الله بن معاذ العنبري",
+      "category": "narrator",
+      "tabaqa": {
+        "number": 10,
+        "qualifier": null,
+        "text": "من العاشرة"
+      },
+      "gradeText": "ثقة حافظ",
+      "death": {
+        "text": "مات سنة سبع وثلاثين",
+        "yearHijri": 237,
+        "derivation": "taqrib_century_rule"
+      },
+      "sigla": "خ م د س",
+      "entry": {
+        "sourceId": "taqrib_tahdhib",
+        "locator": "ترجمة عبيد الله بن معاذ العنبري",
+        "text": "عبيد الله ابن معاذ ابن معاذ ابن نصر ابن حسان العنبري أبو عمرو البصري ثقة حافظ رجح ابن معين أخاه المثنى عليه من العاشرة مات سنة سبع وثلاثين خ م د س"
+      }
+    }
+  ]
+}

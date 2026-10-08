@@ -1,0 +1,672 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "nawawi40_001",
+  "sequence": 1,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 1
+  },
+  "title": "الأعمال بالنيات",
+  "teaser": {
+    "text": "رحلتك تبدأ بخطوةٍ لا يراها أحد… فما هي؟"
+  },
+  "journey": {
+    "stationId": "makkah_dar_al_arqam",
+    "stepInStation": 1,
+    "milestone": "عقد النية قبل المسير",
+    "assignmentBasis": "thematic"
+  },
+  "context": {
+    "narrative": "قبل فتح مكة كان المسلمون يهاجرون منها إلى مدينة النبي ﷺ، يدَعون الأهل والمال طلباً لدار الإسلام. والطريق الواحد قد يسلكه رجلان ببواعث مختلفة: أحدهما خرج حبّاً لله ورسوله ورغبةً في تعلّم دينه، والآخر خرج لتجارة يصيبها أو امرأة يخطبها؛ فالأول مهاجر، والثاني تاجر أو خاطب. وفي هذا الحديث يجعل النبي ﷺ الباعثَ ميزانَ كل عمل. وقد سمعه علقمة بن وقاص الليثي من عمر بن الخطاب يحدّث به على المنبر.",
+    "humanMotive": "اختلاف البواعث وراء العمل الواحد.",
+    "place": {
+      "name": "المدينة النبوية",
+      "stationId": "hijrah_masjid_nabawi",
+      "relation": "subject_location",
+      "latitude": 24.4672,
+      "longitude": 39.6111,
+      "coordinatesApproximate": true
+    },
+    "sources": [
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص73",
+        "quote": "كان المهاجرون قبل فتح مكة يهاجرون منها إلى مدينة النبي صلى الله عليه وسلم"
+      },
+      {
+        "sourceId": "nihaya_gharib",
+        "locator": "ج5 ص244",
+        "quote": "ويدع أهله وماله"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص73",
+        "quote": "ورغبة في تعلم دين الإسلام"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص73",
+        "quote": "فالأول تاجر، والثاني خاطب، وليس واحد منهما بمهاجر"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص75",
+        "quote": "وسائر الأعمال كالهجرة في هذا المعنى، فصلاحها وفسادها بحسب النية الباعثة عليها"
+      },
+      {
+        "sourceId": "sahih_bukhari",
+        "locator": "1",
+        "quote": "سَمِعْتُ عُمَرَ بْنَ الْخَطَّابِ رَضِيَ اللَّهُ عَنْهُ عَلَى الْمِنْبَرِ"
+      }
+    ],
+    "cautions": [
+      {
+        "text": "اشتهر أن قصة «مهاجر أم قيس» سببُ ورود الحديث، وقد نبّه ابن رجب إلى أنه لم يجد لذلك أصلاً بإسناد يصح؛ فلا تُعرض القصة سبباً للحديث.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص74",
+            "quote": "وقد اشتهر أن قصة مهاجر أم قيس هي كانت سبب قول النبي صلى الله عليه وسلم"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص75",
+            "quote": "ولم نر لذلك أصلا بإسناد يصح"
+          }
+        ]
+      }
+    ]
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَمِيرِ الْمُؤْمِنِينَ أَبِي حَفْصٍ عُمَرَ بْنِ الْخَطَّابِ رَضِيَ اللهُ عَنْهُ قَالَ: سَمِعْتُ رَسُولَ اللَّهِ ﷺ يَقُولُ:"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى، فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ فَهِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ، وَمَنْ كَانَتْ هِجْرَتُهُ لِدُنْيَا يُصِيبُهَا أَوِ امْرَأَةٍ يَنْكِحُهَا فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_niyyat",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 2,
+          "length": 1,
+          "surface": "بِالنِّيَّاتِ"
+        },
+        "headword": "النِّيَّات",
+        "meaning": "جمع نيّة، وهي في اللغة نوعٌ من القصد والإرادة.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص65",
+            "quote": "واعلم أن النية في اللغة نوع من القصد والإرادة"
+          }
+        ]
+      },
+      {
+        "id": "g_hijrah",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 10,
+          "length": 1,
+          "surface": "هِجْرَتُهُ"
+        },
+        "headword": "الهِجْرَة",
+        "meaning": "أصلها من الهَجْر ضدّ الوصل، ثم غلبت على الخروج من أرض إلى أرض وترك الأولى للثانية؛ والمراد هنا ترك بلد الشرك والانتقال إلى دار الإسلام.",
+        "sources": [
+          {
+            "sourceId": "nihaya_gharib",
+            "locator": "ج5 ص244",
+            "quote": "الهجرة في الأصل: الاسم من الهجر، ضد الوصل. وقد هجره هجرا وهجرانا، ثم غلب على الخروج من أرض إلى أرض، وترك الأولى للثانية."
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص72",
+            "quote": "وأصل الهجرة: هجران بلد الشرك، والانتقال منه إلى دار الإسلام"
+          }
+        ]
+      },
+      {
+        "id": "g_yankihuha",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 25,
+          "length": 1,
+          "surface": "يَنْكِحُهَا"
+        },
+        "headword": "يَنْكِحُهَا",
+        "meaning": "يتزوّجها؛ وبهذا اللفظ جاءت رواية مالك عن يحيى بن سعيد عند البخاري ومسلم.",
+        "sources": [
+          {
+            "sourceId": "sahih_bukhari",
+            "locator": "54",
+            "quote": "أَوِ امْرَأَةٍ يَتَزَوَّجُهَا"
+          },
+          {
+            "sourceId": "sahih_muslim",
+            "locator": "1907",
+            "quote": "أَوِ امْرَأَةٍ يَتَزَوَّجُهَا"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "assetPath": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح البخاري، رقم 1",
+      "references": [
+        {
+          "sourceId": "sahih_bukhari",
+          "hadithNumber": "1",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-bukhari.json → hadithnumber 1"
+        },
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "1907",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 1907.01"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ إِمَامَا الْمُحَدِّثِينَ أَبُو عَبْدِ اللهِ مُحَمَّدُ بنُ إِسْمَاعِيل بن إِبْرَاهِيم بن الْمُغِيرَة بن بَرْدِزبَه الْبُخَارِيُّ الْجُعْفِيُّ، وَأَبُو الْحُسَيْنِ مُسْلِمٌ بنُ الْحَجَّاج بن مُسْلِم الْقُشَيْرِيُّ النَّيْسَابُورِيُّ رَضِيَ اللهُ عَنْهُمَا فِي \"صَحِيحَيْهِمَا\" اللذَينِ هُمَا أَصَحُّ الْكُتُبِ الْمُصَنَّفَةِ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 2,
+        "label": "المقطع الأول: ميزان الأعمال"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 3,
+        "endToken": 7,
+        "label": "المقطع الثاني: حظ كل عامل"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 8,
+        "endToken": 17,
+        "label": "المقطع الثالث: الهجرة إلى الله ورسوله"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 18,
+        "endToken": 30,
+        "label": "المقطع الرابع: الهجرة لغير ذلك"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 2,
+          "length": 1,
+          "surface": "بِالنِّيَّاتِ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 7,
+          "length": 1,
+          "surface": "نَوَى"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 25,
+          "length": 1,
+          "surface": "يَنْكِحُهَا"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "تطوّعتَ مع فريقٍ جامعي لتوزيع سلالٍ غذائية على أسرٍ متعففة، وفي أثناء التوزيع عرض عليك صديقك أن يلتقط لك صوراً تنشرها في حسابك وتضيفها إلى سيرتك الذاتية.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أواصل العمل، وأراجع الباعث في قلبي فأجعله ابتغاء وجه الله ونفع الأسر، فلا تكون الصورة غاية العمل.",
+          "feedback": "أحسنت؛ فالعمل واحد في صورته، وصلاحه بحسب النية الباعثة عليه."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أنسحب من التطوع كله حتى أتيقّن أن نيتي خالصة تماماً.",
+          "feedback": "حرصك على الإخلاص محمود، غير أن الحديث يوجّه إلى إصلاح الباعث على العمل، لا إلى ترك العمل الصالح نفسه."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "لا يهمّ الدافع ما دامت السلال ستصل إلى مستحقيها.",
+          "feedback": "نفع الناس حاصل، لكن حظّك أنت من عملك هو نيتك: «وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى»."
+        }
+      ],
+      "takeaway": "العمل الواحد في صورته يختلف صلاحه باختلاف الباعث عليه؛ فاستحضر نيتك قبل كل عمل.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص75",
+          "quote": "وسائر الأعمال كالهجرة في هذا المعنى، فصلاحها وفسادها بحسب النية الباعثة عليها"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص72",
+          "quote": "وأن حظ العامل من عمله نيته من خير أو شر"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "حظُّ العامل من عمله نيتُه من خيرٍ أو شر؛ فاجعل لكل عمل نيةً حاضرة.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص72",
+            "quote": "وأن حظ العامل من عمله نيته من خير أو شر"
+          }
+        ]
+      },
+      {
+        "text": "الأعمال المتشابهة في صورتها يتفاوت صلاحها بتفاوت البواعث عليها، كما تفاوتت الهجرة.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص75",
+            "quote": "وسائر الأعمال كالهجرة في هذا المعنى، فصلاحها وفسادها بحسب النية الباعثة عليها"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [
+      {
+        "id": "chain_bukhari_1",
+        "source": {
+          "sourceId": "sahih_bukhari",
+          "hadithNumber": "1"
+        },
+        "isWordingChain": true,
+        "remark": null,
+        "links": [
+          {
+            "narratorId": "prophet",
+            "nameAsWritten": "رَسُولَ اللَّهِ",
+            "term": null,
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "umar_bin_khattab",
+            "nameAsWritten": "عُمَرَ بْنَ الْخَطَّابِ",
+            "term": "سَمِعْتُ",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "alqamah_bin_waqqas",
+            "nameAsWritten": "عَلْقَمَةَ بْنَ وَقَّاصٍ اللَّيْثِيَّ",
+            "term": "سَمِعْتُ",
+            "remark": "صرّح بسماعه من عمر على المنبر.",
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "muhammad_bin_ibrahim_taymi",
+            "nameAsWritten": "مُحَمَّدُ بْنُ إِبْرَاهِيمَ التَّيْمِيُّ",
+            "term": "سَمِعَ",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "yahya_bin_said_ansari",
+            "nameAsWritten": "يَحْيَى بْنُ سَعِيدٍ الْأَنْصَارِيُّ",
+            "term": "أَخْبَرَنِي",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "sufyan_bin_uyaynah",
+            "nameAsWritten": "سُفْيَانُ",
+            "term": "حَدَّثَنَا",
+            "remark": null,
+            "identificationBasis": "الراوي عنه الحميدي، وفي ترجمته في التقريب: «أجل أصحاب ابن عيينة»."
+          },
+          {
+            "narratorId": "humaydi",
+            "nameAsWritten": "الْحُمَيْدِيُّ عَبْدُ اللَّهِ بْنُ الزُّبَيْرِ",
+            "term": "حَدَّثَنَا",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "bukhari",
+            "nameAsWritten": null,
+            "term": "حَدَّثَنَا",
+            "remark": null,
+            "identificationBasis": null
+          }
+        ]
+      },
+      {
+        "id": "chain_bukhari_54",
+        "source": {
+          "sourceId": "sahih_bukhari",
+          "hadithNumber": "54"
+        },
+        "isWordingChain": false,
+        "remark": null,
+        "links": [
+          {
+            "narratorId": "prophet",
+            "nameAsWritten": "رَسُولَ اللَّهِ",
+            "term": null,
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "umar_bin_khattab",
+            "nameAsWritten": "عُمَرَ",
+            "term": "أَنَّ",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "alqamah_bin_waqqas",
+            "nameAsWritten": "عَلْقَمَةَ بْنِ وَقَّاصٍ",
+            "term": "عَنْ",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "muhammad_bin_ibrahim_taymi",
+            "nameAsWritten": "مُحَمَّدِ بْنِ إِبْرَاهِيمَ",
+            "term": "عَنْ",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "yahya_bin_said_ansari",
+            "nameAsWritten": "يَحْيَى بْنِ سَعِيدٍ",
+            "term": "عَنْ",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "malik_bin_anas",
+            "nameAsWritten": "مَالِكٌ",
+            "term": "عَنْ",
+            "remark": null,
+            "identificationBasis": "الراوي عنه عبد الله بن مسلمة القعنبي، وفي ترجمته في التقريب أنه لا يُقدَّم عليه أحد في الموطأ."
+          },
+          {
+            "narratorId": "qanabi",
+            "nameAsWritten": "عَبْدُ اللَّهِ بْنُ مَسْلَمَةَ",
+            "term": "أَخْبَرَنَا",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "bukhari",
+            "nameAsWritten": null,
+            "term": "حَدَّثَنَا",
+            "remark": null,
+            "identificationBasis": null
+          }
+        ]
+      },
+      {
+        "id": "chain_muslim_1907",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "1907"
+        },
+        "isWordingChain": false,
+        "remark": "ذكر مسلم بعده طرقاً أخرى عن يحيى بن سعيد، وفي حديث سفيان منها: سمعت عمر بن الخطاب على المنبر.",
+        "links": [
+          {
+            "narratorId": "prophet",
+            "nameAsWritten": "رَسُولُ اللَّهِ",
+            "term": null,
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "umar_bin_khattab",
+            "nameAsWritten": "عُمَرَ بْنِ الْخَطَّابِ",
+            "term": "قَالَ",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "alqamah_bin_waqqas",
+            "nameAsWritten": "عَلْقَمَةَ بْنِ وَقَّاصٍ",
+            "term": "عَنْ",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "muhammad_bin_ibrahim_taymi",
+            "nameAsWritten": "مُحَمَّدِ بْنِ إِبْرَاهِيمَ",
+            "term": "عَنْ",
+            "remark": "في المصدر الرقمي فاصلة زائدة: «مُحَمَّدِ، بْنِ إِبْرَاهِيمَ».",
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "yahya_bin_said_ansari",
+            "nameAsWritten": "يَحْيَى بْنِ سَعِيدٍ",
+            "term": "عَنْ",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "malik_bin_anas",
+            "nameAsWritten": "مَالِكٌ",
+            "term": "عَنْ",
+            "remark": null,
+            "identificationBasis": "الراوي عنه عبد الله بن مسلمة بن قعنب، وفي ترجمته في التقريب أنه لا يُقدَّم عليه أحد في الموطأ."
+          },
+          {
+            "narratorId": "qanabi",
+            "nameAsWritten": "عَبْدُ اللَّهِ بْنُ مَسْلَمَةَ بْنِ قَعْنَبٍ",
+            "term": "حَدَّثَنَا",
+            "remark": null,
+            "identificationBasis": null
+          },
+          {
+            "narratorId": "muslim",
+            "nameAsWritten": null,
+            "term": "حَدَّثَنَا",
+            "remark": null,
+            "identificationBasis": null
+          }
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "v_bukhari_1",
+        "sourceId": "sahih_bukhari",
+        "hadithNumber": "1",
+        "relation": "same_companion",
+        "companionNarratorId": "umar_bin_khattab",
+        "chainIds": [
+          "chain_bukhari_1"
+        ],
+        "fullText": "حَدَّثَنَا الْحُمَيْدِيُّ عَبْدُ اللَّهِ بْنُ الزُّبَيْرِ ، قَالَ : حَدَّثَنَا سُفْيَانُ ، قَالَ : حَدَّثَنَا يَحْيَى بْنُ سَعِيدٍ الْأَنْصَارِيُّ ، قَالَ : أَخْبَرَنِي مُحَمَّدُ بْنُ إِبْرَاهِيمَ التَّيْمِيُّ ، أَنَّهُ سَمِعَ عَلْقَمَةَ بْنَ وَقَّاصٍ اللَّيْثِيَّ ، يَقُولُ : سَمِعْتُ عُمَرَ بْنَ الْخَطَّابِ رَضِيَ اللَّهُ عَنْهُ عَلَى الْمِنْبَرِ، قَالَ : سَمِعْتُ رَسُولَ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ، يَقُولُ : \" إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى، فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى دُنْيَا يُصِيبُهَا أَوْ إِلَى امْرَأَةٍ يَنْكِحُهَا، فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ",
+        "matnText": "إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى، فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى دُنْيَا يُصِيبُهَا أَوْ إِلَى امْرَأَةٍ يَنْكِحُهَا، فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ",
+        "notes": [
+          "ليس فيها جملة «فمن كانت هجرته إلى الله ورسوله فهجرته إلى الله ورسوله».",
+          "فيها «إلى دنيا يصيبها أو إلى امرأة ينكحها» بزيادة «إلى» مرتين.",
+          "صرّح فيها علقمة بسماعه من عمر «على المنبر»."
+        ]
+      },
+      {
+        "id": "v_bukhari_54",
+        "sourceId": "sahih_bukhari",
+        "hadithNumber": "54",
+        "relation": "same_companion",
+        "companionNarratorId": "umar_bin_khattab",
+        "chainIds": [
+          "chain_bukhari_54"
+        ],
+        "fullText": "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ مَسْلَمَةَ، قَالَ أَخْبَرَنَا مَالِكٌ، عَنْ يَحْيَى بْنِ سَعِيدٍ، عَنْ مُحَمَّدِ بْنِ إِبْرَاهِيمَ، عَنْ عَلْقَمَةَ بْنِ وَقَّاصٍ، عَنْ عُمَرَ، أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم قَالَ  \" الأَعْمَالُ بِالنِّيَّةِ، وَلِكُلِّ امْرِئٍ مَا نَوَى، فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ، فَهِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ، وَمَنْ كَانَتْ هِجْرَتُهُ لِدُنْيَا يُصِيبُهَا، أَوِ امْرَأَةٍ يَتَزَوَّجُهَا، فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ \".",
+        "matnText": "الأَعْمَالُ بِالنِّيَّةِ، وَلِكُلِّ امْرِئٍ مَا نَوَى، فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ، فَهِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ، وَمَنْ كَانَتْ هِجْرَتُهُ لِدُنْيَا يُصِيبُهَا، أَوِ امْرَأَةٍ يَتَزَوَّجُهَا، فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ \".",
+        "notes": [
+          "«الأعمال بالنية» بالإفراد ودون «إنما».",
+          "«ولكل امرئ ما نوى».",
+          "«أو امرأة يتزوجها» بدل «ينكحها»."
+        ]
+      },
+      {
+        "id": "v_muslim_1907",
+        "sourceId": "sahih_muslim",
+        "hadithNumber": "1907",
+        "relation": "same_companion",
+        "companionNarratorId": "umar_bin_khattab",
+        "chainIds": [
+          "chain_muslim_1907"
+        ],
+        "fullText": "حَدَّثَنَا عَبْدُ اللَّهِ بْنُ مَسْلَمَةَ بْنِ قَعْنَبٍ، حَدَّثَنَا مَالِكٌ، عَنْ يَحْيَى بْنِ سَعِيدٍ، عَنْ مُحَمَّدِ، بْنِ إِبْرَاهِيمَ عَنْ عَلْقَمَةَ بْنِ وَقَّاصٍ، عَنْ عُمَرَ بْنِ الْخَطَّابِ، قَالَ قَالَ رَسُولُ اللَّهِ صلى الله عليه وسلم  \" إِنَّمَا الأَعْمَالُ بِالنِّيَّةِ وَإِنَّمَا لاِمْرِئٍ مَا نَوَى فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ فَهِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ وَمَنْ كَانَتْ هِجْرَتُهُ لِدُنْيَا يُصِيبُهَا أَوِ امْرَأَةٍ يَتَزَوَّجُهَا فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ \" .",
+        "matnText": "إِنَّمَا الأَعْمَالُ بِالنِّيَّةِ وَإِنَّمَا لاِمْرِئٍ مَا نَوَى فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ فَهِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ وَمَنْ كَانَتْ هِجْرَتُهُ لِدُنْيَا يُصِيبُهَا أَوِ امْرَأَةٍ يَتَزَوَّجُهَا فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ \" .",
+        "notes": [
+          "«إنما الأعمال بالنية» بالإفراد.",
+          "«وإنما لامرئ ما نوى» دون «لكل».",
+          "«أو امرأة يتزوجها» بدل «ينكحها»."
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 1",
+      "quote": null
+    },
+    "normalizations": [
+      "حذف محارف الاتجاه الخفية (Unicode bidi controls).",
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "ضبط المسافات قبل علامات الترقيم.",
+      "حذف علامتي التنصيص حول كلام النبي ﷺ؛ إذ يحدده حقل voice.",
+      "نقل عبارة «رواه…» إلى takhrij.compilerStatement، وحذف أرقام [رقم:…] المضافة في المصدر الرقمي."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s2",
+        "tokenIndex": 0,
+        "before": "إنَّمَا",
+        "after": "إِنَّمَا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 11,
+        "before": "إلَى",
+        "after": "إِلَى",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 15,
+        "before": "إلَى",
+        "after": "إِلَى",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 23,
+        "before": "أَوْ",
+        "after": "أَوِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_bukhari",
+          "locator": "54",
+          "quote": "أَوِ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 27,
+        "before": "إلَى",
+        "after": "إِلَى",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 30,
+        "before": "إلَيْهِ",
+        "after": "إِلَيْهِ",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "عبارة التخريج في compilerStatement منقولة كما هي؛ وأواخر بعض الأعلام فيها غير مضبوطة (إسماعيل، إبراهيم، المغيرة، بردزبه، الحجاج، مسلم، بن)، وفيها تنوين في «مُسْلِمٌ بنُ» قبل «بن» بين علمين؛ تُضبط من طبعة محققة قبل عرضها.",
+      "تعيين «سُفْيَانُ» بابن عيينة و«مَالِكٌ» بابن أنس مبني على تراجم الرواة عنهما في التقريب؛ يُقرّه المراجع.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

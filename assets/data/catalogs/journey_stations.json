@@ -1,0 +1,406 @@
+{
+  "schemaVersion": "1.1.0",
+  "regions": [
+    {
+      "id": "makkah",
+      "order": 1,
+      "name": "مكة المكرمة",
+      "theme": "أحاديث التوحيد وبناء الشخصية"
+    },
+    {
+      "id": "hijrah_yathrib",
+      "order": 2,
+      "name": "طريق الهجرة ويثرب",
+      "theme": "أحاديث المؤاخاة والأحكام"
+    },
+    {
+      "id": "rashidun",
+      "order": 3,
+      "name": "عصر الخلفاء الراشدين",
+      "theme": "فتوحات الشام والعراق وبدايات التدوين"
+    },
+    {
+      "id": "isnad_centers",
+      "order": 4,
+      "name": "مراكز الإسناد الكبرى",
+      "theme": "حواضر الرواية والتصنيف"
+    }
+  ],
+  "stations": [
+    {
+      "id": "makkah_dar_al_arqam",
+      "regionId": "makkah",
+      "order": 1,
+      "name": "دار الأرقم",
+      "description": "محطة البدايات: النية وأصول الدين.",
+      "latitude": 21.4229,
+      "longitude": 39.8273,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "دار الدعوة الأولى، وفيها أسلم عمر",
+        "sources": [
+          {
+            "sourceId": "tabaqat_ibn_sad",
+            "locator": "ج3 ص183",
+            "quote": "وكانت داره بمكة على الصفا وهي الدار التي كان النبي - صلى الله عليه وسلم - يكون فيها في أول الإسلام. وفيها دعا الناس إلى الإسلام. وأسلم فيها قوم كثير."
+          },
+          {
+            "sourceId": "tabaqat_ibn_sad",
+            "locator": "ج3 ص184",
+            "quote": "فجاء عمر بن الخطاب من الغد بكرة فأسلم في دار الأرقم."
+          },
+          {
+            "sourceId": "tabaqat_ibn_sad",
+            "locator": "ج3 ص184",
+            "quote": "ودعيت دار الأرقم دار الإسلام."
+          }
+        ]
+      }
+    },
+    {
+      "id": "makkah_bat_ha",
+      "regionId": "makkah",
+      "order": 2,
+      "name": "بطحاء مكة",
+      "description": "محطة الثبات وبناء الشخصية.",
+      "latitude": 21.424,
+      "longitude": 39.829,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "ثبات بلال: «أحد أحد»",
+        "sources": [
+          {
+            "sourceId": "sira_ibn_hisham",
+            "locator": "ج1 ص317",
+            "quote": "وكان بلال، مولى أبي بكر رضي الله عنهما، لبعض بني جمح، مولدا من مولديهم، وهو بلال بن رباح"
+          },
+          {
+            "sourceId": "sira_ibn_hisham",
+            "locator": "ج1 ص317–318",
+            "quote": "وكان أمية بن خلف بن وهب بن حذافة بن جمح يخرجه إذا حميت الظهيرة، فيطرحه على ظهره في بطحاء مكة، ثم يأمر بالصخرة العظيمة فتتوضع على صدره"
+          },
+          {
+            "sourceId": "sira_ibn_hisham",
+            "locator": "ج1 ص318",
+            "quote": "فيقول وهو في ذلك البلاء: أحد أحد."
+          }
+        ]
+      }
+    },
+    {
+      "id": "makkah_ghar_hira",
+      "regionId": "makkah",
+      "order": 3,
+      "name": "غار حراء",
+      "description": "محطة التوحيد والتدبر.",
+      "latitude": 21.4576,
+      "longitude": 39.8592,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "التحنّث في الغار حتى جاءه الحق",
+        "sources": [
+          {
+            "sourceId": "sahih_bukhari",
+            "locator": "3",
+            "quote": "ثُمَّ حُبِّبَ إِلَيْهِ الْخَلاَءُ، وَكَانَ يَخْلُو بِغَارِ حِرَاءٍ فَيَتَحَنَّثُ فِيهِ ـ وَهُوَ التَّعَبُّدُ ـ اللَّيَالِيَ ذَوَاتِ الْعَدَدِ"
+          },
+          {
+            "sourceId": "sahih_bukhari",
+            "locator": "3",
+            "quote": "حَتَّى جَاءَهُ الْحَقُّ وَهُوَ فِي غَارِ حِرَاءٍ"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hijrah_quba",
+      "regionId": "hijrah_yathrib",
+      "order": 4,
+      "name": "قباء",
+      "description": "أولى محطات الهجرة: المؤاخاة وبناء المجتمع.",
+      "latitude": 24.4393,
+      "longitude": 39.6172,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "النزول في بني عمرو بن عوف وتأسيس مسجد التقوى",
+        "sources": [
+          {
+            "sourceId": "sahih_bukhari",
+            "locator": "3906",
+            "quote": "حَتَّى نَزَلَ بِهِمْ فِي بَنِي عَمْرِو بْنِ عَوْفٍ، وَذَلِكَ يَوْمَ الاِثْنَيْنِ مِنْ شَهْرِ رَبِيعٍ الأَوَّلِ"
+          },
+          {
+            "sourceId": "sahih_bukhari",
+            "locator": "3906",
+            "quote": "فَلَبِثَ رَسُولُ اللَّهِ صلى الله عليه وسلم فِي بَنِي عَمْرِو بْنِ عَوْفٍ بِضْعَ عَشْرَةَ لَيْلَةً وَأُسِّسَ الْمَسْجِدُ الَّذِي أُسِّسَ عَلَى التَّقْوَى"
+          },
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج4 ص301",
+            "quote": "وهي مساكن بني عمرو بن عوف من الأنصار"
+          },
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج4 ص302",
+            "quote": "وهي قرية على ميلين من المدينة على يسار القاصد إلى مكة بها أثر بنيان كثير وهناك مسجد التقوى"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hijrah_masjid_nabawi",
+      "regionId": "hijrah_yathrib",
+      "order": 5,
+      "name": "المسجد النبوي",
+      "description": "محطة الأحكام والعبادات.",
+      "latitude": 24.4672,
+      "longitude": 39.6111,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "مبرك الناقة، وبناء المسجد باللَّبِن",
+        "sources": [
+          {
+            "sourceId": "sahih_bukhari",
+            "locator": "3906",
+            "quote": "حَتَّى بَرَكَتْ عِنْدَ مَسْجِدِ الرَّسُولِ صلى الله عليه وسلم بِالْمَدِينَةِ"
+          },
+          {
+            "sourceId": "sahih_bukhari",
+            "locator": "3906",
+            "quote": "ثُمَّ بَنَاهُ مَسْجِدًا، وَطَفِقَ رَسُولُ اللَّهِ صلى الله عليه وسلم يَنْقُلُ مَعَهُمُ اللَّبِنَ فِي بُنْيَانِهِ"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hijrah_badr",
+      "regionId": "hijrah_yathrib",
+      "order": 6,
+      "name": "بدر",
+      "description": "ميادين الغزوات: الصبر والثبات.",
+      "latitude": 23.7333,
+      "longitude": 38.7667,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "عِدّة أهل بدر",
+        "sources": [
+          {
+            "sourceId": "sahih_bukhari",
+            "locator": "3957",
+            "quote": "مِمَّنْ شَهِدَ بَدْرًا أَنَّهُمْ كَانُوا عِدَّةَ أَصْحَابِ طَالُوتَ الَّذِينَ جَازُوا مَعَهُ النَّهَرَ، بِضْعَةَ عَشَرَ وَثَلاَثَمِائَةٍ"
+          },
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج1 ص357",
+            "quote": "بدر: ماء مشهور بين مكة والمدينة أسفل وادي الصفراء"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hijrah_uhud",
+      "regionId": "hijrah_yathrib",
+      "order": 7,
+      "name": "أُحُد",
+      "description": "ميادين الغزوات: الدروس بعد الشدة.",
+      "latitude": 24.5017,
+      "longitude": 39.6122,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "يوم أُحُد",
+        "sources": [
+          {
+            "sourceId": "sahih_bukhari",
+            "locator": "4067",
+            "quote": "جَعَلَ النَّبِيُّ صلى الله عليه وسلم عَلَى الرَّجَّالَةِ يَوْمَ أُحُدٍ عَبْدَ اللَّهِ بْنَ جُبَيْرٍ، وَأَقْبَلُوا مُنْهَزِمِينَ"
+          },
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج1 ص109",
+            "quote": "اسم الجبل الذي كانت عنده غزوة أحد"
+          },
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج1 ص109",
+            "quote": "وبينه وبين المدينة قرابة ميل في شماليها"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rashidun_yarmouk",
+      "regionId": "rashidun",
+      "order": 8,
+      "name": "اليرموك",
+      "description": "فتوح الشام.",
+      "latitude": 32.8,
+      "longitude": 35.95,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "حرب المسلمين والروم",
+        "sources": [
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج5 ص434",
+            "quote": "واد بناحية الشام في طرف الغور يصب في نهر الأردن"
+          },
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج5 ص434",
+            "quote": "كانت به حرب بين المسلمين والروم في أيام أبي بكر الصديق، رضي الله عنه"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rashidun_qadisiyyah",
+      "regionId": "rashidun",
+      "order": 9,
+      "name": "القادسية",
+      "description": "فتوح العراق.",
+      "latitude": 31.7,
+      "longitude": 44.48,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "يوم القادسية",
+        "sources": [
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج4 ص291",
+            "quote": "وبهذا الموضع كان يوم القادسية بين سعد ابن ابي وقاص والمسلمين والفرس في أيام عمر بن الخطاب، رضي الله عنه، في سنة 16 من الهجرة"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rashidun_basra",
+      "regionId": "rashidun",
+      "order": 10,
+      "name": "البصرة",
+      "description": "منازل الرواة وبدايات التدوين.",
+      "latitude": 30.5085,
+      "longitude": 47.7804,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "تمصير البصرة، وفيها ظهر القول في القدر",
+        "sources": [
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج1 ص431",
+            "quote": "ولما بلغ عمر بن الخطاب خبر سويد بن قطبة وما يصنع بالبصرة رأى أن يوليها رجلا من قبله، فولاها عتبة بن غزوان"
+          },
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج1 ص432",
+            "quote": "وكان تمصير البصرة في سنة أربع عشرة قبل الكوفة بستة أشهر"
+          },
+          {
+            "sourceId": "sahih_muslim",
+            "locator": "8",
+            "quote": "كَانَ أَوَّلَ مَنْ قَالَ فِي الْقَدَرِ بِالْبَصْرَةِ مَعْبَدٌ الْجُهَنِيُّ"
+          }
+        ]
+      }
+    },
+    {
+      "id": "isnad_damascus",
+      "regionId": "isnad_centers",
+      "order": 11,
+      "name": "دمشق",
+      "description": "من مراكز الإسناد الكبرى.",
+      "latitude": 33.5138,
+      "longitude": 36.2765,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "فتح دمشق",
+        "sources": [
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج2 ص463",
+            "quote": "البلدة المشهورة قصبة الشام"
+          },
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج2 ص465",
+            "quote": "وفتحها المسلمون في رجب سنة 14 بعد حصار ومنازلة"
+          }
+        ]
+      }
+    },
+    {
+      "id": "isnad_baghdad",
+      "regionId": "isnad_centers",
+      "order": 12,
+      "name": "بغداد",
+      "description": "من مراكز الإسناد الكبرى.",
+      "latitude": 33.3152,
+      "longitude": 44.3661,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "تمصير المنصور لبغداد",
+        "sources": [
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج1 ص457",
+            "quote": "كان أول من مصرها وجعلها مدينة المنصور بالله أبو جعفر عبد الله بن محمد بن علي ابن عبد الله بن عباس بن عبد المطلب ثاني الخلفاء، وانتقل إليها من الهاشمية، وهي مدينة كان قد اختطها أخوه أبو العباس السفاح قرب الكوفة وشرع في عمارتها سنة 145 ونزلها سنة 149"
+          }
+        ]
+      }
+    },
+    {
+      "id": "isnad_cordoba",
+      "regionId": "isnad_centers",
+      "order": 13,
+      "name": "قرطبة",
+      "description": "من مراكز الإسناد الكبرى.",
+      "latitude": 37.8882,
+      "longitude": -4.7794,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "سرير ملك الأندلس",
+        "sources": [
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج4 ص324",
+            "quote": "وهي مدينة عظيمة بالأندلس وسط بلادها وكانت سريرا لملكها وقصبتها وبها كانت ملوك بني أمية ومعدن الفضلاء ومنبع النبلاء من ذلك الصقع"
+          }
+        ]
+      }
+    },
+    {
+      "id": "isnad_kairouan",
+      "regionId": "isnad_centers",
+      "order": 14,
+      "name": "القيروان",
+      "description": "من مراكز الإسناد الكبرى.",
+      "latitude": 35.6781,
+      "longitude": 10.0963,
+      "coordinatesApproximate": true,
+      "event": {
+        "title": "تمصير القيروان في أيام معاوية",
+        "sources": [
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج4 ص420",
+            "quote": "وهي مدينة مصرت في الإسلام في أيام معاوية، رضي الله عنه"
+          },
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج4 ص420",
+            "quote": "وولى إفريقية عقبة بن نافع"
+          },
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج4 ص421",
+            "quote": "ثم اختط دارا للإمارة واختط الناس حوله"
+          },
+          {
+            "sourceId": "mucjam_buldan",
+            "locator": "ج4 ص421",
+            "quote": "وعمر الناس المدينة فاستقامت في سنة 55 للهجرة"
+          }
+        ]
+      }
+    }
+  ]
+}
