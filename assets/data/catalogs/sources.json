@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "1.1.0",
+  "sources": [
+    {
+      "id": "arbaun_nawawiyya",
+      "title": "الأربعون النووية",
+      "author": "يحيى بن شرف النووي",
+      "authorDeathHijri": 676,
+      "kind": "hadith_collection",
+      "edition": null,
+      "digital": {
+        "provider": "fawazahmed0/hadith-api",
+        "repository": "https://github.com/fawazahmed0/hadith-api",
+        "path": "editions/ara-nawawi.json",
+        "commit": "df57907be35291c91ad6a6691180e22ca9920784",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "sahih_bukhari",
+      "title": "صحيح البخاري",
+      "author": "محمد بن إسماعيل البخاري",
+      "authorDeathHijri": 256,
+      "kind": "hadith_collection",
+      "edition": null,
+      "digital": {
+        "provider": "fawazahmed0/hadith-api",
+        "repository": "https://github.com/fawazahmed0/hadith-api",
+        "path": "editions/ara-bukhari.json",
+        "commit": "df57907be35291c91ad6a6691180e22ca9920784",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "sahih_muslim",
+      "title": "صحيح مسلم",
+      "author": "مسلم بن الحجاج النيسابوري",
+      "authorDeathHijri": 261,
+      "kind": "hadith_collection",
+      "edition": null,
+      "digital": {
+        "provider": "fawazahmed0/hadith-api",
+        "repository": "https://github.com/fawazahmed0/hadith-api",
+        "path": "editions/ara-muslim.json",
+        "commit": "df57907be35291c91ad6a6691180e22ca9920784",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "taqrib_tahdhib",
+      "title": "تقريب التهذيب",
+      "author": "ابن حجر العسقلاني",
+      "authorDeathHijri": 852,
+      "kind": "rijal",
+      "edition": {
+        "editor": "محمد عوامة",
+        "publisher": "دار الرشيد - سوريا",
+        "printing": "الأولى، 1406هـ - 1986م"
+      },
+      "digital": {
+        "provider": "OpenITI",
+        "repository": "https://github.com/OpenITI/0875AH",
+        "path": "data/0852IbnHajarCasqalani/0852IbnHajarCasqalani.TaqribTahdhib/0852IbnHajarCasqalani.TaqribTahdhib.Shamela0008609-ara1",
+        "commit": "5835c183b8bbf4ea454d5c1be2b168b669403771",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "jami_ulum_hikam",
+      "title": "جامع العلوم والحكم",
+      "author": "ابن رجب الحنبلي",
+      "authorDeathHijri": 795,
+      "kind": "sharh",
+      "edition": {
+        "editor": "شعيب الأرناؤوط وإبراهيم باجس",
+        "publisher": "مؤسسة الرسالة - بيروت",
+        "printing": "السابعة، 1422هـ - 2001م"
+      },
+      "digital": {
+        "provider": "OpenITI",
+        "repository": "https://github.com/OpenITI/0800AH",
+        "path": "data/0795IbnRajabHanbali/0795IbnRajabHanbali.JamicCulumWaHikam/0795IbnRajabHanbali.JamicCulumWaHikam.Shamela0004268-ara1",
+        "commit": "7b745ec7b83d6d4971f937364dbdec2fe0ba2a40",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "minhaj_sharh_muslim",
+      "title": "المنهاج شرح صحيح مسلم بن الحجاج",
+      "author": "يحيى بن شرف النووي",
+      "authorDeathHijri": 676,
+      "kind": "sharh",
+      "edition": {
+        "editor": null,
+        "publisher": "دار إحياء التراث العربي - بيروت",
+        "printing": "الثانية، 1392هـ"
+      },
+      "digital": {
+        "provider": "OpenITI",
+        "repository": "https://github.com/OpenITI/0700AH",
+        "path": "data/0676Nawawi/0676Nawawi.MinhajFiSharhMuslim/0676Nawawi.MinhajFiSharhMuslim.Shamela0001711-ara1",
+        "commit": "3d8ff4e7b035aaa4ca5dda52c7322645f3401dcf",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "nihaya_gharib",
+      "title": "النهاية في غريب الحديث والأثر",
+      "author": "مجد الدين ابن الأثير",
+      "authorDeathHijri": 606,
+      "kind": "gharib",
+      "edition": {
+        "editor": "طاهر أحمد الزاوي ومحمود محمد الطناحي",
+        "publisher": "المكتبة العلمية - بيروت",
+        "printing": "1399هـ - 1979م"
+      },
+      "digital": {
+        "provider": "OpenITI",
+        "repository": "https://github.com/OpenITI/0625AH",
+        "path": "data/0606IbnAthirMajdDin/0606IbnAthirMajdDin.NihayaFiGharib/0606IbnAthirMajdDin.NihayaFiGharib.Shamela0023691-ara1",
+        "commit": "f1e38210b32fd0d043949ff6471e869d658c3b16",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "tabaqat_ibn_sad",
+      "title": "الطبقات الكبرى",
+      "author": "محمد بن سعد",
+      "authorDeathHijri": 230,
+      "kind": "history",
+      "edition": {
+        "editor": "محمد عبد القادر عطا",
+        "publisher": "دار الكتب العلمية - بيروت",
+        "printing": "الأولى، 1410هـ - 1990م"
+      },
+      "digital": {
+        "provider": "OpenITI",
+        "repository": "https://github.com/OpenITI/0250AH",
+        "path": "data/0230IbnSacd/0230IbnSacd.TabaqatKubra/0230IbnSacd.TabaqatKubra.Shamela0001686-ara1.mARkdown",
+        "commit": "0cc00c0646c81988c75a3815fe6d9a5fa65ce592",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "sira_ibn_hisham",
+      "title": "السيرة النبوية",
+      "author": "عبد الملك بن هشام",
+      "authorDeathHijri": 213,
+      "kind": "history",
+      "edition": {
+        "editor": "مصطفى السقا وإبراهيم الأبياري وعبد الحفيظ الشلبي",
+        "publisher": "شركة مكتبة ومطبعة مصطفى البابي الحلبي وأولاده بمصر",
+        "printing": "الثانية، 1375هـ - 1955م"
+      },
+      "digital": {
+        "provider": "OpenITI",
+        "repository": "https://github.com/OpenITI/0225AH",
+        "path": "data/0213IbnHisham/0213IbnHisham.SiraNabawiyya/0213IbnHisham.SiraNabawiyya.Shamela0023833-ara1.completed",
+        "commit": "2cfdc8cf1b89abfd15463d1c429fbb822aa5d9a5",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "mucjam_buldan",
+      "title": "معجم البلدان",
+      "author": "ياقوت الحموي",
+      "authorDeathHijri": 626,
+      "kind": "geography",
+      "edition": {
+        "editor": null,
+        "publisher": "دار صادر، بيروت",
+        "printing": "الثانية، 1995م"
+      },
+      "digital": {
+        "provider": "OpenITI",
+        "repository": "https://github.com/OpenITI/0650AH",
+        "path": "data/0626YaqutHamawi/0626YaqutHamawi.MucjamBuldan/0626YaqutHamawi.MucjamBuldan.Shamela0023735-ara1.mARkdown",
+        "commit": "287c0cc31845e7f63afb4c0e3c776fc13b45f00f",
+        "retrievedAt": "2026-10-08"
+      }
+    }
+  ]
+}

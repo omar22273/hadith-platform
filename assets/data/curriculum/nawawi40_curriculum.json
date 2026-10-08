@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "arbaun_nawawiyya_journey",
+  "title": "رحلة الأربعين النووية",
+  "dailyCap": {
+    "newHadithPerDay": 1,
+    "unlockAt": "fajr",
+    "fallbackLocalTime": "05:00",
+    "completionMessage": "أتممت وِردك اليومي.. العلم يُنال باللبنة فوق اللبنة"
+  },
+  "items": [
+    {
+      "hadithId": "nawawi40_001",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_001.json",
+      "stationId": "makkah_dar_al_arqam",
+      "title": "الأعمال بالنيات"
+    },
+    {
+      "hadithId": "nawawi40_002",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_002.json",
+      "stationId": "makkah_dar_al_arqam",
+      "title": "الإسلام والإيمان والإحسان"
+    }
+  ]
+}

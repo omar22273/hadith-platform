@@ -1,0 +1,260 @@
+// المرحلة الثانية: المتن والغريب.
+//
+// Hadith Platform — data model v1.1.0.
+
+import 'package:flutter/foundation.dart';
+
+import '../../../../core/json/json_reader.dart';
+import 'audio_sync.dart';
+import 'matn_tokenizer.dart';
+import 'source_ref.dart';
+import 'takhrij.dart';
+
+/// صاحب الكلام في مقطع المتن.
+enum SegmentVoice {
+  /// كلام الراوي وسياق الحكاية.
+  narration('narration'),
+
+  /// كلام النبي ﷺ.
+  prophet('prophet'),
+
+  /// كلام المحاور أو السائل.
+  interlocutor('interlocutor');
+
+  const SegmentVoice(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static SegmentVoice fromWire(String value) {
+    for (final SegmentVoice candidate in SegmentVoice.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown SegmentVoice value: "$value".');
+  }
+}
+
+/// المتن مقسماً إلى مقاطع بحسب المتكلم، مع الغريب والصوت والتخريج.
+@immutable
+class Matn {
+  const Matn({
+    required this.segments,
+    required this.gharib,
+    required this.audio,
+    required this.takhrij,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory Matn.fromJson(JsonMap json) {
+    return Matn(
+      segments: readModelList(json, 'segments', MatnSegment.fromJson),
+      gharib: readModelList(json, 'gharib', GharibEntry.fromJson),
+      audio: readModel(json, 'audio', AudioSync.fromJson),
+      takhrij: readModel(json, 'takhrij', Takhrij.fromJson),
+    );
+  }
+
+  /// مقاطع المتن بالترتيب.
+  final List<MatnSegment> segments;
+
+  /// غريب الألفاظ اللمسي.
+  final List<GharibEntry> gharib;
+
+  /// التلاوة والتتبع الصوتي.
+  final AudioSync audio;
+
+  /// التوثيق والتخريج.
+  final Takhrij takhrij;
+
+  /// يعيد المقطع بمعرّفه، أو null إن لم يوجد.
+  MatnSegment? segmentById(String segmentId) {
+    for (final MatnSegment segment in segments) {
+      if (segment.id == segmentId) {
+        return segment;
+      }
+    }
+    return null;
+  }
+
+  /// مقاطع كلام النبي ﷺ فقط، وهي مادة الحفظ والتلاوة.
+  List<MatnSegment> get propheticSegments {
+    return List<MatnSegment>.unmodifiable(
+      segments.where(
+        (MatnSegment segment) => segment.voice == SegmentVoice.prophet,
+      ),
+    );
+  }
+
+  /// المتن كاملاً متصلاً للعرض والبحث.
+  String get fullText {
+    return segments.map((MatnSegment segment) => segment.text).join(' ');
+  }
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'segments': segments.map((MatnSegment item) => item.toJson()).toList(),
+      'gharib': gharib.map((GharibEntry item) => item.toJson()).toList(),
+      'audio': audio.toJson(),
+      'takhrij': takhrij.toJson(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is Matn &&
+        listEquals(segments, other.segments) &&
+        listEquals(gharib, other.gharib) &&
+        audio == other.audio &&
+        takhrij == other.takhrij;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      Object.hashAll(segments),
+      Object.hashAll(gharib),
+      audio,
+      takhrij,
+    ]);
+  }
+}
+
+/// مقطع متصل من المتن لمتكلم واحد.
+@immutable
+class MatnSegment {
+  const MatnSegment({
+    required this.id,
+    required this.voice,
+    required this.text,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory MatnSegment.fromJson(JsonMap json) {
+    return MatnSegment(
+      id: readString(json, 'id'),
+      voice: readEnum(json, 'voice', SegmentVoice.fromWire),
+      text: readString(json, 'text'),
+    );
+  }
+
+  /// معرّف المقطع داخل الحديث.
+  final String id;
+
+  /// صاحب الكلام.
+  final SegmentVoice voice;
+
+  /// النص المشكول كما هو بعد التطبيع الموثق.
+  final String text;
+
+  /// كلمات المقطع وفق عقد التقسيم المشترك مع خط معالجة البيانات.
+  List<MatnToken> get tokens => MatnTokenizer.tokenize(text);
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'voice': voice.wire,
+      'text': text,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is MatnSegment &&
+        id == other.id &&
+        voice == other.voice &&
+        text == other.text;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      id,
+      voice,
+      text,
+    ]);
+  }
+}
+
+/// شرح لفظة غريبة من كتاب معتمد.
+@immutable
+class GharibEntry {
+  const GharibEntry({
+    required this.id,
+    required this.anchor,
+    required this.headword,
+    required this.meaning,
+    required this.sources,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory GharibEntry.fromJson(JsonMap json) {
+    return GharibEntry(
+      id: readString(json, 'id'),
+      anchor: readModel(json, 'anchor', TokenAnchor.fromJson),
+      headword: readString(json, 'headword'),
+      meaning: readString(json, 'meaning'),
+      sources: readModelList(json, 'sources', SourceRef.fromJson),
+    );
+  }
+
+  /// معرّف الشرح.
+  final String id;
+
+  /// موضع اللفظة في المتن.
+  final TokenAnchor anchor;
+
+  /// اللفظة أو أصلها.
+  final String headword;
+
+  /// البيان المختصر المعروض في البطاقة.
+  final String meaning;
+
+  /// كتب الغريب والشروح المستند إليها.
+  final List<SourceRef> sources;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'anchor': anchor.toJson(),
+      'headword': headword,
+      'meaning': meaning,
+      'sources': sources.map((SourceRef item) => item.toJson()).toList(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is GharibEntry &&
+        id == other.id &&
+        anchor == other.anchor &&
+        headword == other.headword &&
+        meaning == other.meaning &&
+        listEquals(sources, other.sources);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      id,
+      anchor,
+      headword,
+      meaning,
+      Object.hashAll(sources),
+    ]);
+  }
+}

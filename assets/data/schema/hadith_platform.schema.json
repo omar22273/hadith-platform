@@ -1,0 +1,2020 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hadith-platform.app/schema/hadith_platform.schema.json",
+  "title": "HadithDailyModel",
+  "description": "مخطط بيانات منصة الحديث النبوي. الجذر هو HadithDailyModel، والفهارس تُتحقق عبر $defs: SourceCatalog وNarratorCatalog وJourneyCatalog وCurriculumManifest وWisdomCatalog.",
+  "$ref": "#/$defs/HadithDailyModel",
+  "$defs": {
+    "SourceRef": {
+      "type": "object",
+      "description": "إحالة موثقة إلى مصدر، مع نص الشاهد حرفياً للتحقق.",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "locator",
+        "quote"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف المصدر في فهرس المصادر."
+        },
+        "locator": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "موضع الشاهد: الجزء والصفحة أو رقم الحديث."
+        },
+        "quote": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "نص الشاهد كما هو في المصدر، يُستعمل في التدقيق الآلي."
+        }
+      }
+    },
+    "TokenAnchor": {
+      "type": "object",
+      "description": "مرساة تربط بيانات بكلمة أو أكثر من مقطع في المتن.",
+      "additionalProperties": false,
+      "required": [
+        "segmentId",
+        "tokenIndex",
+        "length",
+        "surface"
+      ],
+      "properties": {
+        "segmentId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف المقطع."
+        },
+        "tokenIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "رقم أول كلمة داخل المقطع (يبدأ من صفر)."
+        },
+        "length": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "عدد الكلمات المشمولة."
+        },
+        "surface": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الكلمات كما في المتن دون علامات الترقيم، للتحقق من سلامة المرساة."
+        }
+      }
+    },
+    "HadithDailyModel": {
+      "type": "object",
+      "description": "الوِرد اليومي: حديث واحد بمراحله الأربع وطبقة طالب العلم وسجل التوثيق.",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "sequence",
+        "collection",
+        "title",
+        "teaser",
+        "journey",
+        "context",
+        "matn",
+        "practice",
+        "reflection",
+        "scholar",
+        "provenance",
+        "review"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "إصدار المخطط."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الحديث، مثل nawawi40_001."
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "ترتيب الحديث في المنهج."
+        },
+        "collection": {
+          "$ref": "#/$defs/CollectionRef",
+          "description": "الكتاب الذي ينتمي إليه الحديث في المنهج."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان وصفي قصير."
+        },
+        "teaser": {
+          "$ref": "#/$defs/Teaser",
+          "description": "لمحة التشويق التي تُعرض في ختام وِرد اليوم السابق."
+        },
+        "journey": {
+          "$ref": "#/$defs/JourneyPlacement",
+          "description": "موضع الحديث في مسار القوافل."
+        },
+        "context": {
+          "$ref": "#/$defs/HistoricalContext",
+          "description": "المرحلة الأولى: سياق الورود والحدث التاريخي."
+        },
+        "matn": {
+          "$ref": "#/$defs/Matn",
+          "description": "المرحلة الثانية: المتن والبيان اللغوي والتخريج."
+        },
+        "practice": {
+          "$ref": "#/$defs/PracticeConfig",
+          "description": "المرحلة الثالثة: التثبيت والحفظ التراكمي."
+        },
+        "reflection": {
+          "$ref": "#/$defs/Reflection",
+          "description": "المرحلة الرابعة: الإسقاط السلوكي."
+        },
+        "scholar": {
+          "$ref": "#/$defs/ScholarLayer",
+          "description": "طبقة طالب العلم: الإسناد ومقارنة الروايات."
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance",
+          "description": "سجل مصدر المتن وكل تعديل طرأ عليه."
+        },
+        "review": {
+          "$ref": "#/$defs/ReviewInfo",
+          "description": "حالة المراجعة العلمية قبل النشر."
+        }
+      }
+    },
+    "CollectionRef": {
+      "type": "object",
+      "description": "الكتاب الذي يُدرَّس منه الحديث.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "numberInCollection"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الكتاب."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان الكتاب."
+        },
+        "numberInCollection": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "رقم الحديث في الكتاب."
+        }
+      }
+    },
+    "Teaser": {
+      "type": "object",
+      "description": "بطاقة التشويق للغد.",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "نص اللمحة الغامضة."
+        }
+      }
+    },
+    "JourneyPlacement": {
+      "type": "object",
+      "description": "موضع الحديث على خريطة الرحلة.",
+      "additionalProperties": false,
+      "required": [
+        "stationId",
+        "stepInStation",
+        "milestone",
+        "assignmentBasis"
+      ],
+      "properties": {
+        "stationId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف المحطة في فهرس الرحلة."
+        },
+        "stepInStation": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "رقم الخطوة داخل المحطة."
+        },
+        "milestone": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان الخطوة على الخريطة."
+        },
+        "assignmentBasis": {
+          "enum": [
+            "thematic",
+            "historical"
+          ],
+          "description": "أساس الربط بالمحطة."
+        }
+      }
+    },
+    "HistoricalContext": {
+      "type": "object",
+      "description": "بطاقة سياق الورود (70-80 كلمة).",
+      "additionalProperties": false,
+      "required": [
+        "narrative",
+        "humanMotive",
+        "place",
+        "sources",
+        "cautions"
+      ],
+      "properties": {
+        "narrative": {
+          "type": "string",
+          "minLength": 1,
+          "description": "القصة المركزة بالزمان والمكان والدافع البشري."
+        },
+        "humanMotive": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الدافع البشري في سطر واحد."
+        },
+        "place": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HistoricalPlace"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "المكان المرتبط على الخريطة التاريخية."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "مصادر كل معلومة في القصة."
+        },
+        "cautions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ContextCaution"
+          },
+          "description": "تنبيهات على أخبار مشهورة لم تثبت."
+        }
+      }
+    },
+    "HistoricalPlace": {
+      "type": "object",
+      "description": "مكان على الخريطة التاريخية.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "stationId",
+        "relation",
+        "latitude",
+        "longitude",
+        "coordinatesApproximate"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "اسم المكان."
+        },
+        "stationId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "محطة الرحلة المقابلة إن وجدت."
+        },
+        "relation": {
+          "enum": [
+            "event_location",
+            "subject_location",
+            "transmission_location"
+          ],
+          "description": "علاقة المكان بالحديث."
+        },
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "خط العرض."
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "خط الطول."
+        },
+        "coordinatesApproximate": {
+          "type": "boolean",
+          "description": "هل الإحداثيات تقريبية."
+        }
+      }
+    },
+    "ContextCaution": {
+      "type": "object",
+      "description": "تنبيه علمي يمنع نسبة ما لم يثبت.",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "sources"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "نص التنبيه."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "مستند التنبيه."
+        }
+      }
+    },
+    "Matn": {
+      "type": "object",
+      "description": "المتن مقسماً إلى مقاطع بحسب المتكلم، مع الغريب والصوت والتخريج.",
+      "additionalProperties": false,
+      "required": [
+        "segments",
+        "gharib",
+        "audio",
+        "takhrij"
+      ],
+      "properties": {
+        "segments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MatnSegment"
+          },
+          "minItems": 1,
+          "description": "مقاطع المتن بالترتيب."
+        },
+        "gharib": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/GharibEntry"
+          },
+          "description": "غريب الألفاظ اللمسي."
+        },
+        "audio": {
+          "$ref": "#/$defs/AudioSync",
+          "description": "التلاوة والتتبع الصوتي."
+        },
+        "takhrij": {
+          "$ref": "#/$defs/Takhrij",
+          "description": "التوثيق والتخريج."
+        }
+      }
+    },
+    "MatnSegment": {
+      "type": "object",
+      "description": "مقطع متصل من المتن لمتكلم واحد.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "voice",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف المقطع داخل الحديث."
+        },
+        "voice": {
+          "enum": [
+            "narration",
+            "prophet",
+            "interlocutor"
+          ],
+          "description": "صاحب الكلام."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "النص المشكول كما هو بعد التطبيع الموثق."
+        }
+      }
+    },
+    "GharibEntry": {
+      "type": "object",
+      "description": "شرح لفظة غريبة من كتاب معتمد.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "anchor",
+        "headword",
+        "meaning",
+        "sources"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الشرح."
+        },
+        "anchor": {
+          "$ref": "#/$defs/TokenAnchor",
+          "description": "موضع اللفظة في المتن."
+        },
+        "headword": {
+          "type": "string",
+          "minLength": 1,
+          "description": "اللفظة أو أصلها."
+        },
+        "meaning": {
+          "type": "string",
+          "minLength": 1,
+          "description": "البيان المختصر المعروض في البطاقة."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "كتب الغريب والشروح المستند إليها."
+        }
+      }
+    },
+    "AudioSync": {
+      "type": "object",
+      "description": "بيانات التلاوة والتتبع الصوتي التزامني.",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "assetPath",
+        "reciter",
+        "durationMs",
+        "timings"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_recorded",
+            "recorded",
+            "aligned"
+          ],
+          "description": "حالة التسجيل."
+        },
+        "assetPath": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "مسار الملف الصوتي في الأصول."
+        },
+        "reciter": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "اسم القارئ."
+        },
+        "durationMs": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "مدة التلاوة بالمللي ثانية."
+        },
+        "timings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WordTiming"
+          },
+          "description": "توقيت كل كلمة؛ فارغة حتى تتم المزامنة."
+        }
+      }
+    },
+    "WordTiming": {
+      "type": "object",
+      "description": "توقيت كلمة واحدة في التلاوة.",
+      "additionalProperties": false,
+      "required": [
+        "segmentId",
+        "tokenIndex",
+        "startMs",
+        "endMs"
+      ],
+      "properties": {
+        "segmentId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف المقطع."
+        },
+        "tokenIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "رقم الكلمة داخل المقطع."
+        },
+        "startMs": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "بداية الكلمة."
+        },
+        "endMs": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "نهاية الكلمة."
+        }
+      }
+    },
+    "Takhrij": {
+      "type": "object",
+      "description": "التوثيق الهادئ في زاوية الشاشة والتخريج الإجمالي.",
+      "additionalProperties": false,
+      "required": [
+        "displayLabel",
+        "references",
+        "compilerStatement",
+        "gradings"
+      ],
+      "properties": {
+        "displayLabel": {
+          "type": "string",
+          "minLength": 1,
+          "description": "النص المختصر في الزاوية العلوية."
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TakhrijReference"
+          },
+          "minItems": 1,
+          "description": "مواضع الحديث في الكتب."
+        },
+        "compilerStatement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CompilerStatement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "عبارة المصنف في التخريج كما وردت."
+        },
+        "gradings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Grading"
+          },
+          "description": "أحكام منقولة عن الأئمة فقط، ولا يُولَّد فيها حكم."
+        }
+      }
+    },
+    "TakhrijReference": {
+      "type": "object",
+      "description": "موضع الحديث في كتاب مسند.",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "hadithNumber",
+        "numberingSystem",
+        "digitalLocator"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الكتاب."
+        },
+        "hadithNumber": {
+          "type": "string",
+          "minLength": 1,
+          "description": "رقم الحديث."
+        },
+        "numberingSystem": {
+          "enum": [
+            "fuad_abdul_baqi",
+            "sunnah_com",
+            "other"
+          ],
+          "description": "نظام الترقيم."
+        },
+        "digitalLocator": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "موضعه في المصدر الرقمي المستخرج منه."
+        }
+      }
+    },
+    "CompilerStatement": {
+      "type": "object",
+      "description": "عبارة المصنف في عزو الحديث.",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "sourceId"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "النص كما في المصدر."
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف كتاب المصنف."
+        }
+      }
+    },
+    "Grading": {
+      "type": "object",
+      "description": "حكم على الحديث منقول بنصه عن إمام.",
+      "additionalProperties": false,
+      "required": [
+        "grade",
+        "gradedBy",
+        "source"
+      ],
+      "properties": {
+        "grade": {
+          "type": "string",
+          "minLength": 1,
+          "description": "نص الحكم."
+        },
+        "gradedBy": {
+          "type": "string",
+          "minLength": 1,
+          "description": "صاحب الحكم."
+        },
+        "source": {
+          "$ref": "#/$defs/SourceRef",
+          "description": "موضع الحكم."
+        }
+      }
+    },
+    "PracticeConfig": {
+      "type": "object",
+      "description": "إعدادات الترصيع والتلاشي التدريجي.",
+      "additionalProperties": false,
+      "required": [
+        "chunks",
+        "reconstruction",
+        "vanishing"
+      ],
+      "properties": {
+        "chunks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PracticeChunk"
+          },
+          "minItems": 1,
+          "description": "مقاطع الحفظ التراكمي."
+        },
+        "reconstruction": {
+          "$ref": "#/$defs/ReconstructionConfig",
+          "description": "ترصيع المتن."
+        },
+        "vanishing": {
+          "$ref": "#/$defs/VanishingConfig",
+          "description": "التلاشي التدريجي."
+        }
+      }
+    },
+    "PracticeChunk": {
+      "type": "object",
+      "description": "مقطع حفظ: مدى من كلمات مقطع واحد.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "segmentId",
+        "startToken",
+        "endToken",
+        "label"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف المقطع التدريبي."
+        },
+        "segmentId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "مقطع المتن."
+        },
+        "startToken": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "أول كلمة."
+        },
+        "endToken": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "آخر كلمة (شاملة)."
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان المقطع في واجهة التدريب."
+        }
+      }
+    },
+    "ReconstructionConfig": {
+      "type": "object",
+      "description": "تمرين ترصيع المتن.",
+      "additionalProperties": false,
+      "required": [
+        "chunkIds",
+        "shuffleStrategy"
+      ],
+      "properties": {
+        "chunkIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "description": "المقاطع التي تُبعثر كلماتها بالترتيب."
+        },
+        "shuffleStrategy": {
+          "enum": [
+            "per_user_per_day",
+            "fixed"
+          ],
+          "description": "طريقة البعثرة."
+        }
+      }
+    },
+    "VanishingConfig": {
+      "type": "object",
+      "description": "تمرين التلاشي التدريجي.",
+      "additionalProperties": false,
+      "required": [
+        "levels",
+        "priorityAnchors"
+      ],
+      "properties": {
+        "levels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/VanishingLevel"
+          },
+          "minItems": 1,
+          "description": "المستويات بنسب إخفاء متصاعدة."
+        },
+        "priorityAnchors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TokenAnchor"
+          },
+          "description": "كلمات مفتاحية تُخفى أولاً."
+        }
+      }
+    },
+    "VanishingLevel": {
+      "type": "object",
+      "description": "مستوى إخفاء.",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "hidePercent"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "رقم المستوى."
+        },
+        "hidePercent": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "نسبة الكلمات المخفية."
+        }
+      }
+    },
+    "Reflection": {
+      "type": "object",
+      "description": "الإسقاط السلوكي.",
+      "additionalProperties": false,
+      "required": [
+        "scenario",
+        "impacts"
+      ],
+      "properties": {
+        "scenario": {
+          "$ref": "#/$defs/Scenario",
+          "description": "مأزق الموقف الواقعي."
+        },
+        "impacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BehavioralImpact"
+          },
+          "minItems": 1,
+          "description": "الأثر السلوكي في المسار الميسر."
+        }
+      }
+    },
+    "Scenario": {
+      "type": "object",
+      "description": "موقف معاصر بخيارات تقيس فهم المقصد.",
+      "additionalProperties": false,
+      "required": [
+        "situation",
+        "question",
+        "options",
+        "takeaway",
+        "basis"
+      ],
+      "properties": {
+        "situation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "وصف الموقف."
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "description": "السؤال."
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ScenarioOption"
+          },
+          "minItems": 2,
+          "description": "الخيارات."
+        },
+        "takeaway": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الخلاصة بعد الإجابة."
+        },
+        "basis": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "الشروح التي بُني عليها الموقف."
+        }
+      }
+    },
+    "ScenarioOption": {
+      "type": "object",
+      "description": "خيار مع تغذية راجعة لطيفة.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text",
+        "alignment",
+        "feedback"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الخيار."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "نص الخيار."
+        },
+        "alignment": {
+          "enum": [
+            "aligned",
+            "partial",
+            "misaligned"
+          ],
+          "description": "درجة الموافقة."
+        },
+        "feedback": {
+          "type": "string",
+          "minLength": 1,
+          "description": "تغذية راجعة بلا توبيخ."
+        }
+      }
+    },
+    "BehavioralImpact": {
+      "type": "object",
+      "description": "أثر سلوكي مستند إلى شرح معتمد.",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "sources"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "نص الأثر."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "المستند."
+        }
+      }
+    },
+    "ScholarLayer": {
+      "type": "object",
+      "description": "طبقة طالب العلم.",
+      "additionalProperties": false,
+      "required": [
+        "chains",
+        "variants"
+      ],
+      "properties": {
+        "chains": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SanadChain"
+          },
+          "minItems": 1,
+          "description": "أسانيد تُدمج في شجرة الإسناد التفاعلية."
+        },
+        "variants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NarrationVariant"
+          },
+          "description": "مصفوفة مقارنة الروايات."
+        }
+      }
+    },
+    "SanadChain": {
+      "type": "object",
+      "description": "إسناد واحد كما ورد في كتاب، مرتب من النبي ﷺ إلى المصنف.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "isWordingChain",
+        "remark",
+        "links"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الإسناد."
+        },
+        "source": {
+          "$ref": "#/$defs/ChainSource",
+          "description": "موضع الإسناد."
+        },
+        "isWordingChain": {
+          "type": "boolean",
+          "description": "هل اللفظ المسوق لهذا الإسناد."
+        },
+        "remark": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "ملاحظة من نص المصدر."
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SanadLink"
+          },
+          "minItems": 2,
+          "description": "حلقات الإسناد من النبي ﷺ إلى المصنف."
+        }
+      }
+    },
+    "ChainSource": {
+      "type": "object",
+      "description": "موضع الإسناد.",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "hadithNumber"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الكتاب."
+        },
+        "hadithNumber": {
+          "type": "string",
+          "minLength": 1,
+          "description": "رقم الحديث."
+        }
+      }
+    },
+    "SanadLink": {
+      "type": "object",
+      "description": "حلقة في الإسناد.",
+      "additionalProperties": false,
+      "required": [
+        "narratorId",
+        "nameAsWritten",
+        "term",
+        "remark",
+        "identificationBasis"
+      ],
+      "properties": {
+        "narratorId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الراوي في فهرس الرواة."
+        },
+        "nameAsWritten": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "الاسم كما ورد في الإسناد مشكولاً."
+        },
+        "term": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "صيغة الأداء التي تحمّل بها عمّن قبله."
+        },
+        "remark": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "ملاحظة على هذه الحلقة."
+        },
+        "identificationBasis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "مستند تعيين الراوي إذا أُبهم اسمه في الإسناد."
+        }
+      }
+    },
+    "NarrationVariant": {
+      "type": "object",
+      "description": "رواية تُقارن بالمتن المعروض.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sourceId",
+        "hadithNumber",
+        "relation",
+        "companionNarratorId",
+        "chainIds",
+        "fullText",
+        "matnText",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الرواية."
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "الكتاب."
+        },
+        "hadithNumber": {
+          "type": "string",
+          "minLength": 1,
+          "description": "رقم الحديث."
+        },
+        "relation": {
+          "enum": [
+            "same_companion",
+            "witness_other_companion"
+          ],
+          "description": "علاقتها بالحديث."
+        },
+        "companionNarratorId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "الصحابي راوي الحديث."
+        },
+        "chainIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "الأسانيد المرتبطة بها في الشجرة."
+        },
+        "fullText": {
+          "type": "string",
+          "minLength": 1,
+          "description": "النص الكامل كما في المصدر."
+        },
+        "matnText": {
+          "type": "string",
+          "minLength": 1,
+          "description": "موضع المتن من النص الكامل، للمقارنة المرئية."
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "فروق موثقة بالنص."
+        }
+      }
+    },
+    "Provenance": {
+      "type": "object",
+      "description": "سجل مصدر المتن وكل تطبيع أو ضبط.",
+      "additionalProperties": false,
+      "required": [
+        "matnSource",
+        "normalizations",
+        "vocalizationEdits"
+      ],
+      "properties": {
+        "matnSource": {
+          "$ref": "#/$defs/SourceRef",
+          "description": "مصدر المتن."
+        },
+        "normalizations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "عمليات تطبيع لا تمس الحروف ولا الحركات."
+        },
+        "vocalizationEdits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/VocalizationEdit"
+          },
+          "description": "كل تعديل في الضبط بمستنده."
+        }
+      }
+    },
+    "VocalizationEdit": {
+      "type": "object",
+      "description": "تعديل ضبط كلمة واحدة.",
+      "additionalProperties": false,
+      "required": [
+        "segmentId",
+        "tokenIndex",
+        "before",
+        "after",
+        "rule",
+        "method",
+        "source"
+      ],
+      "properties": {
+        "segmentId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "المقطع."
+        },
+        "tokenIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "رقم الكلمة."
+        },
+        "before": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الكلمة في المصدر الرقمي."
+        },
+        "after": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الكلمة بعد التعديل."
+        },
+        "rule": {
+          "enum": [
+            "missing_final_vowel",
+            "sukun_before_wasl",
+            "fatha_on_wasl_alif",
+            "hamza_below_without_kasra"
+          ],
+          "description": "القاعدة التي كشفت الخلل."
+        },
+        "method": {
+          "enum": [
+            "aligned_source",
+            "orthographic_rule"
+          ],
+          "description": "طريقة التصحيح."
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "المصدر المشكول المنقول منه."
+        }
+      }
+    },
+    "ReviewInfo": {
+      "type": "object",
+      "description": "المراجعة العلمية.",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewer",
+        "reviewedAt",
+        "notes"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pending_scholarly_review",
+            "approved",
+            "changes_requested"
+          ],
+          "description": "الحالة."
+        },
+        "reviewer": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "المراجع."
+        },
+        "reviewedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "تاريخ المراجعة YYYY-MM-DD."
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "ملاحظات مفتوحة للمراجع."
+        }
+      }
+    },
+    "NarratorCatalog": {
+      "type": "object",
+      "description": "فهرس تراجم الرواة المشترك بين الأحاديث.",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "narrators"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "إصدار المخطط."
+        },
+        "narrators": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NarratorProfile"
+          },
+          "minItems": 1,
+          "description": "التراجم."
+        }
+      }
+    },
+    "NarratorProfile": {
+      "type": "object",
+      "description": "بطاقة الراوي بلمسة واحدة.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "displayName",
+        "category",
+        "tabaqa",
+        "gradeText",
+        "death",
+        "sigla",
+        "entry"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "المعرّف."
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الاسم المختصر للعرض."
+        },
+        "category": {
+          "enum": [
+            "prophet",
+            "companion",
+            "narrator",
+            "compiler"
+          ],
+          "description": "صفته."
+        },
+        "tabaqa": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Tabaqa"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "الطبقة كما في التقريب."
+        },
+        "gradeText": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "عبارة الجرح والتعديل بنصها من التقريب."
+        },
+        "death": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DeathRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "الوفاة."
+        },
+        "sigla": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "رموز من أخرج له كما في التقريب."
+        },
+        "entry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RijalEntry"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "نص الترجمة كاملاً بمصدره."
+        }
+      }
+    },
+    "Tabaqa": {
+      "type": "object",
+      "description": "طبقة الراوي.",
+      "additionalProperties": false,
+      "required": [
+        "number",
+        "qualifier",
+        "text"
+      ],
+      "properties": {
+        "number": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12,
+          "description": "رقم الطبقة عند ابن حجر."
+        },
+        "qualifier": {
+          "enum": [
+            "senior",
+            "junior",
+            "head",
+            null
+          ],
+          "description": "كبار أو صغار أو رؤوس."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "العبارة كما في التقريب."
+        }
+      }
+    },
+    "DeathRecord": {
+      "type": "object",
+      "description": "وفاة الراوي.",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "yearHijri",
+        "derivation"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عبارة الوفاة كما في التقريب."
+        },
+        "yearHijri": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 1500,
+          "description": "السنة الهجرية الكاملة إن أمكن تعيينها."
+        },
+        "derivation": {
+          "enum": [
+            "explicit",
+            "taqrib_century_rule",
+            null
+          ],
+          "description": "طريقة تعيين السنة."
+        }
+      }
+    },
+    "RijalEntry": {
+      "type": "object",
+      "description": "نص الترجمة بمصدره.",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "locator",
+        "text"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "كتاب التراجم."
+        },
+        "locator": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "الموضع."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "نص الترجمة كاملاً."
+        }
+      }
+    },
+    "JourneyCatalog": {
+      "type": "object",
+      "description": "فهرس مسار القوافل.",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "regions",
+        "stations"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "إصدار المخطط."
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/JourneyRegion"
+          },
+          "minItems": 1,
+          "description": "المراحل الكبرى."
+        },
+        "stations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/JourneyStation"
+          },
+          "minItems": 1,
+          "description": "المحطات."
+        }
+      }
+    },
+    "JourneyRegion": {
+      "type": "object",
+      "description": "مرحلة كبرى من الرحلة.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "order",
+        "name",
+        "theme"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "المعرّف."
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "الترتيب."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الاسم."
+        },
+        "theme": {
+          "type": "string",
+          "minLength": 1,
+          "description": "موضوع أحاديثها."
+        }
+      }
+    },
+    "JourneyStation": {
+      "type": "object",
+      "description": "محطة على الخريطة.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "regionId",
+        "order",
+        "name",
+        "description",
+        "latitude",
+        "longitude",
+        "coordinatesApproximate",
+        "event"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "المعرّف."
+        },
+        "regionId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "المرحلة."
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "الترتيب داخل الرحلة كلها."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الاسم."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "وصف قصير."
+        },
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "خط العرض."
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "خط الطول."
+        },
+        "coordinatesApproximate": {
+          "type": "boolean",
+          "description": "هل الإحداثيات تقريبية."
+        },
+        "event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StationEvent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "الحدث التاريخي الموثق للمحطة."
+        }
+      }
+    },
+    "StationEvent": {
+      "type": "object",
+      "description": "حدث تاريخي موثق بنصوص مصادره.",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "sources"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان الحدث كما يُعرض على الخريطة، مستخلص من نصوص الشواهد."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "شواهد الحدث منقولة بنصها مع مواضعها."
+        }
+      }
+    },
+    "WisdomCatalog": {
+      "type": "object",
+      "description": "بنك العبارات التراثية الموثقة لشاشة ختام الوِرد.",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "entries"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "إصدار المخطط."
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WisdomEntry"
+          },
+          "minItems": 1,
+          "description": "العبارات."
+        }
+      }
+    },
+    "WisdomEntry": {
+      "type": "object",
+      "description": "عبارة تراثية منقولة بنصها عن قائلها.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text",
+        "speaker",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "المعرّف."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "نص العبارة كما في المصدر."
+        },
+        "speaker": {
+          "type": "string",
+          "minLength": 1,
+          "description": "القائل كما سُمّي في المصدر."
+        },
+        "source": {
+          "$ref": "#/$defs/SourceRef",
+          "description": "موضع العبارة، والشاهد كاملاً بإسنادها إلى قائلها."
+        }
+      }
+    },
+    "SourceCatalog": {
+      "type": "object",
+      "description": "فهرس المصادر المعتمدة.",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "sources"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "إصدار المخطط."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceWork"
+          },
+          "minItems": 1,
+          "description": "المصادر."
+        }
+      }
+    },
+    "SourceWork": {
+      "type": "object",
+      "description": "كتاب معتمد.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "author",
+        "authorDeathHijri",
+        "kind",
+        "edition",
+        "digital"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "المعرّف."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "العنوان."
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1,
+          "description": "المؤلف."
+        },
+        "authorDeathHijri": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 1500,
+          "description": "وفاة المؤلف."
+        },
+        "kind": {
+          "enum": [
+            "hadith_collection",
+            "sharh",
+            "gharib",
+            "rijal",
+            "history",
+            "geography"
+          ],
+          "description": "النوع."
+        },
+        "edition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceEdition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "الطبعة الورقية المقابلة."
+        },
+        "digital": {
+          "$ref": "#/$defs/DigitalOrigin",
+          "description": "المصدر الرقمي الذي استُخرجت منه البيانات."
+        }
+      }
+    },
+    "SourceEdition": {
+      "type": "object",
+      "description": "الطبعة الورقية.",
+      "additionalProperties": false,
+      "required": [
+        "editor",
+        "publisher",
+        "printing"
+      ],
+      "properties": {
+        "editor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "المحقق."
+        },
+        "publisher": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "الناشر."
+        },
+        "printing": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "رقم الطبعة وسنتها."
+        }
+      }
+    },
+    "DigitalOrigin": {
+      "type": "object",
+      "description": "أصل البيانات الرقمي لإعادة الإنتاج.",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "repository",
+        "path",
+        "commit",
+        "retrievedAt"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الجهة."
+        },
+        "repository": {
+          "type": "string",
+          "minLength": 1,
+          "description": "المستودع."
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "مسار الملف داخل المستودع."
+        },
+        "commit": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[0-9a-f]{7,40}$",
+          "description": "رقم الإيداع."
+        },
+        "retrievedAt": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "تاريخ الاستخراج."
+        }
+      }
+    },
+    "CurriculumManifest": {
+      "type": "object",
+      "description": "ترتيب الأوراد وسياسة القفل اليومي.",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "title",
+        "dailyCap",
+        "items"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "إصدار المخطط."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "المعرّف."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "العنوان."
+        },
+        "dailyCap": {
+          "$ref": "#/$defs/DailyCapPolicy",
+          "description": "قفل الوِرد اليومي."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CurriculumItem"
+          },
+          "minItems": 1,
+          "description": "الأحاديث بالترتيب."
+        }
+      }
+    },
+    "DailyCapPolicy": {
+      "type": "object",
+      "description": "سياسة إغلاق الوِرد اليومي.",
+      "additionalProperties": false,
+      "required": [
+        "newHadithPerDay",
+        "unlockAt",
+        "fallbackLocalTime",
+        "completionMessage"
+      ],
+      "properties": {
+        "newHadithPerDay": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "عدد الأحاديث الجديدة يومياً."
+        },
+        "unlockAt": {
+          "enum": [
+            "fajr"
+          ],
+          "description": "وقت فتح الوِرد التالي."
+        },
+        "fallbackLocalTime": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+          "description": "وقت بديل HH:MM إن تعذر حساب الفجر."
+        },
+        "completionMessage": {
+          "type": "string",
+          "minLength": 1,
+          "description": "رسالة الإتمام."
+        }
+      }
+    },
+    "CurriculumItem": {
+      "type": "object",
+      "description": "عنصر في المنهج.",
+      "additionalProperties": false,
+      "required": [
+        "hadithId",
+        "assetPath",
+        "stationId",
+        "title"
+      ],
+      "properties": {
+        "hadithId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الحديث."
+        },
+        "assetPath": {
+          "type": "string",
+          "minLength": 1,
+          "description": "مسار ملف الحديث في الأصول."
+        },
+        "stationId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "محطة الحديث، فهرس سريع يطابق journey.stationId في ملف الحديث."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان الحديث، فهرس سريع يطابق title في ملف الحديث."
+        }
+      }
+    }
+  }
+}

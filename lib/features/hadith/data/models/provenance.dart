@@ -1,0 +1,300 @@
+// سجل التوثيق والمراجعة.
+//
+// Hadith Platform — data model v1.1.0.
+
+import 'package:flutter/foundation.dart';
+
+import '../../../../core/json/json_reader.dart';
+import 'source_ref.dart';
+
+/// قاعدة الضبط التي كشفت الحاجة إلى التعديل.
+enum LintRule {
+  /// آخر الكلمة بلا حركة.
+  missingFinalVowel('missing_final_vowel'),
+
+  /// سكون قبل همزة وصل.
+  sukunBeforeWasl('sukun_before_wasl'),
+
+  /// فتحة على ألف وصل.
+  fathaOnWaslAlif('fatha_on_wasl_alif'),
+
+  /// همزة تحت الألف بلا كسرة.
+  hamzaBelowWithoutKasra('hamza_below_without_kasra');
+
+  const LintRule(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static LintRule fromWire(String value) {
+    for (final LintRule candidate in LintRule.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown LintRule value: "$value".');
+  }
+}
+
+/// مصدر التصحيح.
+enum EditMethod {
+  /// منقول من الكلمة المقابلة في مصدر مشكول بعد مطابقة الرسم.
+  alignedSource('aligned_source'),
+
+  /// قاعدة إملائية حتمية (كسرة الهمزة تحت الألف).
+  orthographicRule('orthographic_rule');
+
+  const EditMethod(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static EditMethod fromWire(String value) {
+    for (final EditMethod candidate in EditMethod.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown EditMethod value: "$value".');
+  }
+}
+
+/// حالة المراجعة العلمية.
+enum ReviewStatus {
+  /// بانتظار مراجعة متخصص.
+  pendingScholarlyReview('pending_scholarly_review'),
+
+  /// معتمد للنشر.
+  approved('approved'),
+
+  /// طُلبت تعديلات.
+  changesRequested('changes_requested');
+
+  const ReviewStatus(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static ReviewStatus fromWire(String value) {
+    for (final ReviewStatus candidate in ReviewStatus.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown ReviewStatus value: "$value".');
+  }
+}
+
+/// سجل مصدر المتن وكل تطبيع أو ضبط.
+@immutable
+class Provenance {
+  const Provenance({
+    required this.matnSource,
+    required this.normalizations,
+    required this.vocalizationEdits,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory Provenance.fromJson(JsonMap json) {
+    return Provenance(
+      matnSource: readModel(json, 'matnSource', SourceRef.fromJson),
+      normalizations: readStringList(json, 'normalizations'),
+      vocalizationEdits: readModelList(json, 'vocalizationEdits', VocalizationEdit.fromJson),
+    );
+  }
+
+  /// مصدر المتن.
+  final SourceRef matnSource;
+
+  /// عمليات تطبيع لا تمس الحروف ولا الحركات.
+  final List<String> normalizations;
+
+  /// كل تعديل في الضبط بمستنده.
+  final List<VocalizationEdit> vocalizationEdits;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'matnSource': matnSource.toJson(),
+      'normalizations': List<String>.of(normalizations),
+      'vocalizationEdits': vocalizationEdits.map((VocalizationEdit item) => item.toJson()).toList(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is Provenance &&
+        matnSource == other.matnSource &&
+        listEquals(normalizations, other.normalizations) &&
+        listEquals(vocalizationEdits, other.vocalizationEdits);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      matnSource,
+      Object.hashAll(normalizations),
+      Object.hashAll(vocalizationEdits),
+    ]);
+  }
+}
+
+/// تعديل ضبط كلمة واحدة.
+@immutable
+class VocalizationEdit {
+  const VocalizationEdit({
+    required this.segmentId,
+    required this.tokenIndex,
+    required this.before,
+    required this.after,
+    required this.rule,
+    required this.method,
+    required this.source,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory VocalizationEdit.fromJson(JsonMap json) {
+    return VocalizationEdit(
+      segmentId: readString(json, 'segmentId'),
+      tokenIndex: readInt(json, 'tokenIndex'),
+      before: readString(json, 'before'),
+      after: readString(json, 'after'),
+      rule: readEnum(json, 'rule', LintRule.fromWire),
+      method: readEnum(json, 'method', EditMethod.fromWire),
+      source: readModelOrNull(json, 'source', SourceRef.fromJson),
+    );
+  }
+
+  /// المقطع.
+  final String segmentId;
+
+  /// رقم الكلمة.
+  final int tokenIndex;
+
+  /// الكلمة في المصدر الرقمي.
+  final String before;
+
+  /// الكلمة بعد التعديل.
+  final String after;
+
+  /// القاعدة التي كشفت الخلل.
+  final LintRule rule;
+
+  /// طريقة التصحيح.
+  final EditMethod method;
+
+  /// المصدر المشكول المنقول منه.
+  final SourceRef? source;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'segmentId': segmentId,
+      'tokenIndex': tokenIndex,
+      'before': before,
+      'after': after,
+      'rule': rule.wire,
+      'method': method.wire,
+      'source': source?.toJson(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is VocalizationEdit &&
+        segmentId == other.segmentId &&
+        tokenIndex == other.tokenIndex &&
+        before == other.before &&
+        after == other.after &&
+        rule == other.rule &&
+        method == other.method &&
+        source == other.source;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      segmentId,
+      tokenIndex,
+      before,
+      after,
+      rule,
+      method,
+      source,
+    ]);
+  }
+}
+
+/// المراجعة العلمية.
+@immutable
+class ReviewInfo {
+  const ReviewInfo({
+    required this.status,
+    required this.reviewer,
+    required this.reviewedAt,
+    required this.notes,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory ReviewInfo.fromJson(JsonMap json) {
+    return ReviewInfo(
+      status: readEnum(json, 'status', ReviewStatus.fromWire),
+      reviewer: readStringOrNull(json, 'reviewer'),
+      reviewedAt: readStringOrNull(json, 'reviewedAt'),
+      notes: readStringList(json, 'notes'),
+    );
+  }
+
+  /// الحالة.
+  final ReviewStatus status;
+
+  /// المراجع.
+  final String? reviewer;
+
+  /// تاريخ المراجعة YYYY-MM-DD.
+  final String? reviewedAt;
+
+  /// ملاحظات مفتوحة للمراجع.
+  final List<String> notes;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'status': status.wire,
+      'reviewer': reviewer,
+      'reviewedAt': reviewedAt,
+      'notes': List<String>.of(notes),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is ReviewInfo &&
+        status == other.status &&
+        reviewer == other.reviewer &&
+        reviewedAt == other.reviewedAt &&
+        listEquals(notes, other.notes);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      status,
+      reviewer,
+      reviewedAt,
+      Object.hashAll(notes),
+    ]);
+  }
+}

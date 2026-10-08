@@ -1,0 +1,321 @@
+// فهرس المصادر.
+//
+// Hadith Platform — data model v1.1.0.
+
+import 'package:flutter/foundation.dart';
+
+import '../../../../core/json/json_reader.dart';
+
+/// نوع المصدر.
+enum SourceKind {
+  /// كتاب حديث مسند.
+  hadithCollection('hadith_collection'),
+
+  /// شرح حديثي.
+  sharh('sharh'),
+
+  /// كتاب في غريب الحديث.
+  gharib('gharib'),
+
+  /// كتاب في تراجم الرواة.
+  rijal('rijal'),
+
+  /// كتاب في السيرة والتاريخ والطبقات.
+  history('history'),
+
+  /// كتاب في البلدان والمواضع.
+  geography('geography');
+
+  const SourceKind(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static SourceKind fromWire(String value) {
+    for (final SourceKind candidate in SourceKind.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown SourceKind value: "$value".');
+  }
+}
+
+/// فهرس المصادر المعتمدة.
+@immutable
+class SourceCatalog {
+  const SourceCatalog({
+    required this.schemaVersion,
+    required this.sources,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory SourceCatalog.fromJson(JsonMap json) {
+    return SourceCatalog(
+      schemaVersion: readString(json, 'schemaVersion'),
+      sources: readModelList(json, 'sources', SourceWork.fromJson),
+    );
+  }
+
+  /// إصدار المخطط.
+  final String schemaVersion;
+
+  /// المصادر.
+  final List<SourceWork> sources;
+
+  /// يعيد المصدر بمعرّفه، أو null إن لم يوجد.
+  SourceWork? byId(String sourceId) {
+    for (final SourceWork source in sources) {
+      if (source.id == sourceId) {
+        return source;
+      }
+    }
+    return null;
+  }
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'schemaVersion': schemaVersion,
+      'sources': sources.map((SourceWork item) => item.toJson()).toList(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is SourceCatalog &&
+        schemaVersion == other.schemaVersion &&
+        listEquals(sources, other.sources);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      schemaVersion,
+      Object.hashAll(sources),
+    ]);
+  }
+}
+
+/// كتاب معتمد.
+@immutable
+class SourceWork {
+  const SourceWork({
+    required this.id,
+    required this.title,
+    required this.author,
+    required this.authorDeathHijri,
+    required this.kind,
+    required this.edition,
+    required this.digital,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory SourceWork.fromJson(JsonMap json) {
+    return SourceWork(
+      id: readString(json, 'id'),
+      title: readString(json, 'title'),
+      author: readString(json, 'author'),
+      authorDeathHijri: readIntOrNull(json, 'authorDeathHijri'),
+      kind: readEnum(json, 'kind', SourceKind.fromWire),
+      edition: readModelOrNull(json, 'edition', SourceEdition.fromJson),
+      digital: readModel(json, 'digital', DigitalOrigin.fromJson),
+    );
+  }
+
+  /// المعرّف.
+  final String id;
+
+  /// العنوان.
+  final String title;
+
+  /// المؤلف.
+  final String author;
+
+  /// وفاة المؤلف.
+  final int? authorDeathHijri;
+
+  /// النوع.
+  final SourceKind kind;
+
+  /// الطبعة الورقية المقابلة.
+  final SourceEdition? edition;
+
+  /// المصدر الرقمي الذي استُخرجت منه البيانات.
+  final DigitalOrigin digital;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'author': author,
+      'authorDeathHijri': authorDeathHijri,
+      'kind': kind.wire,
+      'edition': edition?.toJson(),
+      'digital': digital.toJson(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is SourceWork &&
+        id == other.id &&
+        title == other.title &&
+        author == other.author &&
+        authorDeathHijri == other.authorDeathHijri &&
+        kind == other.kind &&
+        edition == other.edition &&
+        digital == other.digital;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      id,
+      title,
+      author,
+      authorDeathHijri,
+      kind,
+      edition,
+      digital,
+    ]);
+  }
+}
+
+/// الطبعة الورقية.
+@immutable
+class SourceEdition {
+  const SourceEdition({
+    required this.editor,
+    required this.publisher,
+    required this.printing,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory SourceEdition.fromJson(JsonMap json) {
+    return SourceEdition(
+      editor: readStringOrNull(json, 'editor'),
+      publisher: readStringOrNull(json, 'publisher'),
+      printing: readStringOrNull(json, 'printing'),
+    );
+  }
+
+  /// المحقق.
+  final String? editor;
+
+  /// الناشر.
+  final String? publisher;
+
+  /// رقم الطبعة وسنتها.
+  final String? printing;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'editor': editor,
+      'publisher': publisher,
+      'printing': printing,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is SourceEdition &&
+        editor == other.editor &&
+        publisher == other.publisher &&
+        printing == other.printing;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      editor,
+      publisher,
+      printing,
+    ]);
+  }
+}
+
+/// أصل البيانات الرقمي لإعادة الإنتاج.
+@immutable
+class DigitalOrigin {
+  const DigitalOrigin({
+    required this.provider,
+    required this.repository,
+    required this.path,
+    required this.commit,
+    required this.retrievedAt,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory DigitalOrigin.fromJson(JsonMap json) {
+    return DigitalOrigin(
+      provider: readString(json, 'provider'),
+      repository: readString(json, 'repository'),
+      path: readString(json, 'path'),
+      commit: readString(json, 'commit'),
+      retrievedAt: readString(json, 'retrievedAt'),
+    );
+  }
+
+  /// الجهة.
+  final String provider;
+
+  /// المستودع.
+  final String repository;
+
+  /// مسار الملف داخل المستودع.
+  final String path;
+
+  /// رقم الإيداع.
+  final String commit;
+
+  /// تاريخ الاستخراج.
+  final String retrievedAt;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'provider': provider,
+      'repository': repository,
+      'path': path,
+      'commit': commit,
+      'retrievedAt': retrievedAt,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is DigitalOrigin &&
+        provider == other.provider &&
+        repository == other.repository &&
+        path == other.path &&
+        commit == other.commit &&
+        retrievedAt == other.retrievedAt;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      provider,
+      repository,
+      path,
+      commit,
+      retrievedAt,
+    ]);
+  }
+}

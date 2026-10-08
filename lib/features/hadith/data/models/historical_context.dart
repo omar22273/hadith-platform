@@ -1,0 +1,238 @@
+// المرحلة الأولى: سياق الورود.
+//
+// Hadith Platform — data model v1.1.0.
+
+import 'package:flutter/foundation.dart';
+
+import '../../../../core/json/json_reader.dart';
+import 'source_ref.dart';
+
+/// علاقة المكان بالحديث.
+enum PlaceRelation {
+  /// مكان وقوع الحدث نفسه.
+  eventLocation('event_location'),
+
+  /// مكان يدور عليه موضوع الحديث.
+  subjectLocation('subject_location'),
+
+  /// مكان مرتبط برواية الحديث ونقله.
+  transmissionLocation('transmission_location');
+
+  const PlaceRelation(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static PlaceRelation fromWire(String value) {
+    for (final PlaceRelation candidate in PlaceRelation.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown PlaceRelation value: "$value".');
+  }
+}
+
+/// بطاقة سياق الورود (70-80 كلمة).
+@immutable
+class HistoricalContext {
+  const HistoricalContext({
+    required this.narrative,
+    required this.humanMotive,
+    required this.place,
+    required this.sources,
+    required this.cautions,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory HistoricalContext.fromJson(JsonMap json) {
+    return HistoricalContext(
+      narrative: readString(json, 'narrative'),
+      humanMotive: readString(json, 'humanMotive'),
+      place: readModelOrNull(json, 'place', HistoricalPlace.fromJson),
+      sources: readModelList(json, 'sources', SourceRef.fromJson),
+      cautions: readModelList(json, 'cautions', ContextCaution.fromJson),
+    );
+  }
+
+  /// القصة المركزة بالزمان والمكان والدافع البشري.
+  final String narrative;
+
+  /// الدافع البشري في سطر واحد.
+  final String humanMotive;
+
+  /// المكان المرتبط على الخريطة التاريخية.
+  final HistoricalPlace? place;
+
+  /// مصادر كل معلومة في القصة.
+  final List<SourceRef> sources;
+
+  /// تنبيهات على أخبار مشهورة لم تثبت.
+  final List<ContextCaution> cautions;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'narrative': narrative,
+      'humanMotive': humanMotive,
+      'place': place?.toJson(),
+      'sources': sources.map((SourceRef item) => item.toJson()).toList(),
+      'cautions': cautions.map((ContextCaution item) => item.toJson()).toList(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is HistoricalContext &&
+        narrative == other.narrative &&
+        humanMotive == other.humanMotive &&
+        place == other.place &&
+        listEquals(sources, other.sources) &&
+        listEquals(cautions, other.cautions);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      narrative,
+      humanMotive,
+      place,
+      Object.hashAll(sources),
+      Object.hashAll(cautions),
+    ]);
+  }
+}
+
+/// مكان على الخريطة التاريخية.
+@immutable
+class HistoricalPlace {
+  const HistoricalPlace({
+    required this.name,
+    required this.stationId,
+    required this.relation,
+    required this.latitude,
+    required this.longitude,
+    required this.coordinatesApproximate,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory HistoricalPlace.fromJson(JsonMap json) {
+    return HistoricalPlace(
+      name: readString(json, 'name'),
+      stationId: readStringOrNull(json, 'stationId'),
+      relation: readEnum(json, 'relation', PlaceRelation.fromWire),
+      latitude: readDouble(json, 'latitude'),
+      longitude: readDouble(json, 'longitude'),
+      coordinatesApproximate: readBool(json, 'coordinatesApproximate'),
+    );
+  }
+
+  /// اسم المكان.
+  final String name;
+
+  /// محطة الرحلة المقابلة إن وجدت.
+  final String? stationId;
+
+  /// علاقة المكان بالحديث.
+  final PlaceRelation relation;
+
+  /// خط العرض.
+  final double latitude;
+
+  /// خط الطول.
+  final double longitude;
+
+  /// هل الإحداثيات تقريبية.
+  final bool coordinatesApproximate;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'name': name,
+      'stationId': stationId,
+      'relation': relation.wire,
+      'latitude': latitude,
+      'longitude': longitude,
+      'coordinatesApproximate': coordinatesApproximate,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is HistoricalPlace &&
+        name == other.name &&
+        stationId == other.stationId &&
+        relation == other.relation &&
+        latitude == other.latitude &&
+        longitude == other.longitude &&
+        coordinatesApproximate == other.coordinatesApproximate;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      name,
+      stationId,
+      relation,
+      latitude,
+      longitude,
+      coordinatesApproximate,
+    ]);
+  }
+}
+
+/// تنبيه علمي يمنع نسبة ما لم يثبت.
+@immutable
+class ContextCaution {
+  const ContextCaution({
+    required this.text,
+    required this.sources,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory ContextCaution.fromJson(JsonMap json) {
+    return ContextCaution(
+      text: readString(json, 'text'),
+      sources: readModelList(json, 'sources', SourceRef.fromJson),
+    );
+  }
+
+  /// نص التنبيه.
+  final String text;
+
+  /// مستند التنبيه.
+  final List<SourceRef> sources;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'text': text,
+      'sources': sources.map((SourceRef item) => item.toJson()).toList(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is ContextCaution &&
+        text == other.text &&
+        listEquals(sources, other.sources);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      text,
+      Object.hashAll(sources),
+    ]);
+  }
+}
