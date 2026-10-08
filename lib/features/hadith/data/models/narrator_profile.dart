@@ -1,0 +1,415 @@
+// فهرس تراجم الرواة.
+//
+// Hadith Platform — data model v1.1.0.
+
+import 'package:flutter/foundation.dart';
+
+import '../../../../core/json/json_reader.dart';
+
+/// صفة العَلَم في الإسناد.
+enum NarratorCategory {
+  /// النبي ﷺ.
+  prophet('prophet'),
+
+  /// صحابي.
+  companion('companion'),
+
+  /// راوٍ.
+  narrator('narrator'),
+
+  /// مصنِّف الكتاب.
+  compiler('compiler');
+
+  const NarratorCategory(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static NarratorCategory fromWire(String value) {
+    for (final NarratorCategory candidate in NarratorCategory.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown NarratorCategory value: "$value".');
+  }
+}
+
+/// وصف موقع الراوي داخل طبقته.
+enum TabaqaQualifier {
+  /// من كبارها.
+  senior('senior'),
+
+  /// من صغارها.
+  junior('junior'),
+
+  /// من رؤوسها.
+  head('head');
+
+  const TabaqaQualifier(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static TabaqaQualifier fromWire(String value) {
+    for (final TabaqaQualifier candidate in TabaqaQualifier.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown TabaqaQualifier value: "$value".');
+  }
+}
+
+/// كيف استُخرجت سنة الوفاة من نص الترجمة.
+enum DeathYearDerivation {
+  /// صرّح النص بالمئة أو هو صحابي قبل المئة.
+  explicit('explicit'),
+
+  /// قاعدة ابن حجر في مقدمة التقريب: المئة تُعرف من الطبقة.
+  taqribCenturyRule('taqrib_century_rule');
+
+  const DeathYearDerivation(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static DeathYearDerivation fromWire(String value) {
+    for (final DeathYearDerivation candidate in DeathYearDerivation.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown DeathYearDerivation value: "$value".');
+  }
+}
+
+/// فهرس تراجم الرواة المشترك بين الأحاديث.
+@immutable
+class NarratorCatalog {
+  const NarratorCatalog({
+    required this.schemaVersion,
+    required this.narrators,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory NarratorCatalog.fromJson(JsonMap json) {
+    return NarratorCatalog(
+      schemaVersion: readString(json, 'schemaVersion'),
+      narrators: readModelList(json, 'narrators', NarratorProfile.fromJson),
+    );
+  }
+
+  /// إصدار المخطط.
+  final String schemaVersion;
+
+  /// التراجم.
+  final List<NarratorProfile> narrators;
+
+  /// يعيد ترجمة الراوي بمعرّفه، أو null إن لم توجد.
+  NarratorProfile? byId(String narratorId) {
+    for (final NarratorProfile narrator in narrators) {
+      if (narrator.id == narratorId) {
+        return narrator;
+      }
+    }
+    return null;
+  }
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'schemaVersion': schemaVersion,
+      'narrators': narrators.map((NarratorProfile item) => item.toJson()).toList(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is NarratorCatalog &&
+        schemaVersion == other.schemaVersion &&
+        listEquals(narrators, other.narrators);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      schemaVersion,
+      Object.hashAll(narrators),
+    ]);
+  }
+}
+
+/// بطاقة الراوي بلمسة واحدة.
+@immutable
+class NarratorProfile {
+  const NarratorProfile({
+    required this.id,
+    required this.displayName,
+    required this.category,
+    required this.tabaqa,
+    required this.gradeText,
+    required this.death,
+    required this.sigla,
+    required this.entry,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory NarratorProfile.fromJson(JsonMap json) {
+    return NarratorProfile(
+      id: readString(json, 'id'),
+      displayName: readString(json, 'displayName'),
+      category: readEnum(json, 'category', NarratorCategory.fromWire),
+      tabaqa: readModelOrNull(json, 'tabaqa', Tabaqa.fromJson),
+      gradeText: readStringOrNull(json, 'gradeText'),
+      death: readModelOrNull(json, 'death', DeathRecord.fromJson),
+      sigla: readStringOrNull(json, 'sigla'),
+      entry: readModelOrNull(json, 'entry', RijalEntry.fromJson),
+    );
+  }
+
+  /// المعرّف.
+  final String id;
+
+  /// الاسم المختصر للعرض.
+  final String displayName;
+
+  /// صفته.
+  final NarratorCategory category;
+
+  /// الطبقة كما في التقريب.
+  final Tabaqa? tabaqa;
+
+  /// عبارة الجرح والتعديل بنصها من التقريب.
+  final String? gradeText;
+
+  /// الوفاة.
+  final DeathRecord? death;
+
+  /// رموز من أخرج له كما في التقريب.
+  final String? sigla;
+
+  /// نص الترجمة كاملاً بمصدره.
+  final RijalEntry? entry;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'displayName': displayName,
+      'category': category.wire,
+      'tabaqa': tabaqa?.toJson(),
+      'gradeText': gradeText,
+      'death': death?.toJson(),
+      'sigla': sigla,
+      'entry': entry?.toJson(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is NarratorProfile &&
+        id == other.id &&
+        displayName == other.displayName &&
+        category == other.category &&
+        tabaqa == other.tabaqa &&
+        gradeText == other.gradeText &&
+        death == other.death &&
+        sigla == other.sigla &&
+        entry == other.entry;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      id,
+      displayName,
+      category,
+      tabaqa,
+      gradeText,
+      death,
+      sigla,
+      entry,
+    ]);
+  }
+}
+
+/// طبقة الراوي.
+@immutable
+class Tabaqa {
+  const Tabaqa({
+    required this.number,
+    required this.qualifier,
+    required this.text,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory Tabaqa.fromJson(JsonMap json) {
+    return Tabaqa(
+      number: readInt(json, 'number'),
+      qualifier: readEnumOrNull(json, 'qualifier', TabaqaQualifier.fromWire),
+      text: readString(json, 'text'),
+    );
+  }
+
+  /// رقم الطبقة عند ابن حجر.
+  final int number;
+
+  /// كبار أو صغار أو رؤوس.
+  final TabaqaQualifier? qualifier;
+
+  /// العبارة كما في التقريب.
+  final String text;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'number': number,
+      'qualifier': qualifier?.wire,
+      'text': text,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is Tabaqa &&
+        number == other.number &&
+        qualifier == other.qualifier &&
+        text == other.text;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      number,
+      qualifier,
+      text,
+    ]);
+  }
+}
+
+/// وفاة الراوي.
+@immutable
+class DeathRecord {
+  const DeathRecord({
+    required this.text,
+    required this.yearHijri,
+    required this.derivation,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory DeathRecord.fromJson(JsonMap json) {
+    return DeathRecord(
+      text: readString(json, 'text'),
+      yearHijri: readIntOrNull(json, 'yearHijri'),
+      derivation: readEnumOrNull(json, 'derivation', DeathYearDerivation.fromWire),
+    );
+  }
+
+  /// عبارة الوفاة كما في التقريب.
+  final String text;
+
+  /// السنة الهجرية الكاملة إن أمكن تعيينها.
+  final int? yearHijri;
+
+  /// طريقة تعيين السنة.
+  final DeathYearDerivation? derivation;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'text': text,
+      'yearHijri': yearHijri,
+      'derivation': derivation?.wire,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is DeathRecord &&
+        text == other.text &&
+        yearHijri == other.yearHijri &&
+        derivation == other.derivation;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      text,
+      yearHijri,
+      derivation,
+    ]);
+  }
+}
+
+/// نص الترجمة بمصدره.
+@immutable
+class RijalEntry {
+  const RijalEntry({
+    required this.sourceId,
+    required this.locator,
+    required this.text,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory RijalEntry.fromJson(JsonMap json) {
+    return RijalEntry(
+      sourceId: readString(json, 'sourceId'),
+      locator: readStringOrNull(json, 'locator'),
+      text: readString(json, 'text'),
+    );
+  }
+
+  /// كتاب التراجم.
+  final String sourceId;
+
+  /// الموضع.
+  final String? locator;
+
+  /// نص الترجمة كاملاً.
+  final String text;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'sourceId': sourceId,
+      'locator': locator,
+      'text': text,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is RijalEntry &&
+        sourceId == other.sourceId &&
+        locator == other.locator &&
+        text == other.text;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      sourceId,
+      locator,
+      text,
+    ]);
+  }
+}

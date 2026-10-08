@@ -1,0 +1,172 @@
+// التتبع الصوتي التزامني.
+//
+// Hadith Platform — data model v1.1.0.
+
+import 'package:flutter/foundation.dart';
+
+import '../../../../core/json/json_reader.dart';
+
+/// حالة التلاوة الصوتية للمتن.
+enum AudioStatus {
+  /// لم تُسجَّل بعد.
+  notRecorded('not_recorded'),
+
+  /// مسجلة دون مزامنة كلمات.
+  recorded('recorded'),
+
+  /// مسجلة ومتزامنة كلمةً كلمة.
+  aligned('aligned');
+
+  const AudioStatus(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static AudioStatus fromWire(String value) {
+    for (final AudioStatus candidate in AudioStatus.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown AudioStatus value: "$value".');
+  }
+}
+
+/// بيانات التلاوة والتتبع الصوتي التزامني.
+@immutable
+class AudioSync {
+  const AudioSync({
+    required this.status,
+    required this.assetPath,
+    required this.reciter,
+    required this.durationMs,
+    required this.timings,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory AudioSync.fromJson(JsonMap json) {
+    return AudioSync(
+      status: readEnum(json, 'status', AudioStatus.fromWire),
+      assetPath: readStringOrNull(json, 'assetPath'),
+      reciter: readStringOrNull(json, 'reciter'),
+      durationMs: readIntOrNull(json, 'durationMs'),
+      timings: readModelList(json, 'timings', WordTiming.fromJson),
+    );
+  }
+
+  /// حالة التسجيل.
+  final AudioStatus status;
+
+  /// مسار الملف الصوتي في الأصول.
+  final String? assetPath;
+
+  /// اسم القارئ.
+  final String? reciter;
+
+  /// مدة التلاوة بالمللي ثانية.
+  final int? durationMs;
+
+  /// توقيت كل كلمة؛ فارغة حتى تتم المزامنة.
+  final List<WordTiming> timings;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'status': status.wire,
+      'assetPath': assetPath,
+      'reciter': reciter,
+      'durationMs': durationMs,
+      'timings': timings.map((WordTiming item) => item.toJson()).toList(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is AudioSync &&
+        status == other.status &&
+        assetPath == other.assetPath &&
+        reciter == other.reciter &&
+        durationMs == other.durationMs &&
+        listEquals(timings, other.timings);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      status,
+      assetPath,
+      reciter,
+      durationMs,
+      Object.hashAll(timings),
+    ]);
+  }
+}
+
+/// توقيت كلمة واحدة في التلاوة.
+@immutable
+class WordTiming {
+  const WordTiming({
+    required this.segmentId,
+    required this.tokenIndex,
+    required this.startMs,
+    required this.endMs,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory WordTiming.fromJson(JsonMap json) {
+    return WordTiming(
+      segmentId: readString(json, 'segmentId'),
+      tokenIndex: readInt(json, 'tokenIndex'),
+      startMs: readInt(json, 'startMs'),
+      endMs: readInt(json, 'endMs'),
+    );
+  }
+
+  /// معرّف المقطع.
+  final String segmentId;
+
+  /// رقم الكلمة داخل المقطع.
+  final int tokenIndex;
+
+  /// بداية الكلمة.
+  final int startMs;
+
+  /// نهاية الكلمة.
+  final int endMs;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'segmentId': segmentId,
+      'tokenIndex': tokenIndex,
+      'startMs': startMs,
+      'endMs': endMs,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is WordTiming &&
+        segmentId == other.segmentId &&
+        tokenIndex == other.tokenIndex &&
+        startMs == other.startMs &&
+        endMs == other.endMs;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      segmentId,
+      tokenIndex,
+      startMs,
+      endMs,
+    ]);
+  }
+}

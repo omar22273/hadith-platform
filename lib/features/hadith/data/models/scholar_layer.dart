@@ -1,0 +1,390 @@
+// طبقة طالب العلم: الإسناد والروايات.
+//
+// Hadith Platform — data model v1.1.0.
+
+import 'package:flutter/foundation.dart';
+
+import '../../../../core/json/json_reader.dart';
+
+/// علاقة الرواية بالحديث الأصل.
+enum VariantRelation {
+  /// رواية عن الصحابي نفسه.
+  sameCompanion('same_companion'),
+
+  /// شاهد من حديث صحابي آخر.
+  witnessOtherCompanion('witness_other_companion');
+
+  const VariantRelation(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static VariantRelation fromWire(String value) {
+    for (final VariantRelation candidate in VariantRelation.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown VariantRelation value: "$value".');
+  }
+}
+
+/// طبقة طالب العلم.
+@immutable
+class ScholarLayer {
+  const ScholarLayer({
+    required this.chains,
+    required this.variants,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory ScholarLayer.fromJson(JsonMap json) {
+    return ScholarLayer(
+      chains: readModelList(json, 'chains', SanadChain.fromJson),
+      variants: readModelList(json, 'variants', NarrationVariant.fromJson),
+    );
+  }
+
+  /// أسانيد تُدمج في شجرة الإسناد التفاعلية.
+  final List<SanadChain> chains;
+
+  /// مصفوفة مقارنة الروايات.
+  final List<NarrationVariant> variants;
+
+  /// يعيد الإسناد بمعرّفه، أو null إن لم يوجد.
+  SanadChain? chainById(String chainId) {
+    for (final SanadChain chain in chains) {
+      if (chain.id == chainId) {
+        return chain;
+      }
+    }
+    return null;
+  }
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'chains': chains.map((SanadChain item) => item.toJson()).toList(),
+      'variants': variants.map((NarrationVariant item) => item.toJson()).toList(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is ScholarLayer &&
+        listEquals(chains, other.chains) &&
+        listEquals(variants, other.variants);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      Object.hashAll(chains),
+      Object.hashAll(variants),
+    ]);
+  }
+}
+
+/// إسناد واحد كما ورد في كتاب، مرتب من النبي ﷺ إلى المصنف.
+@immutable
+class SanadChain {
+  const SanadChain({
+    required this.id,
+    required this.source,
+    required this.isWordingChain,
+    required this.remark,
+    required this.links,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory SanadChain.fromJson(JsonMap json) {
+    return SanadChain(
+      id: readString(json, 'id'),
+      source: readModel(json, 'source', ChainSource.fromJson),
+      isWordingChain: readBool(json, 'isWordingChain'),
+      remark: readStringOrNull(json, 'remark'),
+      links: readModelList(json, 'links', SanadLink.fromJson),
+    );
+  }
+
+  /// معرّف الإسناد.
+  final String id;
+
+  /// موضع الإسناد.
+  final ChainSource source;
+
+  /// هل اللفظ المسوق لهذا الإسناد.
+  final bool isWordingChain;
+
+  /// ملاحظة من نص المصدر.
+  final String? remark;
+
+  /// حلقات الإسناد من النبي ﷺ إلى المصنف.
+  final List<SanadLink> links;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'source': source.toJson(),
+      'isWordingChain': isWordingChain,
+      'remark': remark,
+      'links': links.map((SanadLink item) => item.toJson()).toList(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is SanadChain &&
+        id == other.id &&
+        source == other.source &&
+        isWordingChain == other.isWordingChain &&
+        remark == other.remark &&
+        listEquals(links, other.links);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      id,
+      source,
+      isWordingChain,
+      remark,
+      Object.hashAll(links),
+    ]);
+  }
+}
+
+/// موضع الإسناد.
+@immutable
+class ChainSource {
+  const ChainSource({
+    required this.sourceId,
+    required this.hadithNumber,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory ChainSource.fromJson(JsonMap json) {
+    return ChainSource(
+      sourceId: readString(json, 'sourceId'),
+      hadithNumber: readString(json, 'hadithNumber'),
+    );
+  }
+
+  /// معرّف الكتاب.
+  final String sourceId;
+
+  /// رقم الحديث.
+  final String hadithNumber;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'sourceId': sourceId,
+      'hadithNumber': hadithNumber,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is ChainSource &&
+        sourceId == other.sourceId &&
+        hadithNumber == other.hadithNumber;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      sourceId,
+      hadithNumber,
+    ]);
+  }
+}
+
+/// حلقة في الإسناد.
+@immutable
+class SanadLink {
+  const SanadLink({
+    required this.narratorId,
+    required this.nameAsWritten,
+    required this.term,
+    required this.remark,
+    required this.identificationBasis,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory SanadLink.fromJson(JsonMap json) {
+    return SanadLink(
+      narratorId: readString(json, 'narratorId'),
+      nameAsWritten: readStringOrNull(json, 'nameAsWritten'),
+      term: readStringOrNull(json, 'term'),
+      remark: readStringOrNull(json, 'remark'),
+      identificationBasis: readStringOrNull(json, 'identificationBasis'),
+    );
+  }
+
+  /// معرّف الراوي في فهرس الرواة.
+  final String narratorId;
+
+  /// الاسم كما ورد في الإسناد مشكولاً.
+  final String? nameAsWritten;
+
+  /// صيغة الأداء التي تحمّل بها عمّن قبله.
+  final String? term;
+
+  /// ملاحظة على هذه الحلقة.
+  final String? remark;
+
+  /// مستند تعيين الراوي إذا أُبهم اسمه في الإسناد.
+  final String? identificationBasis;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'narratorId': narratorId,
+      'nameAsWritten': nameAsWritten,
+      'term': term,
+      'remark': remark,
+      'identificationBasis': identificationBasis,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is SanadLink &&
+        narratorId == other.narratorId &&
+        nameAsWritten == other.nameAsWritten &&
+        term == other.term &&
+        remark == other.remark &&
+        identificationBasis == other.identificationBasis;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      narratorId,
+      nameAsWritten,
+      term,
+      remark,
+      identificationBasis,
+    ]);
+  }
+}
+
+/// رواية تُقارن بالمتن المعروض.
+@immutable
+class NarrationVariant {
+  const NarrationVariant({
+    required this.id,
+    required this.sourceId,
+    required this.hadithNumber,
+    required this.relation,
+    required this.companionNarratorId,
+    required this.chainIds,
+    required this.fullText,
+    required this.matnText,
+    required this.notes,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory NarrationVariant.fromJson(JsonMap json) {
+    return NarrationVariant(
+      id: readString(json, 'id'),
+      sourceId: readString(json, 'sourceId'),
+      hadithNumber: readString(json, 'hadithNumber'),
+      relation: readEnum(json, 'relation', VariantRelation.fromWire),
+      companionNarratorId: readString(json, 'companionNarratorId'),
+      chainIds: readStringList(json, 'chainIds'),
+      fullText: readString(json, 'fullText'),
+      matnText: readString(json, 'matnText'),
+      notes: readStringList(json, 'notes'),
+    );
+  }
+
+  /// معرّف الرواية.
+  final String id;
+
+  /// الكتاب.
+  final String sourceId;
+
+  /// رقم الحديث.
+  final String hadithNumber;
+
+  /// علاقتها بالحديث.
+  final VariantRelation relation;
+
+  /// الصحابي راوي الحديث.
+  final String companionNarratorId;
+
+  /// الأسانيد المرتبطة بها في الشجرة.
+  final List<String> chainIds;
+
+  /// النص الكامل كما في المصدر.
+  final String fullText;
+
+  /// موضع المتن من النص الكامل، للمقارنة المرئية.
+  final String matnText;
+
+  /// فروق موثقة بالنص.
+  final List<String> notes;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'sourceId': sourceId,
+      'hadithNumber': hadithNumber,
+      'relation': relation.wire,
+      'companionNarratorId': companionNarratorId,
+      'chainIds': List<String>.of(chainIds),
+      'fullText': fullText,
+      'matnText': matnText,
+      'notes': List<String>.of(notes),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is NarrationVariant &&
+        id == other.id &&
+        sourceId == other.sourceId &&
+        hadithNumber == other.hadithNumber &&
+        relation == other.relation &&
+        companionNarratorId == other.companionNarratorId &&
+        listEquals(chainIds, other.chainIds) &&
+        fullText == other.fullText &&
+        matnText == other.matnText &&
+        listEquals(notes, other.notes);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      id,
+      sourceId,
+      hadithNumber,
+      relation,
+      companionNarratorId,
+      Object.hashAll(chainIds),
+      fullText,
+      matnText,
+      Object.hashAll(notes),
+    ]);
+  }
+}

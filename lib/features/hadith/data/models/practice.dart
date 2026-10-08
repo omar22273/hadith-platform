@@ -1,0 +1,322 @@
+// المرحلة الثالثة: التثبيت والحفظ.
+//
+// Hadith Platform — data model v1.1.0.
+
+import 'package:flutter/foundation.dart';
+
+import '../../../../core/json/json_reader.dart';
+import 'source_ref.dart';
+
+/// طريقة بعثرة كلمات الترصيع.
+enum ShuffleStrategy {
+  /// بذرة ثابتة للمستخدم في اليوم الواحد.
+  perUserPerDay('per_user_per_day'),
+
+  /// ترتيب بعثرة ثابت للجميع.
+  fixed('fixed');
+
+  const ShuffleStrategy(this.wire);
+
+  /// القيمة المخزنة في ملفات JSON.
+  final String wire;
+
+  /// يحوّل قيمة JSON إلى عنصر التعداد، ويرمي [JsonParseException] للقيم المجهولة.
+  static ShuffleStrategy fromWire(String value) {
+    for (final ShuffleStrategy candidate in ShuffleStrategy.values) {
+      if (candidate.wire == value) {
+        return candidate;
+      }
+    }
+    throw JsonParseException('Unknown ShuffleStrategy value: "$value".');
+  }
+}
+
+/// إعدادات الترصيع والتلاشي التدريجي.
+@immutable
+class PracticeConfig {
+  const PracticeConfig({
+    required this.chunks,
+    required this.reconstruction,
+    required this.vanishing,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory PracticeConfig.fromJson(JsonMap json) {
+    return PracticeConfig(
+      chunks: readModelList(json, 'chunks', PracticeChunk.fromJson),
+      reconstruction: readModel(json, 'reconstruction', ReconstructionConfig.fromJson),
+      vanishing: readModel(json, 'vanishing', VanishingConfig.fromJson),
+    );
+  }
+
+  /// مقاطع الحفظ التراكمي.
+  final List<PracticeChunk> chunks;
+
+  /// ترصيع المتن.
+  final ReconstructionConfig reconstruction;
+
+  /// التلاشي التدريجي.
+  final VanishingConfig vanishing;
+
+  /// يعيد مقطع الحفظ بمعرّفه، أو null إن لم يوجد.
+  PracticeChunk? chunkById(String chunkId) {
+    for (final PracticeChunk chunk in chunks) {
+      if (chunk.id == chunkId) {
+        return chunk;
+      }
+    }
+    return null;
+  }
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'chunks': chunks.map((PracticeChunk item) => item.toJson()).toList(),
+      'reconstruction': reconstruction.toJson(),
+      'vanishing': vanishing.toJson(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is PracticeConfig &&
+        listEquals(chunks, other.chunks) &&
+        reconstruction == other.reconstruction &&
+        vanishing == other.vanishing;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      Object.hashAll(chunks),
+      reconstruction,
+      vanishing,
+    ]);
+  }
+}
+
+/// مقطع حفظ: مدى من كلمات مقطع واحد.
+@immutable
+class PracticeChunk {
+  const PracticeChunk({
+    required this.id,
+    required this.segmentId,
+    required this.startToken,
+    required this.endToken,
+    required this.label,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory PracticeChunk.fromJson(JsonMap json) {
+    return PracticeChunk(
+      id: readString(json, 'id'),
+      segmentId: readString(json, 'segmentId'),
+      startToken: readInt(json, 'startToken'),
+      endToken: readInt(json, 'endToken'),
+      label: readString(json, 'label'),
+    );
+  }
+
+  /// معرّف المقطع التدريبي.
+  final String id;
+
+  /// مقطع المتن.
+  final String segmentId;
+
+  /// أول كلمة.
+  final int startToken;
+
+  /// آخر كلمة (شاملة).
+  final int endToken;
+
+  /// عنوان المقطع في واجهة التدريب.
+  final String label;
+
+  /// عدد كلمات المقطع.
+  int get tokenCount => endToken - startToken + 1;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'segmentId': segmentId,
+      'startToken': startToken,
+      'endToken': endToken,
+      'label': label,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is PracticeChunk &&
+        id == other.id &&
+        segmentId == other.segmentId &&
+        startToken == other.startToken &&
+        endToken == other.endToken &&
+        label == other.label;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      id,
+      segmentId,
+      startToken,
+      endToken,
+      label,
+    ]);
+  }
+}
+
+/// تمرين ترصيع المتن.
+@immutable
+class ReconstructionConfig {
+  const ReconstructionConfig({
+    required this.chunkIds,
+    required this.shuffleStrategy,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory ReconstructionConfig.fromJson(JsonMap json) {
+    return ReconstructionConfig(
+      chunkIds: readStringList(json, 'chunkIds'),
+      shuffleStrategy: readEnum(json, 'shuffleStrategy', ShuffleStrategy.fromWire),
+    );
+  }
+
+  /// المقاطع التي تُبعثر كلماتها بالترتيب.
+  final List<String> chunkIds;
+
+  /// طريقة البعثرة.
+  final ShuffleStrategy shuffleStrategy;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'chunkIds': List<String>.of(chunkIds),
+      'shuffleStrategy': shuffleStrategy.wire,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is ReconstructionConfig &&
+        listEquals(chunkIds, other.chunkIds) &&
+        shuffleStrategy == other.shuffleStrategy;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      Object.hashAll(chunkIds),
+      shuffleStrategy,
+    ]);
+  }
+}
+
+/// تمرين التلاشي التدريجي.
+@immutable
+class VanishingConfig {
+  const VanishingConfig({
+    required this.levels,
+    required this.priorityAnchors,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory VanishingConfig.fromJson(JsonMap json) {
+    return VanishingConfig(
+      levels: readModelList(json, 'levels', VanishingLevel.fromJson),
+      priorityAnchors: readModelList(json, 'priorityAnchors', TokenAnchor.fromJson),
+    );
+  }
+
+  /// المستويات بنسب إخفاء متصاعدة.
+  final List<VanishingLevel> levels;
+
+  /// كلمات مفتاحية تُخفى أولاً.
+  final List<TokenAnchor> priorityAnchors;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'levels': levels.map((VanishingLevel item) => item.toJson()).toList(),
+      'priorityAnchors': priorityAnchors.map((TokenAnchor item) => item.toJson()).toList(),
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is VanishingConfig &&
+        listEquals(levels, other.levels) &&
+        listEquals(priorityAnchors, other.priorityAnchors);
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      Object.hashAll(levels),
+      Object.hashAll(priorityAnchors),
+    ]);
+  }
+}
+
+/// مستوى إخفاء.
+@immutable
+class VanishingLevel {
+  const VanishingLevel({
+    required this.level,
+    required this.hidePercent,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory VanishingLevel.fromJson(JsonMap json) {
+    return VanishingLevel(
+      level: readInt(json, 'level'),
+      hidePercent: readInt(json, 'hidePercent'),
+    );
+  }
+
+  /// رقم المستوى.
+  final int level;
+
+  /// نسبة الكلمات المخفية.
+  final int hidePercent;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'level': level,
+      'hidePercent': hidePercent,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is VanishingLevel &&
+        level == other.level &&
+        hidePercent == other.hidePercent;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      level,
+      hidePercent,
+    ]);
+  }
+}
