@@ -75,30 +75,12 @@ Future<void> _pumpApp(WidgetTester tester) async {
     final String pacing = container.read(pacingProvider).toString();
     final String tree = find.byType(IndexedStack).evaluate().length.toString();
     final StringBuffer buffer = StringBuffer();
-    for (final Type type in <Type>[IndexedStack, ArbaeenPathScreen, SafeArea, CustomScrollView, SliverToBoxAdapter, Viewport, Scaffold]) {
+    for (final Type type in <Type>[IndexedStack, ArbaeenPathScreen, SafeArea, CustomScrollView, SliverToBoxAdapter, Viewport]) {
       for (final Element e in find.byType(type, skipOffstage: false).evaluate()) {
         final RenderObject? ro = e.renderObject;
         buffer.write('$type=${ro is RenderBox ? ro.size : ro?.runtimeType} ');
       }
     }
-    // ignore: avoid_print
-    print('TREE>>> ${buffer.toString()} <<<TREE');
-    final ProviderContainer container = ProviderScope.containerOf(tester.element(find.byType(AppShellScreen)));
-    final String journey = container.read(journeyControllerProvider).toString();
-    final String curriculum = container.read(curriculumProvider).toString();
-    final String progress = container.read(journeyProgressProvider).toString();
-    final String pacing = container.read(pacingProvider).toString();
-    final String tree = find.byType(IndexedStack).evaluate().length.toString();
-    final StringBuffer buffer = StringBuffer();
-    void walk(Element element, int depth) {
-      if (depth > 40) {
-        return;
-      }
-      buffer.write('${depth.toString()}:${element.widget.runtimeType} ');
-      element.visitChildren((Element child) => walk(child, depth + 1));
-    }
-
-    walk(tester.element(find.byType(IndexedStack)), 0);
     // ignore: avoid_print
     print('TREE>>> ${buffer.toString()} <<<TREE');
     fail('Arbaeen path did not render. texts: $texts; stacks: $tree; journey: $journey; curriculum: $curriculum; progress: $progress; pacing: $pacing');
