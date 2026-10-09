@@ -117,13 +117,18 @@ class _ShareHadithSheetState extends ConsumerState<ShareHadithSheet> {
       children: <Widget>[
         Text('مشاركة الحديث', style: AppTypography.heritageTitle(color: palette.ink, fontSize: 24)),
         const SizedBox(height: 10),
-        // المعاينة هي البطاقة نفسها التي تُلتقط صورةً: ما تراه هو ما يُرسل.
+        // المعاينة هي البطاقة نفسها التي تُلتقط صورةً: ما تراه هو ما يُرسل. تُصغَّر
+        // لتظهر كاملة فوق الأزرار دون تمرير؛ والالتقاط يتم بمقاس البطاقة الأصلي
+        // ودقتها العالية لا بمقاس المعاينة.
         Center(
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: RepaintBoundary(
-              key: _cardKey,
-              child: HadithQuoteCard(bundle: widget.bundle),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.42),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: RepaintBoundary(
+                key: _cardKey,
+                child: HadithQuoteCard(bundle: widget.bundle),
+              ),
             ),
           ),
         ),

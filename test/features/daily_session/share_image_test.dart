@@ -25,10 +25,11 @@ Future<ProviderContainer> _openShareSheet(
   WidgetTester tester,
   FakeShareService share, {
   Map<String, String>? stored,
+  Size size = const Size(412, 3000),
 }) async {
   final ProviderContainer container = await pumpApp(
     tester,
-    size: const Size(412, 3000),
+    size: size,
     shareService: share,
     stored: stored,
   );
@@ -74,6 +75,9 @@ void main() {
   });
 
   testWidgets('a very tall capture is scaled down to stay within GPU limits', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(200, 4200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     final GlobalKey key = GlobalKey();
     await tester.pumpWidget(
       Directionality(
@@ -115,6 +119,20 @@ void main() {
     expect(find.text('نسخ'), findsOneWidget);
     expect(find.text('مشاركة كصورة'), findsOneWidget);
     expect(find.text('مشاركة كنص'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('on a normal phone the whole card and every button fit without scrolling', (WidgetTester tester) async {
+    await _openShareSheet(tester, FakeShareService(), size: const Size(412, 915));
+
+    final Rect imageButton = tester.getRect(find.byKey(const ValueKey<String>('share-as-image')));
+    final Rect textButton = tester.getRect(find.text('مشاركة كنص'));
+    expect(imageButton.bottom, lessThanOrEqualTo(915));
+    expect(textButton.bottom, lessThanOrEqualTo(915));
+    // المعاينة مصغّرة لتظهر البطاقة كاملة: أعلى من الأزرار وأصغر من المقاس الأصلي.
+    final Rect preview = tester.getRect(find.byType(FittedBox).last);
+    expect(preview.bottom, lessThanOrEqualTo(imageButton.top));
+    expect(preview.width, lessThan(HadithQuoteCard.width));
     expect(tester.takeException(), isNull);
   });
 

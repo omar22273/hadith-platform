@@ -141,7 +141,9 @@ void main() {
     expect(tester.widget<FilledButton>(nextButton).onPressed, isNull);
     final Finder chips = find.byType(ChoiceChip);
     expect(tester.widget<ChoiceChip>(chips.at(0)).onSelected, isNotNull);
-    for (int i = 1; i < deck.orderChallenges.length; i++) {
+    // الشريط أفقي كسول فلا تُبنى إلا الرقاقات القريبة؛ كلها بعد الأول مقفلة.
+    expect(chips.evaluate().length, greaterThan(1));
+    for (int i = 1; i < chips.evaluate().length; i++) {
       expect(tester.widget<ChoiceChip>(chips.at(i)).onSelected, isNull, reason: 'segment ${i + 1} is locked');
     }
     await tester.tap(chips.at(1), warnIfMissed: false);
