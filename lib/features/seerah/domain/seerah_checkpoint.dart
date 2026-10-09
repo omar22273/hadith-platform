@@ -42,6 +42,12 @@ class SeerahCheckpoint {
     return SeerahCheckpoint._(stations: group, shuffled: _shuffle(group));
   }
 
+  /// واحة بترتيب بداية محدد (للاختبار).
+  @visibleForTesting
+  factory SeerahCheckpoint.withOrder(List<SeerahStationModel> stations, List<SeerahStationModel> shuffled) {
+    return SeerahCheckpoint._(stations: stations, shuffled: shuffled);
+  }
+
   /// صحة كل موضع في [attempt]: true إن كانت المحطة في مكانها الزمني.
   List<bool> evaluate(List<SeerahStationModel> attempt) {
     return <bool>[
