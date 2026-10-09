@@ -20,8 +20,11 @@ import '../../oral_mode/presentation/oral_mode_screen.dart';
 import '../application/journey_controller.dart';
 import '../application/journey_progress_controller.dart';
 import '../application/pacing_notifier.dart';
+import '../domain/course_catalog.dart';
 import '../domain/journey_snapshot.dart';
 import 'widgets/caravan_trail_view.dart';
+import 'widgets/course_cards.dart';
+import 'widgets/hadith_search_results.dart';
 import 'widgets/journey_summary_card.dart';
 import 'widgets/wird_sheet.dart';
 
@@ -66,6 +69,29 @@ class _ArbaeenPathScreenState extends ConsumerState<ArbaeenPathScreen> {
     ref.invalidate(journeyControllerProvider);
   }
 
+  final TextEditingController _query = TextEditingController();
+  bool _searching = false;
+
+  @override
+  void dispose() {
+    _query.dispose();
+    super.dispose();
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _searching = !_searching;
+      _query.clear();
+    });
+  }
+
+  void _showLockedCourse(CurriculumCourse course) {
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('${course.title}: ${CourseCatalog.lockedNote}')));
+  }
+
   @override
   Widget build(BuildContext context) {
     final AsyncValue<JourneySnapshot> journey = ref.watch(journeyControllerProvider);
@@ -77,25 +103,51 @@ class _ArbaeenPathScreenState extends ConsumerState<ArbaeenPathScreen> {
           skipLoadingOnReload: true,
           loading: () => const _LoadingView(),
           error: (Object error, StackTrace stackTrace) => _ErrorView(error: error, onRetry: _retry),
-          data: (JourneySnapshot snapshot) => CustomScrollView(
-            slivers: <Widget>[
-              SliverToBoxAdapter(child: _Header(curriculumTitle: curriculumTitle)),
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                sliver: SliverToBoxAdapter(
-                  child: JourneySummaryCard(
-                    snapshot: snapshot,
-                    onOpenToday: () => _openNode(snapshot.caravanIndex),
-                    onOpenReview: () => ref.read(appTabProvider.notifier).select(AppTab.review),
-                    onBypassLock: () => unawaited(ref.read(pacingProvider.notifier).bypassTodayLock()),
-                  ),
-                ),
+          data: (JourneySnapshot snapshot) => Column(
+            children: <Widget>[
+              _Header(
+                curriculumTitle: curriculumTitle,
+                searching: _searching,
+                controller: _query,
+                onToggleSearch: _toggleSearch,
+                onQueryChanged: (String _) => setState(() {}),
               ),
-              SliverToBoxAdapter(
-                child: CaravanTrailView(
-                  snapshot: snapshot,
-                  onNodeTap: _openNode,
-                ),
+              Expanded(
+                child: _searching
+                    ? HadithSearchResults(
+                        query: _query.text,
+                        onOpen: (String hadithId) {
+                          final int index = snapshot.nodes.indexWhere(
+                            (WirdNode node) => node.item?.hadithId == hadithId,
+                          );
+                          if (index >= 0) {
+                            unawaited(_openNode(index));
+                          }
+                        },
+                      )
+                    : CustomScrollView(
+                        slivers: <Widget>[
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 2, 16, 8),
+                            sliver: SliverToBoxAdapter(
+                              child: JourneySummaryCard(
+                                snapshot: snapshot,
+                                onOpenToday: () => _openNode(snapshot.caravanIndex),
+                                onOpenReview: () => ref.read(appTabProvider.notifier).select(AppTab.review),
+                                onBypassLock: () =>
+                                    unawaited(ref.read(pacingProvider.notifier).bypassTodayLock()),
+                              ),
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: CaravanTrailView(
+                              snapshot: snapshot,
+                              onNodeTap: _openNode,
+                            ),
+                          ),
+                          SliverToBoxAdapter(child: LockedCoursesSection(onLockedTap: _showLockedCourse)),
+                        ],
+                      ),
               ),
             ],
           ),
@@ -106,9 +158,19 @@ class _ArbaeenPathScreenState extends ConsumerState<ArbaeenPathScreen> {
 }
 
 class _Header extends ConsumerWidget {
-  const _Header({required this.curriculumTitle});
+  const _Header({
+    required this.curriculumTitle,
+    required this.searching,
+    required this.controller,
+    required this.onToggleSearch,
+    required this.onQueryChanged,
+  });
 
   final String? curriculumTitle;
+  final bool searching;
+  final TextEditingController controller;
+  final VoidCallback onToggleSearch;
+  final ValueChanged<String> onQueryChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -116,28 +178,74 @@ class _Header extends ConsumerWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final ReceptionMode mode = ref.watch(receptionModeProvider);
     return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(20, 14, 20, 10),
+      padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 8, 6),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          if (curriculumTitle != null)
-            Text(
-              curriculumTitle!,
-              style: text.labelLarge?.copyWith(
-                color: palette.amberText,
-                fontWeight: FontWeight.w600,
+          if (searching)
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    autofocus: true,
+                    textInputAction: TextInputAction.search,
+                    onChanged: onQueryChanged,
+                    decoration: const InputDecoration(
+                      hintText: 'ابحث بعنوان الحديث أو كلمة من متنه أو رقمه',
+                      prefixIcon: Icon(Icons.search_rounded),
+                      isDense: true,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'إغلاق البحث',
+                  onPressed: onToggleSearch,
+                  icon: const Icon(Icons.close_rounded),
+                ),
+              ],
+            )
+          else ...<Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        curriculumTitle ?? 'منهاج المتون المتدرج',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: text.labelMedium?.copyWith(
+                          color: palette.amberText,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        'منهاج المتون',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.heritageTitle(color: palette.ink, fontSize: 28),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'بحث في الأحاديث',
+                  onPressed: onToggleSearch,
+                  icon: const Icon(Icons.search_rounded),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsetsDirectional.only(end: 12, top: 4),
+              child: _ReceptionToggle(
+                mode: mode,
+                onChanged: (ReceptionMode value) =>
+                    ref.read(receptionModeProvider.notifier).select(value),
               ),
             ),
-          Text(
-            'مسار الأربعين',
-            style: AppTypography.heritageTitle(color: palette.ink, fontSize: 34),
-          ),
-          const SizedBox(height: 12),
-          _ReceptionToggle(
-            mode: mode,
-            onChanged: (ReceptionMode value) =>
-                ref.read(receptionModeProvider.notifier).select(value),
-          ),
+          ],
         ],
       ),
     );
@@ -168,7 +276,7 @@ class _ReceptionToggle extends StatelessWidget {
             child: InkWell(
               onTap: () => onChanged(value),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 52),
+                constraints: const BoxConstraints(minHeight: 44),
                 child: ExcludeSemantics(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -204,7 +312,7 @@ class _ReceptionToggle extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(5),
+        padding: const EdgeInsets.all(4),
         child: Row(
           children: <Widget>[
             option(ReceptionMode.touch, Icons.touch_app_rounded, 'القراءة واللمس'),

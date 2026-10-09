@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/json/json_reader.dart';
 import '../../../core/text/arabic_digits.dart';
+import '../../../core/text/arabic_search.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/ui/app_shapes.dart';
@@ -18,6 +19,7 @@ import '../data/models/seerah_station.dart';
 import '../domain/seerah_map.dart';
 import '../domain/seerah_repository.dart';
 import 'seerah_scene_screen.dart';
+import 'widgets/seerah_detail_sheet.dart';
 import 'widgets/seerah_labels.dart';
 import 'widgets/seerah_map_view.dart';
 import 'widgets/seerah_timeline.dart';
@@ -51,7 +53,7 @@ class SeerahJourneyScreen extends ConsumerWidget {
   }
 }
 
-class _JourneyBody extends ConsumerWidget {
+class _JourneyBody extends ConsumerStatefulWidget {
   const _JourneyBody({required this.dataset, required this.land, required this.route});
 
   final SeerahDataset dataset;
@@ -59,10 +61,39 @@ class _JourneyBody extends ConsumerWidget {
   final SeerahRoute route;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_JourneyBody> createState() => _JourneyBodyState();
+}
+
+class _JourneyBodyState extends ConsumerState<_JourneyBody> {
+  final TextEditingController _query = TextEditingController();
+  bool _searching = false;
+
+  @override
+  void dispose() {
+    _query.dispose();
+    super.dispose();
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _searching = !_searching;
+      _query.clear();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final SeerahDataset dataset = widget.dataset;
+    final SeerahLand land = widget.land;
+    final SeerahRoute route = widget.route;
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
     final List<SeerahStationModel> stations = dataset.chronological;
+    if (stations.isEmpty) {
+      return Center(
+        child: Text('لا محطات في ملف السيرة.', style: text.bodyLarge?.copyWith(color: palette.inkSoft)),
+      );
+    }
     final String? chosen = ref.watch(selectedSeerahStationProvider);
     int selectedIndex = 0;
     for (int i = 0; i < stations.length; i++) {
@@ -102,26 +133,122 @@ class _JourneyBody extends ConsumerWidget {
     }
 
     final SeerahStationModel selected = stations[selectedIndex];
+    if (_searching) {
+      final List<SeerahStationModel> found = <SeerahStationModel>[
+        for (final SeerahStationModel station in stations)
+          if (ArabicSearch.matches(
+            '${station.title} ${station.place.name} ${station.timeLabel ?? ''} ${station.sceneDescription} '
+            '${station.challenge} ${station.propheticDecision}',
+            _query.text,
+          ))
+            station,
+      ];
+      return Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 8, 6),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    controller: _query,
+                    autofocus: true,
+                    textInputAction: TextInputAction.search,
+                    onChanged: (String _) => setState(() {}),
+                    decoration: const InputDecoration(
+                      hintText: 'ابحث في المحطات بالاسم أو الموضع أو كلمة من المشهد',
+                      prefixIcon: Icon(Icons.search_rounded),
+                      isDense: true,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'إغلاق البحث',
+                  onPressed: _toggleSearch,
+                  icon: const Icon(Icons.close_rounded),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: found.isEmpty
+                ? Center(
+                    child: Text(
+                      'لا محطة تطابق «${_query.text.trim()}».',
+                      style: text.bodyLarge?.copyWith(color: palette.inkSoft),
+                    ),
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                    itemCount: found.length,
+                    separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 10),
+                    itemBuilder: (BuildContext context, int i) {
+                      final SeerahStationModel station = found[i];
+                      return SmoothSurface(
+                        radius: AppShapes.radiusMedium,
+                        borderColor: palette.line,
+                        padding: const EdgeInsets.all(14),
+                        semanticLabel: 'المحطة ${arabicDigits(station.order)}: ${station.title}',
+                        onTap: () {
+                          ref.read(selectedSeerahStationProvider.notifier).select(station.id);
+                          _toggleSearch();
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              'المحطة ${arabicDigits(station.order)} · ${epochLabel(station.epoch)} · ${station.place.name}',
+                              style: text.labelMedium?.copyWith(
+                                color: palette.amberText,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              station.title,
+                              style: AppTypography.heritageTitle(color: palette.ink, fontSize: 22),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      );
+    }
     return CustomScrollView(
       slivers: <Widget>[
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(20, 14, 20, 10),
-            child: Column(
+            padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 8, 6),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  dataset.title,
-                  style: text.labelLarge?.copyWith(color: palette.amberText, fontWeight: FontWeight.w600),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        dataset.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: text.labelLarge?.copyWith(color: palette.amberText, fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        'رحلة السيرة',
+                        style: AppTypography.heritageTitle(color: palette.ink, fontSize: 30),
+                      ),
+                      Text(
+                        'ثلاثة مشاهد لكل محطة · أتممتَ ${arabicDigits(visitedCount)} من ${arabicDigits(stations.length)}',
+                        style: text.bodySmall?.copyWith(color: palette.inkSoft),
+                      ),
+                    ],
+                  ),
                 ),
-                Text(
-                  'رحلة السيرة',
-                  style: AppTypography.heritageTitle(color: palette.ink, fontSize: 34),
-                ),
-                Text(
-                  'لكل محطة ثلاثة مشاهد: المشهد الزماني، والمأزق، والقرار النبوي ونتيجته · '
-                  'أتممتَ ${arabicDigits(visitedCount)} من ${arabicDigits(stations.length)}',
-                  style: text.bodySmall?.copyWith(color: palette.inkSoft),
+                IconButton(
+                  tooltip: 'بحث في المحطات',
+                  onPressed: _toggleSearch,
+                  icon: const Icon(Icons.search_rounded),
                 ),
               ],
             ),
@@ -172,6 +299,7 @@ class _JourneyBody extends ConsumerWidget {
               total: stations.length,
               visited: visited.contains(selected.id),
               onOpen: () => openScenes(selected),
+              onDetails: () => showSeerahDetailSheet(context, selected),
             ),
           ),
         ),
@@ -196,12 +324,14 @@ class _SelectedStationCard extends StatelessWidget {
     required this.total,
     required this.visited,
     required this.onOpen,
+    required this.onDetails,
   });
 
   final SeerahStationModel station;
   final int total;
   final bool visited;
   final VoidCallback onOpen;
+  final VoidCallback onDetails;
 
   @override
   Widget build(BuildContext context) {
@@ -250,6 +380,12 @@ class _SelectedStationCard extends StatelessWidget {
             subtitle: 'المشهد الزماني ← المأزق ← القرار النبوي ونتيجته',
             icon: Icons.theaters_rounded,
             onPressed: onOpen,
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: onDetails,
+            icon: const Icon(Icons.menu_book_rounded),
+            label: const Text('التفاصيل والرواية الكاملة'),
           ),
         ],
       ),

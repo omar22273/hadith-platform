@@ -3,6 +3,7 @@
 // المحطة المختارة كهرماني، والقادم نقاط هادئة. تُكبَّر الخريطة باللمس، وتبقى
 // العلامات بحجمها.
 
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show PathMetric;
 
@@ -41,6 +42,16 @@ class SeerahMapProjection {
   }
 }
 
+/// مصفوفة تمركز نقطة [at] (بإحداثيات اللوحة) في وسط الإطار بتكبير [scale]،
+/// محصورة داخل حدود اللوحة فلا يظهر فراغ خارجها.
+Matrix4 seerahCameraMatrix({required Offset at, required Size size, required double scale}) {
+  final double tx = (size.width / 2 - at.dx * scale).clamp(size.width - size.width * scale, 0.0).toDouble();
+  final double ty = (size.height / 2 - at.dy * scale).clamp(size.height - size.height * scale, 0.0).toDouble();
+  return Matrix4.identity()
+    ..translateByDouble(tx, ty, 0, 1)
+    ..scaleByDouble(scale, scale, 1, 1);
+}
+
 /// الخريطة.
 class SeerahMapView extends StatefulWidget {
   const SeerahMapView({
@@ -75,13 +86,73 @@ class SeerahMapView extends StatefulWidget {
   State<SeerahMapView> createState() => _SeerahMapViewState();
 }
 
-class _SeerahMapViewState extends State<SeerahMapView> {
+class _SeerahMapViewState extends State<SeerahMapView> with SingleTickerProviderStateMixin {
+  /// تكبير التمركز على محطة مختارة: يفصل الدبابيس المتجاورة في الحجاز.
+  static const double focusZoom = 3.2;
+
   final TransformationController _transform = TransformationController();
+  late final AnimationController _camera = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 650),
+  );
+  Animation<Matrix4>? _tween;
+  Size _size = Size.zero;
+  SeerahMapProjection? _projection;
+
+  @override
+  void initState() {
+    super.initState();
+    _camera.addListener(() {
+      final Animation<Matrix4>? tween = _tween;
+      if (tween != null) {
+        _transform.value = tween.value;
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(SeerahMapView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedIndex != widget.selectedIndex) {
+      _focusSelected();
+    }
+  }
 
   @override
   void dispose() {
+    _camera.dispose();
     _transform.dispose();
     super.dispose();
+  }
+
+  /// يحرّك الكاميرا إلى موضع المحطة المختارة تحريكاً ناعماً (أو فوراً عند تقليل الحركة).
+  void _focusSelected() {
+    final SeerahMapProjection? projection = _projection;
+    if (projection == null || widget.stations.isEmpty || _size.isEmpty) {
+      return;
+    }
+    final String id = widget.stations[widget.selectedIndex].id;
+    final int? clusterIndex = widget.route.clusterOfStation[id];
+    if (clusterIndex == null) {
+      return;
+    }
+    final Offset at = projection.project(widget.route.clusters[clusterIndex].center);
+    final Matrix4 target = seerahCameraMatrix(at: at, size: _size, scale: focusZoom);
+    _animateTo(target);
+  }
+
+  void _resetCamera() => _animateTo(Matrix4.identity());
+
+  void _animateTo(Matrix4 target) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _camera.stop();
+      _transform.value = target;
+      return;
+    }
+    _tween = Matrix4Tween(begin: _transform.value, end: target).animate(
+      CurvedAnimation(parent: _camera, curve: Curves.easeInOutCubic),
+    );
+    unawaited(_camera.forward(from: 0));
   }
 
   @override
@@ -93,53 +164,69 @@ class _SeerahMapViewState extends State<SeerahMapView> {
           widget.land.bounds,
           constraints.maxWidth,
         );
+        _projection = projection;
+        _size = Size(projection.width, projection.height);
         final String selectedId = widget.stations.isEmpty ? '' : widget.stations[widget.selectedIndex].id;
         final int? selectedCluster = widget.route.clusterOfStation[selectedId];
         return SizedBox(
           width: projection.width,
           height: projection.height,
-          child: ClipRect(
-            child: InteractiveViewer(
-              transformationController: _transform,
-              minScale: 1,
-              maxScale: 6,
-              child: SizedBox(
-                width: projection.width,
-                height: projection.height,
-                child: AnimatedBuilder(
-                  animation: _transform,
-                  builder: (BuildContext context, Widget? child) {
-                    final double zoom = _transform.value.getMaxScaleOnAxis();
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: <Widget>[
-                        Positioned.fill(
-                          child: RepaintBoundary(
-                            child: CustomPaint(
-                              painter: _SeerahMapPainter(
-                                land: widget.land,
-                                route: widget.route,
-                                projection: projection,
-                                reachedStationIndex: widget.selectedIndex,
-                                palette: palette,
-                                zoom: zoom,
+          child: Stack(
+            children: <Widget>[
+              ClipRect(
+                child: InteractiveViewer(
+                  transformationController: _transform,
+                  minScale: 1,
+                  maxScale: 6,
+                  onInteractionStart: (ScaleStartDetails details) => _camera.stop(),
+                  child: SizedBox(
+                    width: projection.width,
+                    height: projection.height,
+                    child: AnimatedBuilder(
+                      animation: _transform,
+                      builder: (BuildContext context, Widget? child) {
+                        final double zoom = _transform.value.getMaxScaleOnAxis();
+                        return Stack(
+                          clipBehavior: Clip.none,
+                          children: <Widget>[
+                            Positioned.fill(
+                              child: RepaintBoundary(
+                                child: CustomPaint(
+                                  painter: _SeerahMapPainter(
+                                    land: widget.land,
+                                    route: widget.route,
+                                    projection: projection,
+                                    reachedStationIndex: widget.selectedIndex,
+                                    palette: palette,
+                                    zoom: zoom,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        for (final SeerahPlaceCluster cluster in widget.route.clusters)
-                          _positionedPin(
-                            cluster: cluster,
-                            projection: projection,
-                            zoom: zoom,
-                            selected: cluster.index == selectedCluster,
-                          ),
-                      ],
-                    );
-                  },
+                            for (final SeerahPlaceCluster cluster in widget.route.clusters)
+                              _positionedPin(
+                                cluster: cluster,
+                                projection: projection,
+                                zoom: zoom,
+                                selected: cluster.index == selectedCluster,
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
-            ),
+              PositionedDirectional(
+                top: 6,
+                start: 6,
+                child: IconButton.filledTonal(
+                  tooltip: 'عرض الخريطة كاملة',
+                  onPressed: _resetCamera,
+                  icon: const Icon(Icons.zoom_out_map_rounded),
+                ),
+              ),
+            ],
           ),
         );
       },

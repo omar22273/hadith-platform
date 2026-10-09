@@ -10,6 +10,7 @@ import '../data/asset_hadith_repository.dart';
 import '../data/models/models.dart';
 import '../domain/hadith_bundle.dart';
 import '../domain/hadith_repository.dart';
+import '../domain/hadith_search.dart';
 
 export '../../../core/content/source_catalog_provider.dart' show sourceCatalogProvider;
 
@@ -56,6 +57,25 @@ final FutureProviderFamily<HadithBundle, String> hadithBundleProvider =
     final NarratorCatalog narrators = await ref.watch(narratorCatalogProvider.future);
     final SourceCatalog sources = await ref.watch(sourceCatalogProvider.future);
     return HadithBundle(hadith: hadith, narrators: narrators, sources: sources);
+  },
+  retry: contentNoRetry,
+);
+
+/// فهرس البحث: الأحاديث المُعدّة فقط. حديث تعذر تحميله يُتخطّى ولا يمنع البحث.
+final FutureProvider<List<HadithSearchEntry>> hadithSearchIndexProvider =
+    FutureProvider<List<HadithSearchEntry>>(
+  (Ref ref) async {
+    final CurriculumManifest curriculum = await ref.watch(curriculumProvider.future);
+    final List<HadithSearchEntry> entries = <HadithSearchEntry>[];
+    for (final CurriculumItem item in curriculum.items) {
+      try {
+        final HadithDailyModel hadith = await ref.watch(hadithProvider(item.hadithId).future);
+        entries.add(HadithSearchEntry.of(item, hadith));
+      } on Object {
+        continue;
+      }
+    }
+    return List<HadithSearchEntry>.unmodifiable(entries);
   },
   retry: contentNoRetry,
 );

@@ -17,6 +17,8 @@ import '../../../core/ui/app_shapes.dart';
 import '../../../core/ui/smooth_surface.dart';
 import '../application/seerah_providers.dart';
 import '../data/models/seerah_station.dart';
+import '../domain/seerah_checkpoint.dart';
+import 'seerah_checkpoint_screen.dart';
 import 'widgets/seerah_labels.dart';
 
 /// شاشة المشاهد.
@@ -59,6 +61,26 @@ class _SeerahSceneScreenState extends ConsumerState<SeerahSceneScreen> {
     if (page == SeerahScene.values.length - 1) {
       ref.read(seerahVisitedProvider.notifier).markVisited(widget.stationId);
     }
+  }
+
+  /// ينتقل إلى المحطة التالية، وتتوسط الطريق واحة استذكار كل خمس محطات.
+  Future<void> _continueTo(
+    SeerahStationModel next,
+    List<SeerahStationModel> ordered,
+    int currentIndex,
+  ) async {
+    final SeerahCheckpoint? checkpoint = SeerahCheckpoint.after(ordered, currentIndex);
+    if (checkpoint != null) {
+      await Navigator.of(context).push<bool>(
+        MaterialPageRoute<bool>(
+          builder: (BuildContext routeContext) => SeerahCheckpointScreen(checkpoint: checkpoint),
+        ),
+      );
+      if (!mounted) {
+        return;
+      }
+    }
+    _openStation(next);
   }
 
   void _openStation(SeerahStationModel station) {
@@ -126,12 +148,12 @@ class _SeerahSceneScreenState extends ConsumerState<SeerahSceneScreen> {
                     flex: 2,
                     child: FilledButton.icon(
                       onPressed: last
-                          ? (next == null ? () => Navigator.of(context).maybePop() : () => _openStation(next))
+                          ? (next == null ? () => Navigator.of(context).maybePop() : () => unawaited(_continueTo(next, ordered, index)))
                           : () => _goTo(_page + 1),
                       icon: Icon(last && next == null ? Icons.map_rounded : Icons.arrow_forward_rounded),
                       label: Text(
                         last
-                            ? (next == null ? 'العودة إلى الخريطة' : 'المحطة التالية: ${next.title}')
+                            ? (next == null ? 'العودة إلى الخريطة' : (SeerahCheckpoint.isDueAfter(index, ordered.length) ? 'واحة الاستذكار ثم المتابعة' : 'المحطة التالية: ${next.title}'))
                             : 'المشهد التالي',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

@@ -16,6 +16,7 @@ dependencies:
   shared_preferences: ^2.5.5
   flutter_tts: ^4.2.5
   just_audio: ^0.10.6
+  share_plus: ^13.0.0
 
 dev_dependencies:
   flutter_test:
