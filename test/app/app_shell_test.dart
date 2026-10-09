@@ -12,6 +12,10 @@ import 'package:hadith_platform/app/hadith_app.dart';
 import 'package:hadith_platform/core/content/asset_json_source.dart';
 import 'package:hadith_platform/core/storage/key_value_store.dart';
 import 'package:hadith_platform/core/time/clock.dart';
+import 'package:hadith_platform/features/hadith/application/hadith_providers.dart';
+import 'package:hadith_platform/features/journey/application/journey_controller.dart';
+import 'package:hadith_platform/features/journey/application/journey_progress_controller.dart';
+import 'package:hadith_platform/features/journey/application/pacing_notifier.dart';
 
 /// حزمة أصول تقرأ من القرص مباشرة، فلا تحتاج قراءة الملفات الكبيرة إلى عزلة.
 class _DiskBundle extends CachingAssetBundle {
@@ -54,6 +58,11 @@ void main() {
     );
     await _settle(tester);
 
+    final ProviderContainer container = ProviderScope.containerOf(tester.element(find.byType(HadithApp)));
+    printOnFailure('curriculum: ${container.read(curriculumProvider)}');
+    printOnFailure('progress: ${container.read(journeyProgressProvider)}');
+    printOnFailure('pacing: ${container.read(pacingProvider)}');
+    printOnFailure('journey: ${container.read(journeyControllerProvider)}');
     expect(find.text('مسار الأربعين'), findsWidgets);
     expect(find.text('الأعمال بالنيات'), findsWidgets);
     expect(find.text('قيد الإعداد'), findsWidgets);
