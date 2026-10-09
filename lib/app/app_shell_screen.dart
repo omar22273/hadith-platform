@@ -5,6 +5,8 @@
 // زر الرجوع في غير التبويب الأول يعيد إليه بدل إغلاق التطبيق، وعودة التطبيق
 // من الخلفية تقدّم الساعة المرجعية فيُعاد حساب قفل الفجر والاستمرارية.
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,6 +17,7 @@ import '../core/theme/app_typography.dart';
 import '../core/time/clock.dart';
 import '../core/ui/app_shapes.dart';
 import '../features/journey/presentation/arbaeen_path_screen.dart';
+import '../features/reminders/application/reminder_controller.dart';
 import '../features/review/presentation/review_arena_screen.dart';
 import '../features/seerah/presentation/seerah_journey_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
@@ -37,6 +40,13 @@ class _AppShellScreenState extends ConsumerState<AppShellScreen> {
     _lifecycle = AppLifecycleListener(
       onResume: () => ref.read(nowProvider.notifier).tick(),
     );
+    // توفيق التنبيه اليومي مع الإعدادات المحفوظة عند كل فتح: يعيد جدولته إن
+    // تغيّر التوقيت، ويكشف سحب إذن الإشعارات.
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      if (mounted) {
+        unawaited(ref.read(reminderControllerProvider.notifier).syncSchedule());
+      }
+    });
   }
 
   @override

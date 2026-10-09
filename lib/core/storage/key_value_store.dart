@@ -34,6 +34,9 @@ abstract final class StorageKeys {
   /// محطات رحلة السيرة التي فتحها المستخدم.
   static const String seerahVisited = 'seerah.visited.v1';
 
+  /// إعدادات تذكير الورد اليومي: التفعيل والوقت.
+  static const String reminder = 'settings.reminder.v1';
+
   /// كل المفاتيح.
   static const Set<String> all = <String>{
     journeyProgress,
@@ -45,6 +48,7 @@ abstract final class StorageKeys {
     readingPreferences,
     pacing,
     seerahVisited,
+    reminder,
   };
 }
 

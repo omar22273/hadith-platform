@@ -12,6 +12,8 @@ import 'package:hadith_platform/core/content/asset_json_source.dart';
 import 'package:hadith_platform/core/share/share_service.dart';
 import 'package:hadith_platform/core/storage/key_value_store.dart';
 import 'package:hadith_platform/core/time/clock.dart';
+import 'package:hadith_platform/features/backup/data/backup_file_picker.dart';
+import 'package:hadith_platform/features/reminders/application/notification_service.dart';
 import 'package:hadith_platform/features/journey/domain/journey_progress.dart';
 
 /// حزمة أصول تقرأ من القرص مباشرة.
@@ -54,6 +56,8 @@ Future<ProviderContainer> pumpApp(
   Size size = const Size(412, 915),
   double systemTextScale = 1,
   ShareService? shareService,
+  NotificationService? notificationService,
+  BackupFilePicker? backupFilePicker,
 }) async {
   tester.view.physicalSize = size * 3;
   tester.view.devicePixelRatio = 3;
@@ -67,6 +71,8 @@ Future<ProviderContainer> pumpApp(
         assetJsonSourceProvider.overrideWithValue(AssetJsonSource(DiskBundle())),
         clockProvider.overrideWithValue(() => DateTime(2026, 10, 9, 10)),
         if (shareService != null) shareServiceProvider.overrideWithValue(shareService),
+        if (notificationService != null) notificationServiceProvider.overrideWithValue(notificationService),
+        if (backupFilePicker != null) backupFilePickerProvider.overrideWithValue(backupFilePicker),
       ],
       child: const HadithApp(),
     ),

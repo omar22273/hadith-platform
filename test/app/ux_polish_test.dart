@@ -11,7 +11,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hadith_platform/app/app_shell_screen.dart';
-import 'package:hadith_platform/core/share/share_service.dart';
 import 'package:hadith_platform/core/storage/key_value_store.dart';
 import 'package:hadith_platform/features/hadith/application/hadith_providers.dart';
 import 'package:hadith_platform/features/hadith/data/models/models.dart';
@@ -25,15 +24,7 @@ import 'package:hadith_platform/features/seerah/domain/seerah_checkpoint.dart';
 import 'package:hadith_platform/features/seerah/presentation/seerah_checkpoint_screen.dart';
 
 import '../support/app_harness.dart';
-
-class _FakeShare implements ShareService {
-  final List<String> shared = <String>[];
-
-  @override
-  Future<void> shareText(String text, {String? subject}) async {
-    shared.add(text);
-  }
-}
+import '../support/fakes.dart';
 
 Finder _navLabel(String label) {
   return find.descendant(of: find.byType(AppBottomBar), matching: find.text(label));
@@ -189,7 +180,7 @@ void main() {
   });
 
   testWidgets('sharing copies the vocalized matn with its takhrij, or opens the share sheet', (WidgetTester tester) async {
-    final _FakeShare share = _FakeShare();
+    final FakeShareService share = FakeShareService();
     String? clipboard;
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (MethodCall call) async {
       if (call.method == 'Clipboard.setData') {
@@ -215,10 +206,10 @@ void main() {
 
     await tester.tap(find.byTooltip('مشاركة الحديث'));
     await settle(tester);
-    await tester.tap(find.widgetWithText(FilledButton, 'مشاركة'));
+    await tester.tap(find.widgetWithText(TextButton, 'مشاركة كنص'));
     await settle(tester);
-    expect(share.shared, hasLength(1));
-    expect(share.shared.single, contains(hadith.matn.fullText));
+    expect(share.texts, hasLength(1));
+    expect(share.texts.single, contains(hadith.matn.fullText));
   });
 
   testWidgets('every tab survives the largest fonts on a narrow phone without overflow', (WidgetTester tester) async {
