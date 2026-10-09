@@ -1,8 +1,10 @@
 // لوحة ألوان المنصة: ورق دافئ وحبر وقور ولمسات كهرمانية وزمردية للإنجاز.
 //
-// الوضع الفاتح: خلفية ورقية #FBF9F5 وحبر #0F172A.
-// الوضع الداكن: خلفية #0F172A وبطاقات #1E293B.
-// الكهرماني #D97706 للتدرجات والمحطة النشطة، والزمردي #059669 للإنجاز.
+// الوضع النهاري التراثي (Warm Parchment): خلفية كتان عاجي #F8F6F0، وبطاقات
+// بيضاء #FFFFFF بحواف خفيفة #E2E8F0، وحبر فحمي #0F172A، ونصوص ثانوية #475569،
+// ولمسات كهرمانية وزمردية هادئة.
+// الوضع الداكن: خلفية كحلية فاحمة #0F172A وبطاقات #1E293B، بالذهبي #D97706
+// والزمردي #059669.
 // لا يوجد لون أحمر في اللوحة: المنصة لا تعاقب ولا تنذر.
 
 import 'package:flutter/material.dart';
@@ -31,26 +33,26 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.road,
   });
 
-  /// ألوان الوضع الفاتح.
+  /// ألوان الوضع النهاري التراثي (Warm Parchment).
   static const AppPalette light = AppPalette(
-    paper: Color(0xFFFBF9F5),
-    surface: Color(0xFFFFFDF8),
-    surfaceMuted: Color(0xFFF8FAFC),
+    paper: Color(0xFFF8F6F0),
+    surface: Color(0xFFFFFFFF),
+    surfaceMuted: Color(0xFFF2EFE7),
     ink: Color(0xFF0F172A),
-    inkSoft: Color(0xFF526075),
-    line: Color(0xFFE7DFCF),
-    amber: Color(0xFFD97706),
-    amberDeep: Color(0xFFB45309),
-    amberSoft: Color(0xFFFEF3C7),
-    amberText: Color(0xFFB45309),
-    emerald: Color(0xFF059669),
-    emeraldSoft: Color(0xFFD1FAE5),
-    emeraldText: Color(0xFF047857),
+    inkSoft: Color(0xFF475569),
+    line: Color(0xFFE2E8F0),
+    amber: Color(0xFFC27A0E),
+    amberDeep: Color(0xFF9A5B0B),
+    amberSoft: Color(0xFFFBF1DC),
+    amberText: Color(0xFF92400E),
+    emerald: Color(0xFF0E8A63),
+    emeraldSoft: Color(0xFFE2F3EB),
+    emeraldText: Color(0xFF065F46),
     locked: Color(0xFF94A3B8),
-    lockedSoft: Color(0xFFEEF1F5),
+    lockedSoft: Color(0xFFEFF1F4),
     onAccent: Color(0xFFFFFFFF),
-    shadow: Color(0x400F172A),
-    road: Color(0xFFEFE6D3),
+    shadow: Color(0x330F172A),
+    road: Color(0xFFEAE3D2),
   );
 
   /// ألوان الوضع الداكن.

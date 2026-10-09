@@ -22,6 +22,18 @@ abstract final class StorageKeys {
   /// ملح عشوائي ثابت للجهاز، تُبنى منه بعثرة الترصيع الخاصة بكل مستخدم.
   static const String installSalt = 'device.install_salt.v1';
 
+  /// نمط السمة: تلقائي، أو النهاري التراثي، أو الداكن.
+  static const String themeMode = 'settings.theme_mode.v1';
+
+  /// إعدادات الخطوط والحجم.
+  static const String readingPreferences = 'settings.reading.v1';
+
+  /// إعدادات وتيرة الأوراد: الحصة المختارة، وتخطي القفل للتجربة، وأفضل استمرارية مسجلة.
+  static const String pacing = 'pacing.settings.v1';
+
+  /// محطات رحلة السيرة التي فتحها المستخدم.
+  static const String seerahVisited = 'seerah.visited.v1';
+
   /// كل المفاتيح.
   static const Set<String> all = <String>{
     journeyProgress,
@@ -29,6 +41,10 @@ abstract final class StorageKeys {
     receptionMode,
     oralPace,
     installSalt,
+    themeMode,
+    readingPreferences,
+    pacing,
+    seerahVisited,
   };
 }
 

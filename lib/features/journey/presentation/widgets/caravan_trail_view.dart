@@ -1,5 +1,6 @@
-// مسار القوافل المتعرج: طريق S عمودي يرسمه CustomPainter، تعلوه رؤوس المراحل
-// وكتل المحطات ومجسم القافلة. عند تقدم القافلة تسير على المقطع الجديد حركةً.
+// مسار القوافل المتعرج لأوراد الأربعين: طريق S عمودي يرسمه CustomPainter،
+// تعلوه رؤوس المجموعات وعقد الأحاديث ومجسم القافلة. عند تقدم القافلة تسير
+// على المقطع الجديد حركةً، ويُلغى ذلك إن طلب المستخدم تقليل الحركة.
 
 import 'dart:async';
 
@@ -9,23 +10,22 @@ import '../../../../core/theme/app_palette.dart';
 import '../../domain/journey_snapshot.dart';
 import 'caravan_marker.dart';
 import 'caravan_trail_painter.dart';
-import 'station_labels.dart';
-import 'station_node.dart';
 import 'trail_geometry.dart';
+import 'wird_node.dart';
 
-/// عرض المسار. ارتفاعه ثابت محسوب، ويوضع داخل قائمة تمرير الشاشة.
+/// المسار.
 class CaravanTrailView extends StatefulWidget {
   const CaravanTrailView({
     super.key,
     required this.snapshot,
-    required this.onStationTap,
+    required this.onNodeTap,
   });
 
-  /// لقطة المسار.
+  /// اللقطة.
   final JourneySnapshot snapshot;
 
-  /// لمس محطة.
-  final ValueChanged<int> onStationTap;
+  /// فتح بطاقة عقدة بموضعها.
+  final ValueChanged<int> onNodeTap;
 
   @override
   State<CaravanTrailView> createState() => _CaravanTrailViewState();
@@ -33,7 +33,7 @@ class CaravanTrailView extends StatefulWidget {
 
 class _CaravanTrailViewState extends State<CaravanTrailView> with TickerProviderStateMixin {
   static const double _maxTextScale = 1.3;
-  static const double _markerSize = 46;
+  static const double _markerSize = 44;
 
   late final AnimationController _pulse = AnimationController(
     vsync: this,
@@ -80,12 +80,9 @@ class _CaravanTrailViewState extends State<CaravanTrailView> with TickerProvider
     }
   }
 
-  /// التوهج يعمل فقط حين توجد محطة نشطة، ويتوقف عند تقليل الحركة.
   void _syncPulse() {
-    final bool hasActive = widget.snapshot.stations.any(
-      (StationView view) => view.status == StationStatus.active,
-    );
-    if (hasActive && !_reduceMotion) {
+    final bool hasToday = widget.snapshot.todayKind == TodayKind.available;
+    if (hasToday && !_reduceMotion) {
       if (!_pulse.isAnimating) {
         _pulse.repeat();
       }
@@ -105,7 +102,7 @@ class _CaravanTrailViewState extends State<CaravanTrailView> with TickerProvider
   }
 
   void _scheduleScrollToCaravan({required bool animate}) {
-    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+    WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
       final BuildContext? rowContext = _caravanRowKey.currentContext;
       if (!mounted || rowContext == null) {
         return;
@@ -131,7 +128,9 @@ class _CaravanTrailViewState extends State<CaravanTrailView> with TickerProvider
       _scheduleScrollToCaravan(animate: false);
     }
     final JourneySnapshot snapshot = widget.snapshot;
-
+    final List<int> groups = <int>[
+      for (final WirdNode node in snapshot.nodes) node.segmentIndex,
+    ];
     return MediaQuery.withClampedTextScaling(
       maxScaleFactor: _maxTextScale,
       child: LayoutBuilder(
@@ -139,7 +138,7 @@ class _CaravanTrailViewState extends State<CaravanTrailView> with TickerProvider
           final TrailLayout layout = TrailLayout.compute(
             width: constraints.maxWidth,
             textScale: clampedScale,
-            stations: snapshot.stations,
+            groupOfNode: groups,
           );
           final List<Widget> children = <Widget>[
             Positioned.fill(
@@ -156,36 +155,19 @@ class _CaravanTrailViewState extends State<CaravanTrailView> with TickerProvider
               ),
             ),
           ];
-
-          for (int h = 0; h < layout.headers.length; h++) {
-            final TrailHeaderBox header = layout.headers[h];
-            final List<StationView> inRegion = snapshot.stations
-                .where((StationView view) => view.station.regionId == header.regionId)
-                .toList();
-            final double done = inRegion.fold<double>(0, (double sum, StationView view) {
-              if (view.wirds.isEmpty) {
-                return sum + (view.status == StationStatus.completed ? 1 : 0);
-              }
-              return sum + view.completedCount / view.wirds.length;
-            });
-            final StationView first = snapshot.stations[header.firstStationIndex];
+          for (final TrailHeaderBox header in layout.headers) {
+            final PathSegment segment = snapshot.segments[header.groupIndex];
             children.add(
               Positioned.fromRect(
                 rect: header.rect,
-                child: RegionHeader(
-                  ordinal: regionOrdinal(h),
-                  name: first.region.name,
-                  theme: first.region.theme,
-                  stationCount: inRegion.length,
-                  completedFraction: inRegion.isEmpty ? 0 : done / inRegion.length,
-                  locked: header.firstStationIndex > snapshot.caravanIndex,
+                child: SegmentHeader(
+                  segment: segment,
+                  locked: header.firstNodeIndex > snapshot.caravanIndex,
                 ),
               ),
             );
           }
-
-          for (int k = 0; k < snapshot.stations.length; k++) {
-            final StationView view = snapshot.stations[k];
+          for (int k = 0; k < snapshot.nodes.length; k++) {
             children.add(
               Positioned(
                 key: k == snapshot.caravanIndex ? _caravanRowKey : null,
@@ -193,44 +175,42 @@ class _CaravanTrailViewState extends State<CaravanTrailView> with TickerProvider
                 top: layout.rowTops[k],
                 width: layout.width,
                 height: layout.rowHeight,
-                child: StationNode(
-                  view: view,
-                  today: snapshot.todayKind,
-                  dayNumber: view.status == StationStatus.active ? snapshot.nextDayNumber : null,
+                child: WirdNodeView(
+                  node: snapshot.nodes[k],
                   centerX: layout.nodeCenters[k].dx,
                   rowHeight: layout.rowHeight,
                   nodeRadius: layout.nodeRadius,
                   width: layout.width,
                   pulse: _pulse,
-                  onTap: () => widget.onStationTap(k),
+                  onTap: () => widget.onNodeTap(k),
                 ),
               ),
             );
           }
-
-          children.add(
-            AnimatedBuilder(
-              animation: _travelCurve,
-              builder: (BuildContext context, Widget? child) {
-                final bool travelling = _travelSegment >= 0 && _travel.value < 1;
-                final Offset anchor = travelling
-                    ? layout.pointAlong(_travelSegment, _travelCurve.value)
-                    : layout.nodeCenters[snapshot.caravanIndex];
-                return Positioned(
-                  left: anchor.dx - _markerSize / 2,
-                  top: anchor.dy - layout.nodeRadius - _markerSize + 6,
-                  width: _markerSize,
-                  height: _markerSize,
-                  child: IgnorePointer(child: child),
-                );
-              },
-              child: CaravanMarker(
-                size: _markerSize,
-                waiting: snapshot.todayKind == TodayKind.capReached,
+          if (snapshot.nodes.isNotEmpty) {
+            children.add(
+              AnimatedBuilder(
+                animation: _travelCurve,
+                builder: (BuildContext context, Widget? child) {
+                  final bool travelling = _travelSegment >= 0 && _travel.value < 1;
+                  final Offset anchor = travelling
+                      ? layout.pointAlong(_travelSegment, _travelCurve.value)
+                      : layout.nodeCenters[snapshot.caravanIndex];
+                  return Positioned(
+                    left: anchor.dx - _markerSize / 2,
+                    top: anchor.dy - layout.nodeRadius - _markerSize + 6,
+                    width: _markerSize,
+                    height: _markerSize,
+                    child: IgnorePointer(child: child),
+                  );
+                },
+                child: CaravanMarker(
+                  size: _markerSize,
+                  waiting: snapshot.todayKind == TodayKind.capReached,
+                ),
               ),
-            ),
-          );
-
+            );
+          }
           return SizedBox(
             width: layout.width,
             height: layout.height,

@@ -1,298 +1,292 @@
-// لقطة مسار القوافل: حساب صرف (بلا واجهة ولا تخزين) لحالة كل محطة،
-// وموضع القافلة، ووِرد اليوم، ونسبة التقدم، ووقت الفتح القادم.
+// لقطة مسار الأربعين: حساب صرف (بلا واجهة ولا تخزين) لحالة كل وِرد على
+// المسار، وموضع القافلة، ووِرد اليوم، ونسبة التقدم، ووقت الفتح القادم.
+//
+// المسار مخصص لأوراد الأحاديث النبوية وحدها: كل عقدة حديث من الكتاب برقمه،
+// ولا صلة له بمحطات السيرة ولا بحواضر الرواية؛ فتلك لها رحلتها المستقلة.
 //
 // القواعد:
-// - المحطة مكتملة إذا اكتملت كل أورادها في المنهج.
-// - المحطة النشطة هي محطة الوِرد التالي، ما دام وِردها متاحاً أو كانت القافلة فيها.
-// - إذا اكتمل وِرد اليوم وكان الوِرد التالي في محطة جديدة، تبقى القافلة في
-//   محطتها وتُقفل المحطة الجديدة قفلاً زمنياً حتى الفجر، ثم تسير إليها.
-// - المحطات التي لم تُربط بها أوراد في المنهج بعد تبقى مقفلة بسبب ذلك.
+// - العقدة مكتملة إذا أُتمّ وِردها، ونشطة إذا كانت وِرد اليوم المتاح.
+// - إذا بلغ المستخدم حصة اليوم بقيت القافلة عند آخر وِرد أتمّه، ويُقفل
+//   الوِرد التالي حتى الفجر (ما لم يُتخطَّ القفل يدوياً لأغراض التجربة).
+// - الأحاديث التي لم يكتمل إعدادها ومراجعتها تظهر مقفلة «قيد الإعداد» بلا
+//   عنوان، فلا يُنسب إليها نص لم يُوثَّق بعد.
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/text/arabic_digits.dart';
 import '../../hadith/data/models/models.dart';
 import 'journey_progress.dart';
-import 'unlock_schedule.dart';
+import 'pacing.dart';
 
-/// حالة المحطة.
-enum StationStatus {
-  /// اكتملت أورادها (زمردية مع علامة الإنجاز).
+/// حالة عقدة الوِرد.
+enum WirdNodeStatus {
+  /// أُتمّ وِردها.
   completed,
 
-  /// محطة وِرد اليوم (توهج كهرماني مع مجسم القافلة).
-  active,
-
-  /// مقفلة حتى يحين وِردها (رمادية مع قفل زمني).
-  locked,
-}
-
-/// سبب القفل.
-enum StationLockReason {
-  /// تسبقها محطة لم تكتمل.
-  awaitingPrevious,
-
-  /// وِردها التالي يُفتح عند الفجر.
-  awaitingDawn,
-
-  /// لم تُربط بها أوراد في نسخة المنهج الحالية.
-  notInCurriculumYet,
-}
-
-/// حالة الوِرد داخل المحطة.
-enum WirdStatus {
-  /// مكتمل.
-  completed,
-
-  /// وِرد اليوم المتاح الآن.
+  /// وِرد اليوم المتاح.
   today,
 
-  /// الوِرد التالي، يُفتح عند الفجر.
+  /// الوِرد التالي، مقفل حتى الفجر لبلوغ حصة اليوم.
   afterDawn,
 
-  /// وِرد قادم.
+  /// مُعدّ، وينتظر ما قبله.
   upcoming,
+
+  /// لم يكتمل إعداده ومراجعته بعد.
+  inPreparation,
 }
 
 /// حالة وِرد اليوم.
 enum TodayKind {
-  /// الوِرد متاح.
+  /// وِرد اليوم متاح.
   available,
 
-  /// اكتمل وِرد اليوم، والتالي يُفتح عند الفجر.
+  /// بلغ المستخدم حصة اليوم؛ يُفتح الجديد عند الفجر.
   capReached,
 
-  /// اكتملت الأوراد المتاحة في المنهج كله.
+  /// أتمّ كل الأوراد المُعدّة في هذا الإصدار.
   curriculumFinished,
 }
 
-/// وِرد في محطة.
+/// عقدة على المسار: حديث واحد برقمه في الكتاب.
 @immutable
-class StationWird {
-  const StationWird({
-    required this.item,
-    required this.dayNumber,
-    required this.status,
-  });
-
-  /// عنصر المنهج.
-  final CurriculumItem item;
-
-  /// رقم اليوم في الرحلة.
-  final int dayNumber;
-
-  /// الحالة.
-  final WirdStatus status;
-}
-
-/// محطة بحالتها.
-@immutable
-class StationView {
-  const StationView({
-    required this.station,
-    required this.region,
+class WirdNode {
+  const WirdNode({
     required this.index,
+    required this.number,
+    required this.item,
     required this.status,
-    required this.lockReason,
-    required this.wirds,
-    required this.isCaravanHere,
+    required this.segmentIndex,
   });
 
-  /// المحطة من الفهرس.
-  final JourneyStation station;
-
-  /// مرحلتها.
-  final JourneyRegion region;
-
-  /// موضعها في المسار (يبدأ من صفر).
+  /// موضع العقدة في المسار (من صفر).
   final int index;
 
-  /// حالتها.
-  final StationStatus status;
+  /// رقم الحديث في الكتاب.
+  final int number;
 
-  /// سبب القفل إن كانت مقفلة.
-  final StationLockReason? lockReason;
+  /// عنصر المنهج، أو null إن لم يُعدّ الحديث بعد.
+  final CurriculumItem? item;
 
-  /// أورادها في المنهج.
-  final List<StationWird> wirds;
+  /// الحالة.
+  final WirdNodeStatus status;
 
-  /// هل القافلة فيها الآن.
-  final bool isCaravanHere;
+  /// المجموعة التي تنتمي إليها العقدة.
+  final int segmentIndex;
 
-  /// أول يوم من أيامها.
-  int? get firstDay => wirds.isEmpty ? null : wirds.first.dayNumber;
+  /// هل الحديث مُعدّ.
+  bool get prepared => item != null;
+}
 
-  /// آخر يوم من أيامها.
-  int? get lastDay => wirds.isEmpty ? null : wirds.last.dayNumber;
+/// مجموعة من عشرة أحاديث على المسار.
+@immutable
+class PathSegment {
+  const PathSegment({
+    required this.index,
+    required this.title,
+    required this.firstNumber,
+    required this.lastNumber,
+    required this.firstNodeIndex,
+    required this.completed,
+    required this.total,
+  });
 
-  /// عدد أورادها المكتملة.
-  int get completedCount {
-    return wirds.where((StationWird wird) => wird.status == WirdStatus.completed).length;
-  }
+  /// رقم المجموعة (من صفر).
+  final int index;
+
+  /// العنوان، مثل «العشرة الأولى».
+  final String title;
+
+  /// رقم أول حديث.
+  final int firstNumber;
+
+  /// رقم آخر حديث.
+  final int lastNumber;
+
+  /// موضع أول عقدة في المسار.
+  final int firstNodeIndex;
+
+  /// الأوراد المكتملة فيها.
+  final int completed;
+
+  /// عدد أحاديثها.
+  final int total;
+
+  /// نطاق الأرقام بالأرقام العربية.
+  String get rangeLabel => 'الأحاديث ${arabicDigits(firstNumber)}–${arabicDigits(lastNumber)}';
+
+  /// نسبة الإتمام.
+  double get fraction => total == 0 ? 0 : completed / total;
 }
 
 /// لقطة المسار.
 @immutable
 class JourneySnapshot {
   const JourneySnapshot._({
-    required this.catalog,
     required this.curriculum,
     required this.progress,
-    required this.schedule,
+    required this.pacing,
     required this.computedAt,
-    required this.stations,
+    required this.nodes,
+    required this.segments,
     required this.caravanIndex,
     required this.todayKind,
     required this.nextItem,
-    required this.nextDayNumber,
-    required this.nextUnlockAt,
-    required this.progressFraction,
+    required this.completedCount,
   });
+
+  /// عدد الأحاديث في المجموعة الواحدة على المسار.
+  static const int segmentSize = 10;
 
   /// يحسب اللقطة.
   factory JourneySnapshot.compute({
-    required JourneyCatalog catalog,
     required CurriculumManifest curriculum,
     required JourneyProgress progress,
-    required UnlockSchedule schedule,
+    required PacingState pacing,
     required DateTime now,
   }) {
-    final List<JourneyStation> ordered = List<JourneyStation>.of(catalog.stations)
-      ..sort((JourneyStation a, JourneyStation b) => a.order.compareTo(b.order));
     final List<CurriculumItem> items = curriculum.items;
-    final int perDay = schedule.newHadithPerDay < 1 ? 1 : schedule.newHadithPerDay;
-    int dayOf(int itemIndex) => itemIndex ~/ perDay + 1;
+    final Map<int, CurriculumItem> byNumber = <int, CurriculumItem>{
+      for (final CurriculumItem item in items) item.number: item,
+    };
+    int planned = curriculum.plannedCount;
+    for (final CurriculumItem item in items) {
+      if (item.number > planned) {
+        planned = item.number;
+      }
+    }
 
-    int? nextIndex;
-    for (int i = 0; i < items.length; i++) {
-      if (!progress.isCompleted(items[i].hadithId)) {
-        nextIndex = i;
+    CurriculumItem? nextItem;
+    for (final CurriculumItem item in items) {
+      if (!progress.isCompleted(item.hadithId)) {
+        nextItem = item;
         break;
       }
     }
 
-    CurriculumItem? lastCompletedItem;
-    for (int i = progress.completed.length - 1; i >= 0 && lastCompletedItem == null; i--) {
+    CurriculumItem? lastCompleted;
+    for (int i = progress.completed.length - 1; i >= 0 && lastCompleted == null; i--) {
       final String id = progress.completed[i].hadithId;
       for (final CurriculumItem item in items) {
         if (item.hadithId == id) {
-          lastCompletedItem = item;
+          lastCompleted = item;
           break;
         }
       }
     }
 
-    final bool capReached = schedule.capReached(progress.completionTimes, now);
     final TodayKind todayKind;
-    if (nextIndex == null) {
+    if (nextItem == null) {
       todayKind = TodayKind.curriculumFinished;
-    } else if (capReached) {
+    } else if (pacing.locked) {
       todayKind = TodayKind.capReached;
     } else {
       todayKind = TodayKind.available;
     }
-    final CurriculumItem? nextItem = nextIndex == null ? null : items[nextIndex];
-    final DateTime? nextUnlockAt =
-        todayKind == TodayKind.capReached ? schedule.nextUnlockAfter(now) : null;
 
-    // موضع القافلة والمحطة النشطة.
-    String? activeStationId;
-    String caravanStationId;
-    String? dawnLockedStationId;
-    if (nextItem == null) {
-      caravanStationId = lastCompletedItem?.stationId ?? ordered.first.id;
-    } else if (todayKind == TodayKind.capReached &&
-        lastCompletedItem != null &&
-        lastCompletedItem.stationId != nextItem.stationId) {
-      caravanStationId = lastCompletedItem.stationId;
-      dawnLockedStationId = nextItem.stationId;
-    } else {
-      activeStationId = nextItem.stationId;
-      caravanStationId = nextItem.stationId;
-    }
-    int caravanIndex = 0;
-    for (int k = 0; k < ordered.length; k++) {
-      if (ordered[k].id == caravanStationId) {
-        caravanIndex = k;
-        break;
-      }
-    }
-    final int caravanOrder = ordered[caravanIndex].order;
-
-    final List<StationView> views = <StationView>[];
-    double progressSum = 0;
-    for (int k = 0; k < ordered.length; k++) {
-      final JourneyStation station = ordered[k];
-      final List<StationWird> wirds = <StationWird>[];
-      for (int i = 0; i < items.length; i++) {
-        if (items[i].stationId != station.id) {
-          continue;
-        }
-        final WirdStatus status;
-        if (progress.isCompleted(items[i].hadithId)) {
-          status = WirdStatus.completed;
-        } else if (i == nextIndex) {
-          status = todayKind == TodayKind.capReached ? WirdStatus.afterDawn : WirdStatus.today;
-        } else {
-          status = WirdStatus.upcoming;
-        }
-        wirds.add(StationWird(item: items[i], dayNumber: dayOf(i), status: status));
-      }
-      final int done = wirds.where((StationWird w) => w.status == WirdStatus.completed).length;
-      if (wirds.isNotEmpty) {
-        progressSum += done / wirds.length;
-      }
-
-      final StationStatus status;
-      StationLockReason? lockReason;
-      if (wirds.isNotEmpty && done == wirds.length) {
-        status = StationStatus.completed;
-      } else if (station.id == activeStationId) {
-        status = StationStatus.active;
-      } else if (station.order < caravanOrder) {
-        status = StationStatus.completed;
+    final List<WirdNode> nodes = <WirdNode>[];
+    int completedCount = 0;
+    for (int number = 1; number <= planned; number++) {
+      final CurriculumItem? item = byNumber[number];
+      final WirdNodeStatus status;
+      if (item == null) {
+        status = WirdNodeStatus.inPreparation;
+      } else if (progress.isCompleted(item.hadithId)) {
+        status = WirdNodeStatus.completed;
+        completedCount++;
+      } else if (identical(item, nextItem)) {
+        status = todayKind == TodayKind.capReached ? WirdNodeStatus.afterDawn : WirdNodeStatus.today;
       } else {
-        status = StationStatus.locked;
-        if (station.id == dawnLockedStationId) {
-          lockReason = StationLockReason.awaitingDawn;
-        } else if (wirds.isEmpty) {
-          lockReason = StationLockReason.notInCurriculumYet;
-        } else {
-          lockReason = StationLockReason.awaitingPrevious;
-        }
+        status = WirdNodeStatus.upcoming;
       }
-      final JourneyRegion region = catalog.regionById(station.regionId) ??
-          JourneyRegion(id: station.regionId, order: 0, name: station.regionId, theme: '');
-      views.add(
-        StationView(
-          station: station,
-          region: region,
-          index: k,
+      nodes.add(
+        WirdNode(
+          index: number - 1,
+          number: number,
+          item: item,
           status: status,
-          lockReason: lockReason,
-          wirds: List<StationWird>.unmodifiable(wirds),
-          isCaravanHere: k == caravanIndex,
+          segmentIndex: (number - 1) ~/ segmentSize,
         ),
       );
     }
 
+    final List<PathSegment> segments = <PathSegment>[];
+    for (int first = 1; first <= planned; first += segmentSize) {
+      final int last = first + segmentSize - 1 > planned ? planned : first + segmentSize - 1;
+      final int segmentIndex = (first - 1) ~/ segmentSize;
+      int done = 0;
+      for (int number = first; number <= last; number++) {
+        if (nodes[number - 1].status == WirdNodeStatus.completed) {
+          done++;
+        }
+      }
+      segments.add(
+        PathSegment(
+          index: segmentIndex,
+          title: segmentTitle(segmentIndex, isTail: last - first + 1 < segmentSize && segmentIndex > 0),
+          firstNumber: first,
+          lastNumber: last,
+          firstNodeIndex: first - 1,
+          completed: done,
+          total: last - first + 1,
+        ),
+      );
+    }
+
+    int indexOf(CurriculumItem? item) => item == null ? 0 : item.number - 1;
+    final int caravanIndex;
+    switch (todayKind) {
+      case TodayKind.available:
+        caravanIndex = indexOf(nextItem);
+      case TodayKind.capReached:
+        caravanIndex = lastCompleted == null ? indexOf(nextItem) : indexOf(lastCompleted);
+      case TodayKind.curriculumFinished:
+        caravanIndex = indexOf(lastCompleted);
+    }
+
     return JourneySnapshot._(
-      catalog: catalog,
       curriculum: curriculum,
       progress: progress,
-      schedule: schedule,
+      pacing: pacing,
       computedAt: now,
-      stations: List<StationView>.unmodifiable(views),
-      caravanIndex: caravanIndex,
+      nodes: List<WirdNode>.unmodifiable(nodes),
+      segments: List<PathSegment>.unmodifiable(segments),
+      caravanIndex: _bounded(caravanIndex, nodes.length),
       todayKind: todayKind,
       nextItem: nextItem,
-      nextDayNumber: nextIndex == null ? null : dayOf(nextIndex),
-      nextUnlockAt: nextUnlockAt,
-      progressFraction: ordered.isEmpty ? 0 : progressSum / ordered.length,
+      completedCount: completedCount,
     );
   }
 
-  /// فهرس المسار.
-  final JourneyCatalog catalog;
+  static int _bounded(int index, int length) {
+    if (length == 0 || index < 0) {
+      return 0;
+    }
+    return index >= length ? length - 1 : index;
+  }
+
+  /// عنوان المجموعة: «العشرة الأولى» … والأخيرة الناقصة «تتمة الأربعين».
+  static String segmentTitle(int index, {required bool isTail}) {
+    if (isTail) {
+      return 'تتمة الأربعين';
+    }
+    const List<String> ordinals = <String>[
+      'الأولى',
+      'الثانية',
+      'الثالثة',
+      'الرابعة',
+      'الخامسة',
+      'السادسة',
+      'السابعة',
+      'الثامنة',
+      'التاسعة',
+      'العاشرة',
+    ];
+    if (index < ordinals.length) {
+      return 'العشرة ${ordinals[index]}';
+    }
+    return 'المجموعة ${arabicDigits(index + 1)}';
+  }
 
   /// المنهج.
   final CurriculumManifest curriculum;
@@ -300,14 +294,17 @@ class JourneySnapshot {
   /// التقدم.
   final JourneyProgress progress;
 
-  /// جدول الفتح.
-  final UnlockSchedule schedule;
+  /// الوتيرة.
+  final PacingState pacing;
 
-  /// وقت الحساب.
+  /// لحظة الحساب.
   final DateTime computedAt;
 
-  /// المحطات مرتبة.
-  final List<StationView> stations;
+  /// العقد بترتيب الأرقام.
+  final List<WirdNode> nodes;
+
+  /// المجموعات.
+  final List<PathSegment> segments;
 
   /// موضع القافلة.
   final int caravanIndex;
@@ -315,39 +312,30 @@ class JourneySnapshot {
   /// حالة وِرد اليوم.
   final TodayKind todayKind;
 
-  /// الوِرد التالي غير المكتمل (متاح اليوم أو بعد الفجر).
+  /// الوِرد التالي في المنهج، أو null إن اكتملت الأوراد المعدّة.
   final CurriculumItem? nextItem;
 
-  /// رقم يوم الوِرد التالي.
-  final int? nextDayNumber;
+  /// عدد الأوراد المكتملة.
+  final int completedCount;
 
-  /// وقت فتح الوِرد التالي إن كان مقفلاً.
-  final DateTime? nextUnlockAt;
+  /// العقدة التي تقف عندها القافلة.
+  WirdNode get caravanNode => nodes[caravanIndex];
 
-  /// نسبة التقدم في المسار كله (0 - 1).
-  final double progressFraction;
+  /// عدد أحاديث الكتاب على المسار.
+  int get plannedCount => nodes.length;
 
-  /// المحطة التي فيها القافلة.
-  StationView get caravanStation => stations[caravanIndex];
+  /// عدد الأحاديث المعدّة في هذا الإصدار.
+  int get preparedCount => curriculum.items.length;
 
-  /// المحطة النشطة إن وجدت.
-  StationView? get activeStation {
-    for (final StationView view in stations) {
-      if (view.status == StationStatus.active) {
-        return view;
-      }
-    }
-    return null;
-  }
+  /// نسبة التقدم في الكتاب كله.
+  double get progressFraction => nodes.isEmpty ? 0 : completedCount / nodes.length;
 
-  /// آخر وِرد مكتمل.
-  CompletedWird? get lastCompletion {
-    return progress.completed.isEmpty ? null : progress.completed.last;
-  }
+  /// وقت فتح الوِرد التالي عند بلوغ الحصة، وإلا null.
+  DateTime? get nextUnlockAt => todayKind == TodayKind.capReached ? pacing.nextUnlockAt : null;
 
-  /// هل يُعتمد الوقت الاحتياطي للفتح القادم.
-  bool get unlockUsesFallback {
-    final DateTime? at = nextUnlockAt;
-    return at == null || schedule.usesFallbackOn(at);
-  }
+  /// هل وقت الفتح هو الوقت الاحتياطي في المنهج.
+  bool get unlockUsesFallback => pacing.usesFallbackTime;
+
+  /// العقدة بموضعها.
+  WirdNode nodeAt(int index) => nodes[index];
 }

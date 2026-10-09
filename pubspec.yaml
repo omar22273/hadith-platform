@@ -1,7 +1,7 @@
 name: hadith_platform
-description: منصة الحديث النبوي والتاريخ الإسلامي التفاعلية - مسار القوافل والوِرد اليومي ووضع السماع.
+description: منصة الحديث النبوي والتاريخ الإسلامي التفاعلية - الأربعون النووية ورحلة السيرة وميدان المراجعة.
 publish_to: none
-version: 1.1.0+2
+version: 2.0.0+3
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -28,6 +28,8 @@ flutter:
     - assets/data/catalogs/
     - assets/data/curriculum/
     - assets/data/hadith/nawawi40/
+    - assets/data/seerah_dataset.json
+    - assets/data/seerah_map_land.json
     - assets/fonts/OFL-Amiri.txt
     - assets/fonts/OFL-ReadexPro.txt
   fonts:

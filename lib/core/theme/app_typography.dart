@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_palette.dart';
+import 'reading_theme.dart';
 
 /// أنماط النصوص المشتركة.
 abstract final class AppTypography {
@@ -35,6 +36,22 @@ abstract final class AppTypography {
   }
 
   /// النصوص المنقولة من المصادر (الشواهد والآثار).
+  /// خط المتن بحسب إعدادات القراءة في السياق: يكبّر الحجم بمعامل المستخدم
+  /// ويستعمل العائلة التي اختارها. الحجم الممرر هو الحجم عند المعامل 1.
+  static TextStyle matnOf(
+    BuildContext context, {
+    required Color color,
+    double fontSize = 27,
+    FontWeight fontWeight = FontWeight.w400,
+  }) {
+    final ReadingTheme reading = ReadingTheme.of(context);
+    return matn(
+      color: color,
+      fontSize: fontSize * reading.matnScale,
+      fontWeight: fontWeight,
+    ).copyWith(fontFamily: reading.matnFamily);
+  }
+
   static TextStyle athar({
     required Color color,
     double fontSize = 18,

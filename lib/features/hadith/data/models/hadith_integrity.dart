@@ -1,15 +1,19 @@
 // فاحص سلامة الوِرد: يتحقق من اتساق الحديث مع نفسه ومع الفهارس قبل عرضه.
 //
 // يكشف المراسي المكسورة بعد أي تعديل في المتن، والمعرّفات المفقودة في
-// فهارس الرواة والمصادر والمحطات، ويُستعمل في الاختبارات وفي وضع التطوير.
+// فهرسي الرواة والمصادر، ويُستعمل في المستودع وفي الاختبارات.
 //
-// Hadith Platform — data model v1.1.0.
+// لا يعرف الحديث في الإصدار 2.0.0 شيئاً عن محطات السيرة ولا عن حواضر
+// الرواية؛ فبيانات الحديث معزولة تماماً عن بيانات السيرة.
+//
+// Hadith Platform — data model v2.0.0.
 
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/content/models/source_catalog.dart';
+import '../../../../core/content/models/source_ref.dart';
 import 'audio_sync.dart';
 import 'hadith_daily_model.dart';
-import 'journey_catalog.dart';
 import 'matn.dart';
 import 'matn_tokenizer.dart';
 import 'narrator_profile.dart';
@@ -17,9 +21,8 @@ import 'practice.dart';
 import 'provenance.dart';
 import 'reflection.dart';
 import 'scholar_layer.dart';
-import 'source_catalog.dart';
-import 'source_ref.dart';
 import 'takhrij.dart';
+import 'token_anchor.dart';
 
 /// مشكلة واحدة في سلامة البيانات.
 @immutable
@@ -53,15 +56,11 @@ class IntegrityIssue {
 class HadithIntegrityChecker {
   const HadithIntegrityChecker({
     this.narrators,
-    this.journey,
     this.sources,
   });
 
   /// فهرس الرواة.
   final NarratorCatalog? narrators;
-
-  /// فهرس مسار القوافل.
-  final JourneyCatalog? journey;
 
   /// فهرس المصادر.
   final SourceCatalog? sources;
@@ -89,13 +88,6 @@ class HadithIntegrityChecker {
       final NarratorCatalog? catalog = narrators;
       if (catalog != null && catalog.byId(narratorId) == null) {
         report(path, 'Unknown narratorId "$narratorId".');
-      }
-    }
-
-    void checkStation(String stationId, String path) {
-      final JourneyCatalog? catalog = journey;
-      if (catalog != null && catalog.stationById(stationId) == null) {
-        report(path, 'Unknown stationId "$stationId".');
       }
     }
 
@@ -146,11 +138,9 @@ class HadithIntegrityChecker {
       }
     }
 
-    // ------------------------------------------------------------ journey
-    checkStation(hadith.journey.stationId, 'journey.stationId');
-    final String? placeStation = hadith.context.place?.stationId;
-    if (placeStation != null) {
-      checkStation(placeStation, 'context.place.stationId');
+    // ------------------------------------------------------------ milestone
+    if (hadith.milestone.trim().isEmpty) {
+      report('milestone', 'Milestone must not be blank.');
     }
 
     // ------------------------------------------------------------ context

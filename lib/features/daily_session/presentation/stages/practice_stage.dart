@@ -14,9 +14,9 @@ import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/smooth_surface.dart';
+import '../../../hadith/domain/practice_engine.dart';
 import '../../application/session_controller.dart';
 import '../../application/session_state.dart';
-import '../../domain/practice_engine.dart';
 
 /// مرحلة التثبيت.
 class PracticeStage extends ConsumerWidget {
@@ -118,7 +118,7 @@ class _ReconstructionBoard extends StatelessWidget {
     final ChunkDrill drill = engine.drills[index];
     final Set<int> placed = state.placedTiles.toSet();
     final bool complete = state.placedTiles.length == drill.tokens.length;
-    final TextStyle wordStyle = AppTypography.matn(color: palette.ink, fontSize: 23, fontWeight: FontWeight.w700);
+    final TextStyle wordStyle = AppTypography.matnOf(context, color: palette.ink, fontSize: 23, fontWeight: FontWeight.w700);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -325,7 +325,7 @@ class _VanishingBoard extends StatelessWidget {
     final int level = state.vanishingLevel.clamp(0, engine.levels.length - 1).toInt();
     final Set<int> hidden = engine.hiddenAt(level);
     final int recalled = hidden.where(state.revealed.contains).length;
-    final TextStyle style = AppTypography.matn(color: palette.ink, fontSize: 25, fontWeight: FontWeight.w700);
+    final TextStyle style = AppTypography.matnOf(context, color: palette.ink, fontSize: 25, fontWeight: FontWeight.w700);
 
     final List<InlineSpan> spans = <InlineSpan>[];
     for (int w = 0; w < engine.words.length; w++) {

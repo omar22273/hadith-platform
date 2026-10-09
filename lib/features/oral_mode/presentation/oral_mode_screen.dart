@@ -15,9 +15,11 @@ import '../../../core/ui/app_shapes.dart';
 import '../../../core/ui/smooth_surface.dart';
 import '../../../core/ui/wide_action_button.dart';
 import '../../daily_session/presentation/widgets/closing_view.dart';
-import '../../hadith/application/content_providers.dart';
+import '../../hadith/application/hadith_providers.dart';
 import '../../hadith/data/models/models.dart';
 import '../../hadith/domain/hadith_bundle.dart';
+import '../../journey/application/journey_controller.dart';
+import '../../journey/presentation/widgets/wird_complete_sheet.dart';
 import '../../recitation/application/recitation_controller.dart';
 import '../application/oral_controller.dart';
 import '../domain/oral_script.dart';
@@ -195,14 +197,18 @@ class _OralBody extends ConsumerWidget {
 }
 
 Future<void> _finishOral(BuildContext context, OralController controller, bool countsTowardJourney) async {
+  WirdCompletion? result;
   try {
-    await controller.finish(countsTowardJourney: countsTowardJourney);
+    result = await controller.finish(countsTowardJourney: countsTowardJourney);
   } on Object {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تعذّر حفظ إتمام المجلس على الجهاز. حاول مرة أخرى.')),
       );
     }
+  }
+  if (result == WirdCompletion.quotaReached && context.mounted) {
+    await showWirdCompleteSheet(context);
   }
 }
 
@@ -391,7 +397,7 @@ class _TalqinPanel extends StatelessWidget {
           child: Text(
             chunkText,
             textAlign: TextAlign.center,
-            style: AppTypography.matn(color: palette.ink, fontSize: 34, fontWeight: FontWeight.w700),
+            style: AppTypography.matnOf(context, color: palette.ink, fontSize: 34, fontWeight: FontWeight.w700),
           ),
         ),
         const SizedBox(height: 14),

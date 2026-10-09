@@ -1,20 +1,26 @@
-// بناء ThemeData للوضعين الفاتح والداكن من لوحة الألوان والخطوط والحواف الناعمة.
+// بناء ThemeData للوضعين النهاري التراثي والداكن من لوحة الألوان والخطوط
+// والحواف الناعمة، مع امتداد إعدادات القراءة (حجم خط المتن وعائلته).
 
 import 'package:flutter/material.dart';
 
 import '../ui/app_shapes.dart';
 import 'app_palette.dart';
 import 'app_typography.dart';
+import 'reading_theme.dart';
 
 /// ثيمات التطبيق.
 abstract final class AppTheme {
-  /// الوضع الفاتح: ورق دافئ وحبر وقور.
-  static ThemeData light() => _build(Brightness.light, AppPalette.light);
+  /// الوضع النهاري التراثي (Warm Parchment): كتان عاجي وحبر فحمي.
+  static ThemeData light({ReadingTheme reading = ReadingTheme.standard}) {
+    return _build(Brightness.light, AppPalette.light, reading);
+  }
 
   /// الوضع الداكن: خلفية #0F172A وبطاقات #1E293B.
-  static ThemeData dark() => _build(Brightness.dark, AppPalette.dark);
+  static ThemeData dark({ReadingTheme reading = ReadingTheme.standard}) {
+    return _build(Brightness.dark, AppPalette.dark, reading);
+  }
 
-  static ThemeData _build(Brightness brightness, AppPalette palette) {
+  static ThemeData _build(Brightness brightness, AppPalette palette, ReadingTheme reading) {
     final ColorScheme scheme = ColorScheme(
       brightness: brightness,
       primary: palette.amber,
@@ -39,7 +45,7 @@ abstract final class AppTheme {
     final TextTheme textTheme = AppTypography.textTheme(base.textTheme, palette);
     return base.copyWith(
       textTheme: textTheme,
-      extensions: <ThemeExtension<dynamic>>[palette],
+      extensions: <ThemeExtension<dynamic>>[palette, reading],
       appBarTheme: AppBarTheme(
         backgroundColor: palette.paper,
         foregroundColor: palette.ink,
@@ -138,6 +144,75 @@ abstract final class AppTheme {
         unselectedLabelStyle: AppTypography.ui(color: palette.inkSoft, fontSize: 14),
       ),
       iconTheme: IconThemeData(color: palette.ink),
+      sliderTheme: SliderThemeData(
+        activeTrackColor: palette.amber,
+        inactiveTrackColor: palette.line,
+        thumbColor: palette.amber,
+        overlayColor: palette.amber.withValues(alpha: 0.14),
+        valueIndicatorColor: palette.ink,
+        valueIndicatorTextStyle: AppTypography.ui(color: palette.paper, fontSize: 13),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith<Color>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.selected)) {
+              return palette.onAccent;
+            }
+            return palette.locked;
+          },
+        ),
+        trackColor: WidgetStateProperty.resolveWith<Color>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.selected)) {
+              return palette.emerald;
+            }
+            return palette.lockedSoft;
+          },
+        ),
+        trackOutlineColor: WidgetStateProperty.resolveWith<Color>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.selected)) {
+              return Colors.transparent;
+            }
+            return palette.line;
+          },
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: palette.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: AppShapes.rounded(AppShapes.radiusLarge),
+        titleTextStyle: AppTypography.heritageTitle(color: palette.ink, fontSize: 24),
+        contentTextStyle: AppTypography.ui(color: palette.ink, fontSize: 15),
+      ),
+      inputDecorationTheme: InputDecorationThemeData(
+        filled: true,
+        fillColor: palette.surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        labelStyle: AppTypography.ui(color: palette.inkSoft, fontSize: 14),
+        hintStyle: AppTypography.ui(color: palette.locked, fontSize: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppShapes.radiusSmall),
+          borderSide: BorderSide(color: palette.line),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppShapes.radiusSmall),
+          borderSide: BorderSide(color: palette.line),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppShapes.radiusSmall),
+          borderSide: BorderSide(color: palette.amber, width: 1.6),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppShapes.radiusSmall),
+          borderSide: BorderSide(color: palette.amberDeep, width: 1.4),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppShapes.radiusSmall),
+          borderSide: BorderSide(color: palette.amberDeep, width: 1.6),
+        ),
+        errorStyle: AppTypography.ui(color: palette.amberText, fontSize: 12),
+      ),
     );
   }
 }

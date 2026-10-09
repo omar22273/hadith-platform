@@ -73,7 +73,7 @@ class _VariantCard extends StatelessWidget {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
     final List<DiffWord> words = diffVariant(variantText: variant.matnText, baseText: base);
-    final TextStyle style = AppTypography.matn(color: palette.ink, fontSize: 20).copyWith(height: 2.1);
+    final TextStyle style = AppTypography.matnOf(context, color: palette.ink, fontSize: 20).copyWith(height: 2.1);
     final String companion =
         bundle.narrators.byId(variant.companionNarratorId)?.displayName ?? variant.companionNarratorId;
     final String relation = variant.relation == VariantRelation.sameCompanion

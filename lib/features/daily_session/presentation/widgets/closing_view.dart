@@ -1,21 +1,24 @@
-// شاشة الختام: قفل الفجر الزمني، وحكمة مختارة عشوائياً من بنك العبارات
-// التراثية الموثقة، ولمحة تشويق لحديث الغد.
+// شاشة الختام: قفل الفجر الزمني بحسب حصة اليوم، وحكمة مختارة عشوائياً من
+// بنك العبارات التراثية الموثقة، ولمحة تشويق لحديث الغد، وزر مباشر إلى
+// ميدان المراجعة للتثبيت.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/navigation/app_tab.dart';
 import '../../../../core/storage/install_salt.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/time/clock.dart';
 import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/smooth_surface.dart';
-import '../../../hadith/application/content_providers.dart';
+import '../../../hadith/application/hadith_providers.dart';
 import '../../../hadith/data/models/models.dart';
 import '../../../hadith/domain/hadith_bundle.dart';
 import '../../../journey/application/journey_controller.dart';
 import '../../../journey/domain/journey_snapshot.dart';
 import '../../../journey/presentation/widgets/journey_summary_card.dart';
+import '../../../journey/presentation/widgets/wird_labels.dart';
 import '../../domain/wisdom_picker.dart';
 
 /// الختام.
@@ -62,7 +65,10 @@ class ClosingView extends ConsumerWidget {
         ),
         const SizedBox(height: 18),
         if (countedTowardJourney && snapshot != null) ...<Widget>[
-          _FajrLockCard(snapshot: snapshot),
+          if (snapshot.todayKind == TodayKind.capReached)
+            _FajrLockCard(snapshot: snapshot)
+          else if (snapshot.todayKind == TodayKind.available)
+            _RemainingCard(snapshot: snapshot),
           const SizedBox(height: 14),
         ],
         _WisdomCard(hadithId: hadithId),
@@ -76,16 +82,22 @@ class ClosingView extends ConsumerWidget {
               radius: AppShapes.radiusLarge,
               padding: const EdgeInsets.all(16),
               child: Text(
-                'أتممتَ الأوراد المتاحة في هذه النسخة من المنهج. تُضاف المحطات التالية مع اكتمال إعدادها ومراجعتها.',
+                'أتممتَ الأوراد المُعدّة في هذا الإصدار. تُضاف الأحاديث التالية مع اكتمال توثيقها ومراجعتها.',
                 style: text.bodyMedium?.copyWith(color: palette.ink, height: 1.8),
               ),
             ),
           const SizedBox(height: 20),
         ],
         FilledButton.icon(
+          onPressed: () => openAppTab(context, ref, AppTab.review),
+          icon: const Icon(Icons.psychology_alt_rounded),
+          label: const Text('إلى ميدان المراجعة'),
+        ),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
           onPressed: onBack,
           icon: const Icon(Icons.route_rounded),
-          label: const Text('العودة إلى مسار القوافل'),
+          label: const Text('العودة إلى مسار الأربعين'),
         ),
       ],
     );
@@ -121,10 +133,42 @@ class _FajrLockCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'أُغلقت إضافة الأوراد الجديدة لليوم؛ وِرد واحد كل يوم يرسخ ولا يزاحم.',
+            'أُغلق فتح الأحاديث الجديدة حتى الفجر؛ حصتك اليوم ${hadithCountLabel(snapshot.pacing.dailyQuota)}، والوِرد الذي يرسخ خير من أوراد تتزاحم.',
             style: text.bodyMedium?.copyWith(color: palette.ink, height: 1.8),
           ),
           if (unlockAt != null) FajrCountdown(target: unlockAt, usesFallback: snapshot.unlockUsesFallback),
+        ],
+      ),
+    );
+  }
+}
+
+class _RemainingCard extends StatelessWidget {
+  const _RemainingCard({required this.snapshot});
+
+  final JourneySnapshot snapshot;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+    final TextTheme text = Theme.of(context).textTheme;
+    final int remaining = snapshot.pacing.remainingToday;
+    return SmoothSurface(
+      color: palette.amberSoft,
+      borderColor: palette.amber.withValues(alpha: 0.4),
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: <Widget>[
+          Icon(Icons.wb_twilight_rounded, color: palette.amberText),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              remaining > 0
+                  ? 'بقي من حصة اليوم ${hadithCountLabel(remaining)}؛ تجده في مسار الأربعين.'
+                  : 'قفل الفجر متخطّى لأغراض التجربة؛ الوِرد التالي متاح في مسار الأربعين.',
+              style: text.bodyMedium?.copyWith(color: palette.ink, height: 1.7),
+            ),
+          ),
         ],
       ),
     );

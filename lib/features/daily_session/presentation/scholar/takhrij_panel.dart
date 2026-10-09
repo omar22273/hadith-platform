@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/content/widgets/source_quote_tile.dart';
 import '../../../../core/text/arabic_digits.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -10,7 +11,6 @@ import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/smooth_surface.dart';
 import '../../../hadith/data/models/models.dart';
 import '../../../hadith/domain/hadith_bundle.dart';
-import '../../../hadith/presentation/widgets/source_quote_tile.dart';
 
 /// لوحة التخريج.
 class TakhrijPanel extends StatelessWidget {
@@ -175,7 +175,7 @@ class _EditsSection extends StatelessWidget {
                   children: <Widget>[
                     Text.rich(
                       TextSpan(
-                        style: AppTypography.matn(color: palette.ink, fontSize: 21).copyWith(height: 1.8),
+                        style: AppTypography.matnOf(context, color: palette.ink, fontSize: 21).copyWith(height: 1.8),
                         children: <InlineSpan>[
                           TextSpan(text: edit.before, style: TextStyle(color: palette.inkSoft)),
                           const TextSpan(text: '  ←  '),

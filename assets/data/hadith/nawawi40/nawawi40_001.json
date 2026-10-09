@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "2.0.0",
   "id": "nawawi40_001",
   "sequence": 1,
   "collection": {
@@ -11,18 +11,12 @@
   "teaser": {
     "text": "رحلتك تبدأ بخطوةٍ لا يراها أحد… فما هي؟"
   },
-  "journey": {
-    "stationId": "makkah_dar_al_arqam",
-    "stepInStation": 1,
-    "milestone": "عقد النية قبل المسير",
-    "assignmentBasis": "thematic"
-  },
+  "milestone": "عقد النية قبل المسير",
   "context": {
     "narrative": "قبل فتح مكة كان المسلمون يهاجرون منها إلى مدينة النبي ﷺ، يدَعون الأهل والمال طلباً لدار الإسلام. والطريق الواحد قد يسلكه رجلان ببواعث مختلفة: أحدهما خرج حبّاً لله ورسوله ورغبةً في تعلّم دينه، والآخر خرج لتجارة يصيبها أو امرأة يخطبها؛ فالأول مهاجر، والثاني تاجر أو خاطب. وفي هذا الحديث يجعل النبي ﷺ الباعثَ ميزانَ كل عمل. وقد سمعه علقمة بن وقاص الليثي من عمر بن الخطاب يحدّث به على المنبر.",
     "humanMotive": "اختلاف البواعث وراء العمل الواحد.",
     "place": {
       "name": "المدينة النبوية",
-      "stationId": "hijrah_masjid_nabawi",
       "relation": "subject_location",
       "latitude": 24.4672,
       "longitude": 39.6111,
@@ -159,7 +153,7 @@
     ],
     "audio": {
       "status": "not_recorded",
-      "assetPath": null,
+      "remoteUrl": null,
       "reciter": null,
       "durationMs": null,
       "timings": []
