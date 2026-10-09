@@ -26,6 +26,9 @@ jobs:
       - name: Generate Android Scaffolding
         run: flutter create --platforms=android --org app.hadithplatform --project-name hadith_platform .
 
+      - name: Configure Android manifest (internet, local audio cache proxy, TTS)
+        run: python3 tools/android/patch_manifest.py android
+
       - name: Remove dummy widget test
         run: rm -f test/widget_test.dart
 

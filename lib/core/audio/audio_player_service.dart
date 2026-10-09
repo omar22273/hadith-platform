@@ -117,7 +117,11 @@ class JustAudioPlayerService implements AudioPlayerService {
       return _player.duration;
     }
     _loaded = null;
-    final AudioSource source = kIsWeb ? AudioSource.uri(url) : LockCachingAudioSource(url);
+    // LockCachingAudioSource معلَّم «تجريبياً» في just_audio، وهو المطلوب صراحة
+    // للبث مع التخزين المؤقت؛ وتُثبَّت نسخة الحزمة في pubspec.lock.
+    final AudioSource source =
+        // ignore: experimental_member_use
+        kIsWeb ? AudioSource.uri(url) : LockCachingAudioSource(url);
     try {
       final Duration? duration = await _player.setAudioSource(source).timeout(timeout);
       _loaded = url;

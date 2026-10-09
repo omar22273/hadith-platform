@@ -8,8 +8,6 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-import '../../../core/content/models/review_info.dart';
-import '../../../core/content/models/source_ref.dart';
 import '../../hadith/data/models/models.dart';
 import '../../hadith/domain/hadith_bundle.dart';
 import '../../seerah/data/models/seerah_station.dart';

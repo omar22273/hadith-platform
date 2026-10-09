@@ -176,8 +176,12 @@ class HadithIntegrityChecker {
     if (audio.status == AudioStatus.aligned && audio.timings.isEmpty) {
       report('matn.audio', 'Aligned audio must provide word timings.');
     }
-    if (audio.status != AudioStatus.notRecorded && audio.assetPath == null) {
-      report('matn.audio.assetPath', 'Recorded audio needs an asset path.');
+    if (audio.status != AudioStatus.notRecorded && (audio.reciter ?? '').trim().isEmpty) {
+      report('matn.audio.reciter', 'Recorded audio must name its reciter.');
+    }
+    final String? remoteUrl = audio.remoteUrl;
+    if (remoteUrl != null && !(Uri.tryParse(remoteUrl)?.isScheme('https') ?? false)) {
+      report('matn.audio.remoteUrl', 'A recitation override must be an https URL.');
     }
     for (int index = 0; index < audio.timings.length; index++) {
       final WordTiming timing = audio.timings[index];
