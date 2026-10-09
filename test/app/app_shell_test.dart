@@ -4,7 +4,6 @@
 
 import 'dart:io';
 
-import 'package:flutter/material.dart' show Text;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,11 +73,18 @@ Future<void> _pumpApp(WidgetTester tester) async {
     final String progress = container.read(journeyProgressProvider).toString();
     final String pacing = container.read(pacingProvider).toString();
     final String tree = find.byType(IndexedStack).evaluate().length.toString();
-    final String deep = tester.binding.rootElement!.toStringDeep();
-    final int at = deep.indexOf('IndexedStack');
-    final String dump = at < 0 ? 'no IndexedStack' : deep.substring(at, at + 6000 > deep.length ? deep.length : at + 6000);
+    final StringBuffer buffer = StringBuffer();
+    void walk(Element element, int depth) {
+      if (depth > 40) {
+        return;
+      }
+      buffer.write('${depth.toString()}:${element.widget.runtimeType} ');
+      element.visitChildren((Element child) => walk(child, depth + 1));
+    }
+
+    walk(tester.element(find.byType(IndexedStack)), 0);
     // ignore: avoid_print
-    print('TREE>>>\n$dump\n<<<TREE');
+    print('TREE>>> ${buffer.toString()} <<<TREE');
     fail('Arbaeen path did not render. texts: $texts; stacks: $tree; journey: $journey; curriculum: $curriculum; progress: $progress; pacing: $pacing');
   }
 }
