@@ -94,9 +94,14 @@ class FlashcardSessionController extends Notifier<FlashcardSession> {
 final NotifierProvider<FlashcardSessionController, FlashcardSession> flashcardSessionProvider =
     NotifierProvider<FlashcardSessionController, FlashcardSession>(FlashcardSessionController.new);
 
-/// حالة تحديات الترتيب: التحدي المختار ولوحته.
+/// حالة تحديات الترتيب: التحدي المختار ولوحته والمقاطع المكتملة.
 class OrderChallengeState {
-  const OrderChallengeState({required this.index, required this.board, required this.lastOutcome});
+  const OrderChallengeState({
+    required this.index,
+    required this.board,
+    required this.lastOutcome,
+    this.completed = const <int>{},
+  });
 
   /// التحدي المختار.
   final int index;
@@ -106,6 +111,9 @@ class OrderChallengeState {
 
   /// نتيجة آخر محاولة.
   final PlacementOutcome? lastOutcome;
+
+  /// رتب المقاطع التي اكتمل ترتيبها بنجاح.
+  final Set<int> completed;
 }
 
 /// متحكم تحديات الترتيب.
@@ -113,10 +121,10 @@ class OrderChallengeController extends Notifier<OrderChallengeState> {
   @override
   OrderChallengeState build() {
     final ReviewDeck? deck = ref.watch(reviewDeckProvider).value;
-    return _stateFor(deck, 0);
+    return _stateFor(deck, 0, const <int>{});
   }
 
-  OrderChallengeState _stateFor(ReviewDeck? deck, int index) {
+  OrderChallengeState _stateFor(ReviewDeck? deck, int index, Set<int> completed) {
     if (deck == null || deck.orderChallenges.isEmpty) {
       return const OrderChallengeState(index: 0, board: null, lastOutcome: null);
     }
@@ -125,7 +133,14 @@ class OrderChallengeController extends Notifier<OrderChallengeState> {
       index: bounded,
       board: OrderBoard.start(deck.orderChallenges[bounded].drill),
       lastOutcome: null,
+      completed: completed,
     );
+  }
+
+  /// أعلى مقطع مفتوح الآن.
+  int get openLimit {
+    final ReviewDeck? deck = ref.read(reviewDeckProvider).value;
+    return openChallengeLimit(state.completed, deck?.orderChallenges.length ?? 0);
   }
 
   /// يضع بلاطة في الموضع التالي.
@@ -135,7 +150,14 @@ class OrderChallengeController extends Notifier<OrderChallengeState> {
       return PlacementOutcome.ignored;
     }
     final (OrderBoard next, PlacementOutcome outcome) = board.place(tileId);
-    state = OrderChallengeState(index: state.index, board: next, lastOutcome: outcome);
+    state = OrderChallengeState(
+      index: state.index,
+      board: next,
+      lastOutcome: outcome,
+      completed: outcome == PlacementOutcome.completed
+          ? Set<int>.unmodifiable(<int>{...state.completed, state.index})
+          : state.completed,
+    );
     return outcome;
   }
 
@@ -145,17 +167,25 @@ class OrderChallengeController extends Notifier<OrderChallengeState> {
     if (board == null) {
       return;
     }
-    state = OrderChallengeState(index: state.index, board: board.undo(), lastOutcome: null);
+    state = OrderChallengeState(
+      index: state.index,
+      board: board.undo(),
+      lastOutcome: null,
+      completed: state.completed,
+    );
   }
 
-  /// يعيد المقطع الحالي.
+  /// يعيد المقطع الحالي (ويبقى مفتوحاً ما اكتمل قبلاً).
   void reset() {
-    state = _stateFor(ref.read(reviewDeckProvider).value, state.index);
+    state = _stateFor(ref.read(reviewDeckProvider).value, state.index, state.completed);
   }
 
-  /// ينتقل إلى تحدٍّ.
+  /// ينتقل إلى تحدٍّ مفتوح. المقاطع اللاحقة المقفلة لا تُفتح بالنقر.
   void select(int index) {
-    state = _stateFor(ref.read(reviewDeckProvider).value, index);
+    if (index > openLimit) {
+      return;
+    }
+    state = _stateFor(ref.read(reviewDeckProvider).value, index, state.completed);
   }
 }
 

@@ -11,6 +11,7 @@ import '../../../../core/ui/smooth_sheet.dart';
 import '../../../hadith/domain/hadith_bundle.dart';
 import '../../application/session_state.dart';
 import '../scholar/takhrij_panel.dart';
+import 'share_hadith_button.dart';
 
 /// الترويسة.
 class SessionHeader extends StatelessWidget {
@@ -79,6 +80,7 @@ class SessionHeader extends StatelessWidget {
                   ),
                 ),
               ),
+              ShareHadithButton(bundle: bundle),
             ],
           ),
           const SizedBox(height: 4),

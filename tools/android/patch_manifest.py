@@ -14,6 +14,8 @@ it on every run. This script then adds what the app needs at runtime:
 3. The TTS_SERVICE <queries> intent so Android 11+ can find the speech engine
    used by the oral mode (narration and dilemmas only, never the matn).
 4. The Arabic application label.
+5. android:screenOrientation="portrait" on the main activity (portrait only),
+   matching the SystemChrome lock in lib/main.dart.
 
 The script is idempotent: running it twice leaves the manifest unchanged.
 """
@@ -62,6 +64,13 @@ def patch(manifest: str) -> str:
     else:
         new_tag = new_tag.replace('<application', '<application\n        android:label="%s"' % LABEL, 1)
     manifest = manifest.replace(tag, new_tag, 1)
+    activity = re.search(r'<activity\b[^>]*>', manifest)
+    if activity is not None and 'android:screenOrientation' not in activity.group(0):
+        manifest = manifest.replace(
+            activity.group(0),
+            activity.group(0).replace('<activity', '<activity\n            android:screenOrientation="portrait"', 1),
+            1,
+        )
     if 'android.intent.action.TTS_SERVICE' not in manifest:
         if '<queries>' in manifest:
             manifest = manifest.replace('<queries>', '<queries>\n' + TTS_INTENT.rstrip('\n'), 1)

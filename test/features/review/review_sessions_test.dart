@@ -117,5 +117,18 @@ void main() {
       expect(session.goTo(0).currentChoice, second);
     });
   });
-}
 
+  group('sequential order challenges', () {
+    test('only the first unfinished challenge is open', () {
+      expect(openChallengeLimit(<int>{}, 4), 0);
+      expect(openChallengeLimit(<int>{0}, 4), 1);
+      expect(openChallengeLimit(<int>{0, 1}, 4), 2);
+      expect(openChallengeLimit(<int>{1}, 4), 0, reason: 'completing a later one does not unlock past a gap');
+    });
+
+    test('when all are completed the last stays open, and an empty deck is safe', () {
+      expect(openChallengeLimit(<int>{0, 1, 2}, 3), 2);
+      expect(openChallengeLimit(<int>{}, 0), 0);
+    });
+  });
+}

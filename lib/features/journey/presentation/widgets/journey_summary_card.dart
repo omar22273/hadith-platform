@@ -3,7 +3,6 @@
 // وزر مباشر إلى ميدان المراجعة.
 
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,59 +47,61 @@ class JourneySummaryCard extends StatelessWidget {
     final PacingState pacing = snapshot.pacing;
     return SmoothSurface(
       elevated: true,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          Text(
+            here == null
+                ? 'مسار الأربعين'
+                : '${wirdNumberLabel(here)} من ${arabicDigits(snapshot.plannedCount)} · '
+                    '${snapshot.segments[here.segmentIndex].title}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: text.labelMedium?.copyWith(color: palette.inkSoft),
+          ),
+          Text(
+            here == null ? '' : wirdTitle(here),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.heritageTitle(color: palette.ink, fontSize: 24),
+          ),
+          const SizedBox(height: 8),
+          // الاستمرارية والوتيرة والنسبة في صف أفقي واحد.
           Row(
             children: <Widget>[
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      here == null
-                          ? 'مسار الأربعين'
-                          : '${wirdNumberLabel(here)} من ${arabicDigits(snapshot.plannedCount)} · '
-                              '${snapshot.segments[here.segmentIndex].title}',
-                      style: text.labelMedium?.copyWith(color: palette.inkSoft),
-                    ),
-                    Text(
-                      here == null ? '' : wirdTitle(here),
-                      style: AppTypography.heritageTitle(color: palette.ink, fontSize: 27),
-                    ),
-                    Text(
-                      'المكتمل ${arabicDigits(snapshot.completedCount)} · المُعدّ ${arabicDigits(snapshot.preparedCount)} من ${arabicDigits(snapshot.plannedCount)}',
-                      style: text.bodySmall?.copyWith(color: palette.inkSoft),
-                    ),
-                  ],
+              Flexible(
+                child: _MiniBadge(
+                  icon: Icons.local_fire_department_rounded,
+                  label: pacing.streakDays > 0 ? daysLabel(pacing.streakDays) : 'ابدأ اليوم',
+                  background: palette.amberSoft,
+                  foreground: palette.amberText,
+                  border: palette.amber.withValues(alpha: 0.35),
                 ),
               ),
-              const SizedBox(width: 12),
-              _ProgressRing(fraction: snapshot.progressFraction),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 6,
-            children: <Widget>[
-              SoftChip(
-                icon: Icons.local_fire_department_rounded,
-                label: pacing.streakDays > 0
-                    ? 'الاستمرارية: ${daysLabel(pacing.streakDays)}'
-                    : 'ابدأ سلسلة الاستمرارية اليوم',
-                background: palette.amberSoft,
-                foreground: palette.amberText,
-                borderColor: palette.amber.withValues(alpha: 0.35),
+              const SizedBox(width: 6),
+              Flexible(
+                child: _MiniBadge(
+                  icon: Icons.speed_rounded,
+                  label: '${hadithCountLabel(pacing.dailyQuota)} يومياً',
+                  background: palette.surfaceMuted,
+                  foreground: palette.ink,
+                  border: palette.line,
+                ),
               ),
-              SoftChip(
-                icon: Icons.speed_rounded,
-                label: 'الوتيرة: ${hadithCountLabel(pacing.dailyQuota)} يومياً',
+              const SizedBox(width: 6),
+              Flexible(
+                child: _MiniBadge(
+                  icon: Icons.donut_large_rounded,
+                  label: arabicPercent(snapshot.progressFraction),
+                  background: palette.emeraldSoft,
+                  foreground: palette.emeraldText,
+                  border: palette.emerald.withValues(alpha: 0.35),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
           _TodayStrip(
             snapshot: snapshot,
             onOpenToday: onOpenToday,
@@ -108,6 +109,52 @@ class JourneySummaryCard extends StatelessWidget {
             onBypassLock: onBypassLock,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// شارة صغيرة تتقلص بدل أن تتجاوز العرض.
+class _MiniBadge extends StatelessWidget {
+  const _MiniBadge({
+    required this.icon,
+    required this.label,
+    required this.background,
+    required this.foreground,
+    required this.border,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color background;
+  final Color foreground;
+  final Color border;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme text = Theme.of(context).textTheme;
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        color: background,
+        shape: AppShapes.rounded(AppShapes.radiusSmall, side: BorderSide(color: border)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(icon, size: 16, color: foreground),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: text.labelMedium?.copyWith(color: foreground, fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -296,81 +343,5 @@ class _FajrCountdownState extends ConsumerState<FajrCountdown> {
         ],
       ),
     );
-  }
-}
-
-class _ProgressRing extends StatelessWidget {
-  const _ProgressRing({required this.fraction});
-
-  final double fraction;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    final TextTheme text = Theme.of(context).textTheme;
-    return Semantics(
-      label: 'التقدم في الأربعين ${arabicPercent(fraction)}',
-      child: SizedBox.square(
-        dimension: 84,
-        child: CustomPaint(
-          painter: _RingPainter(
-            fraction: fraction,
-            track: palette.line,
-            fill: palette.emerald,
-          ),
-          child: Center(
-            child: ExcludeSemantics(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    arabicPercent(fraction),
-                    style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700, height: 1.1),
-                  ),
-                  Text(
-                    'من الأربعين',
-                    style: text.labelSmall?.copyWith(color: palette.inkSoft, height: 1.1),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _RingPainter extends CustomPainter {
-  const _RingPainter({required this.fraction, required this.track, required this.fill});
-
-  final double fraction;
-  final Color track;
-  final Color fill;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const double stroke = 7;
-    final Rect rect = (Offset.zero & size).deflate(stroke / 2);
-    final Paint base = Paint()
-      ..color = track
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke;
-    canvas.drawArc(rect, 0, math.pi * 2, false, base);
-    final double bounded = fraction < 0 ? 0 : (fraction > 1 ? 1 : fraction);
-    final double sweep = math.pi * 2 * bounded;
-    if (sweep > 0) {
-      final Paint arc = Paint()
-        ..color = fill
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke
-        ..strokeCap = StrokeCap.round;
-      canvas.drawArc(rect, -math.pi / 2, sweep, false, arc);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_RingPainter oldDelegate) {
-    return oldDelegate.fraction != fraction || oldDelegate.track != track || oldDelegate.fill != fill;
   }
 }
