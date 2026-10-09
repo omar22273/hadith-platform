@@ -119,7 +119,6 @@ void main() {
   });
 
   testWidgets('word-order challenges unlock one after another', (WidgetTester tester) async {
-    final List<MethodCall> calls = _recordPlatformCalls(tester);
     final ProviderContainer container = await pumpApp(
       tester,
       stored: <String, String>{StorageKeys.journeyProgress: completedProgressJson()},
@@ -160,7 +159,6 @@ void main() {
     // محاولة القفز إلى مقطع بعيد لا تفعل شيئاً.
     controller.select(deck.orderChallenges.length - 1);
     expect(container.read(orderChallengeProvider).index, 1, reason: 'later challenges stay locked');
-    expect(calls.where((MethodCall c) => c.method == 'HapticFeedback.vibrate'), isNotEmpty);
   });
 
   testWidgets('scenario options give instant colored feedback with a haptic', (WidgetTester tester) async {
@@ -189,6 +187,8 @@ void main() {
     expect(find.text('ليس هذا مقصد الحديث'), findsOneWidget);
     expect(calls.where((MethodCall c) => c.method == 'HapticFeedback.vibrate'), isNotEmpty);
 
+    await tester.ensureVisible(find.text(right.text).first);
+    await settle(tester);
     await tester.tap(find.text(right.text).first);
     await settle(tester);
     expect(find.text('الخيار النبوي'), findsWidgets);

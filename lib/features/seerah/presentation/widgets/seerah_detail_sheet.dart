@@ -48,10 +48,12 @@ class SeerahDetailSheet extends ConsumerWidget {
       minChildSize: 0.5,
       maxChildSize: 0.96,
       builder: (BuildContext context, ScrollController controller) {
-        return ListView(
+        return SingleChildScrollView(
           controller: controller,
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-          children: <Widget>[
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
             Text(
               'المحطة ${arabicDigits(station.order)} · ${epochLabel(station.epoch)}',
               style: text.labelMedium?.copyWith(color: palette.amberText, fontWeight: FontWeight.w600),
@@ -79,7 +81,8 @@ class SeerahDetailSheet extends ConsumerWidget {
               'وصياغة المشاهد بانتظار المراجعة العلمية.',
               style: text.labelSmall?.copyWith(color: palette.inkSoft, height: 1.7),
             ),
-          ],
+            ],
+          ),
         );
       },
     );
