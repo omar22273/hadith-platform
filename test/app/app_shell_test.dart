@@ -16,6 +16,10 @@ import 'package:hadith_platform/core/storage/key_value_store.dart';
 import 'package:hadith_platform/core/time/clock.dart';
 import 'package:hadith_platform/features/admin/presentation/admin_export_screen.dart';
 import 'package:hadith_platform/features/daily_session/presentation/daily_hadith_session_screen.dart';
+import 'package:hadith_platform/features/hadith/application/hadith_providers.dart';
+import 'package:hadith_platform/features/journey/application/journey_controller.dart';
+import 'package:hadith_platform/features/journey/application/journey_progress_controller.dart';
+import 'package:hadith_platform/features/journey/application/pacing_notifier.dart';
 import 'package:hadith_platform/features/journey/presentation/widgets/caravan_trail_view.dart';
 import 'package:hadith_platform/features/journey/presentation/widgets/wird_node.dart';
 import 'package:hadith_platform/features/settings/presentation/settings_screen.dart';
@@ -64,7 +68,13 @@ Future<void> _pumpApp(WidgetTester tester) async {
         .evaluate()
         .map((Element e) => (e.widget as Text).data ?? '')
         .join(' | ');
-    fail('Arbaeen path did not render. Visible texts: $texts');
+    final ProviderContainer container = ProviderScope.containerOf(tester.element(find.byType(AppShellScreen)));
+    final String journey = container.read(journeyControllerProvider).toString();
+    final String curriculum = container.read(curriculumProvider).toString();
+    final String progress = container.read(journeyProgressProvider).toString();
+    final String pacing = container.read(pacingProvider).toString();
+    final String tree = find.byType(IndexedStack).evaluate().length.toString();
+    fail('Arbaeen path did not render. texts: $texts; stacks: $tree; journey: $journey; curriculum: $curriculum; progress: $progress; pacing: $pacing');
   }
 }
 
