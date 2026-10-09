@@ -76,7 +76,7 @@ void main() {
 
   test('the CDN template builds the audio url of a hadith', () {
     const AppConfig config = AppConfig(
-      version: '2.0.0',
+      version: '2.1.0',
       audioUrlTemplate: AppConfig.defaultAudioUrlTemplate,
       audioLoadTimeout: Duration(seconds: 5),
     );
@@ -84,6 +84,6 @@ void main() {
       config.audioUrlFor('nawawi40_001').toString(),
       'https://cdn.hadithplatform.app/audio/hadith_nawawi40_001.mp3',
     );
-    expect(AppConfig.standard.version, '2.0.0');
+    expect(AppConfig.standard.version, '2.1.0');
   });
 }
