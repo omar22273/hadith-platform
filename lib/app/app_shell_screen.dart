@@ -121,6 +121,7 @@ class AppBottomBar extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               for (final AppTab tab in AppTab.values)
                 Expanded(
@@ -166,6 +167,9 @@ class _NavItem extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
                 child: Column(
+                  // بدون min يمتد العمود إلى ارتفاع الشاشة كله فيستهلك الشريط
+                  // مساحة المحتوى ويصير جسم الصفحة صفري الارتفاع.
+                  mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     AnimatedContainer(

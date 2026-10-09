@@ -15,11 +15,6 @@ import 'package:hadith_platform/core/storage/key_value_store.dart';
 import 'package:hadith_platform/core/time/clock.dart';
 import 'package:hadith_platform/features/admin/presentation/admin_export_screen.dart';
 import 'package:hadith_platform/features/daily_session/presentation/daily_hadith_session_screen.dart';
-import 'package:hadith_platform/features/hadith/application/hadith_providers.dart';
-import 'package:hadith_platform/features/journey/application/journey_controller.dart';
-import 'package:hadith_platform/features/journey/application/journey_progress_controller.dart';
-import 'package:hadith_platform/features/journey/application/pacing_notifier.dart';
-import 'package:hadith_platform/features/journey/presentation/arbaeen_path_screen.dart';
 import 'package:hadith_platform/features/journey/presentation/widgets/caravan_trail_view.dart';
 import 'package:hadith_platform/features/journey/presentation/widgets/wird_node.dart';
 import 'package:hadith_platform/features/settings/presentation/settings_screen.dart';
@@ -62,35 +57,15 @@ Future<void> _pumpApp(WidgetTester tester) async {
     ),
   );
   await _settle(tester);
-  if (find.byType(CaravanTrailView).evaluate().isEmpty) {
-    final String texts = find
-        .byType(Text)
-        .evaluate()
-        .map((Element e) => (e.widget as Text).data ?? '')
-        .join(' | ');
-    final ProviderContainer container = ProviderScope.containerOf(tester.element(find.byType(AppShellScreen)));
-    final String journey = container.read(journeyControllerProvider).toString();
-    final String curriculum = container.read(curriculumProvider).toString();
-    final String progress = container.read(journeyProgressProvider).toString();
-    final String pacing = container.read(pacingProvider).toString();
-    final String tree = find.byType(IndexedStack).evaluate().length.toString();
-    final StringBuffer buffer = StringBuffer();
-    for (final Type type in <Type>[IndexedStack, ArbaeenPathScreen, SafeArea, CustomScrollView, SliverToBoxAdapter, Viewport]) {
-      for (final Element e in find.byType(type, skipOffstage: false).evaluate()) {
-        final RenderObject? ro = e.renderObject;
-        buffer.write('$type=${ro is RenderBox ? ro.size : ro?.runtimeType} ');
-      }
-    }
-    // ignore: avoid_print
-    print('TREE>>> ${buffer.toString()} <<<TREE');
-    fail('Arbaeen path did not render. texts: $texts; stacks: $tree; journey: $journey; curriculum: $curriculum; progress: $progress; pacing: $pacing');
-  }
 }
 
 void main() {
   testWidgets('the shell builds all four tabs and opens the hidden admin gate', (WidgetTester tester) async {
     await _pumpApp(tester);
 
+    // الشريط السفلي لا يبتلع المساحة: جسم الغلاف يأخذ معظم ارتفاع الشاشة.
+    expect(tester.getSize(find.byType(IndexedStack)).height, greaterThan(600));
+    expect(tester.getSize(find.byType(AppBottomBar)).height, lessThan(120));
     expect(find.byType(CaravanTrailView), findsOneWidget);
     expect(find.byType(WirdNodeView), findsNWidgets(42));
     expect(find.text('الأعمال بالنيات'), findsWidgets);
