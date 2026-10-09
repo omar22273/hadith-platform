@@ -19,7 +19,6 @@ import 'package:hadith_platform/features/journey/domain/course_catalog.dart';
 import 'package:hadith_platform/features/journey/presentation/widgets/wird_node.dart';
 import 'package:hadith_platform/features/review/application/review_controllers.dart';
 import 'package:hadith_platform/features/review/domain/review_deck.dart';
-import 'package:hadith_platform/core/json/json_reader.dart';
 import 'package:hadith_platform/core/theme/app_theme.dart';
 import 'package:hadith_platform/features/seerah/data/models/seerah_station.dart';
 import 'package:hadith_platform/features/seerah/domain/seerah_checkpoint.dart';
@@ -69,6 +68,7 @@ void main() {
       400,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.ensureVisible(find.text('صحيح البخاري'));
     for (final CurriculumCourse course in CourseCatalog.lockedCourses) {
       expect(find.text(course.title), findsOneWidget);
     }
@@ -97,6 +97,8 @@ void main() {
       300,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.ensureVisible(find.text('التفاصيل والرواية الكاملة'));
+    await settle(tester);
     await tester.tap(find.text('التفاصيل والرواية الكاملة'));
     await settle(tester);
     expect(find.byType(DraggableScrollableSheet), findsOneWidget);
@@ -180,6 +182,7 @@ void main() {
     final ScenarioOption right = scenario.alignedOption!;
 
     await tester.scrollUntilVisible(find.text(wrong.text), 200, scrollable: find.byType(Scrollable).first);
+    await tester.ensureVisible(find.text(wrong.text));
     await tester.tap(find.text(wrong.text));
     await settle(tester);
     expect(find.text('لماذا هذا هو الخيار النبوي؟'), findsOneWidget);

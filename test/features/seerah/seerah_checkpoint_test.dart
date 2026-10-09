@@ -59,16 +59,16 @@ void main() {
 
   test('the camera matrix centers a point and stays inside the canvas', () {
     const Size size = Size(400, 300);
-    final Matrix4 centered = seerahCameraMatrix(at: const Offset(200, 150), size: size, scale: 2);
+    final centered = seerahCameraMatrix(at: const Offset(200, 150), size: size, scale: 2);
     expect(centered.getMaxScaleOnAxis(), closeTo(2, 1e-9));
     // نقطة الوسط تبقى في الوسط.
     final Offset mapped = MatrixUtils.transformPoint(centered, const Offset(200, 150));
     expect(mapped.dx, closeTo(200, 1e-9));
     expect(mapped.dy, closeTo(150, 1e-9));
     // نقطة عند الزاوية لا تُخرج اللوحة من الإطار.
-    final Matrix4 corner = seerahCameraMatrix(at: Offset.zero, size: size, scale: 3);
+    final corner = seerahCameraMatrix(at: Offset.zero, size: size, scale: 3);
     expect(MatrixUtils.transformPoint(corner, Offset.zero), Offset.zero);
-    final Matrix4 far = seerahCameraMatrix(at: const Offset(400, 300), size: size, scale: 3);
+    final far = seerahCameraMatrix(at: const Offset(400, 300), size: size, scale: 3);
     final Offset bottomRight = MatrixUtils.transformPoint(far, const Offset(400, 300));
     expect(bottomRight.dx, closeTo(400, 1e-9));
     expect(bottomRight.dy, closeTo(300, 1e-9));

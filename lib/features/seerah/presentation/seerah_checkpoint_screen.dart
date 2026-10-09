@@ -25,7 +25,7 @@ class SeerahCheckpointScreen extends StatefulWidget {
 }
 
 class _SeerahCheckpointScreenState extends State<SeerahCheckpointScreen> {
-  late List<SeerahStationModel> _order = List<SeerahStationModel>.of(widget.checkpoint.shuffled);
+  late final List<SeerahStationModel> _order = List<SeerahStationModel>.of(widget.checkpoint.shuffled);
   List<bool>? _result;
   bool _solved = false;
   int _attempts = 0;
