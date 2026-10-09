@@ -307,14 +307,14 @@ void main() {
     });
 
     testWidgets('dragging a handle reorders the list', (WidgetTester tester) async {
-      await pumpOasis(tester, SeerahCheckpoint.after(stations, 4)!, (bool? _) {});
-      final Finder tiles = find.byType(ReorderableDragStartListener);
-      expect(tiles, findsNWidgets(5));
-      final double before = tester.getTopLeft(find.byType(ReorderableDragStartListener).first).dy;
+      final SeerahCheckpoint checkpoint = SeerahCheckpoint.after(stations, 4)!;
+      await pumpOasis(tester, checkpoint, (bool? _) {});
+      expect(find.byType(ReorderableDragStartListener), findsNWidgets(5));
+      final Finder firstTitle = find.text(checkpoint.shuffled.first.title);
+      final double before = tester.getTopLeft(firstTitle).dy;
       await tester.drag(find.byIcon(Icons.drag_indicator_rounded).first, const Offset(0, 220));
       await settle(tester);
-      final double after = tester.getTopLeft(find.byType(ReorderableDragStartListener).first).dy;
-      expect(after, isNot(before), reason: 'the first handle moved to another row');
+      expect(tester.getTopLeft(firstTitle).dy, greaterThan(before), reason: 'the dragged row moved down');
     });
 
     testWidgets('a correct order lets the user continue', (WidgetTester tester) async {
