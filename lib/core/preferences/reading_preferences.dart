@@ -179,11 +179,16 @@ class ReadingPreferencesController extends Notifier<ReadingPreferences> {
     return ReadingPreferences.defaults;
   }
 
-  /// يضبط حجم خط المتن.
-  void setMatnFontSize(double value) => _save(state.copyWith(matnFontSize: value));
+  /// يضبط حجم خط المتن. [persist] false للمعاينة أثناء سحب المنزلق، ويُحفظ
+  /// عند إفلاته.
+  void setMatnFontSize(double value, {bool persist = true}) {
+    _save(state.copyWith(matnFontSize: value), persist: persist);
+  }
 
   /// يضبط تكبير نصوص الواجهة.
-  void setTextScale(double value) => _save(state.copyWith(textScale: value));
+  void setTextScale(double value, {bool persist = true}) {
+    _save(state.copyWith(textScale: value), persist: persist);
+  }
 
   /// يختار خط المتن.
   void setMatnFont(MatnFont font) => _save(state.copyWith(matnFont: font));
@@ -191,15 +196,17 @@ class ReadingPreferencesController extends Notifier<ReadingPreferences> {
   /// يعيد القيم الافتراضية.
   void reset() => _save(ReadingPreferences.defaults);
 
-  void _save(ReadingPreferences next) {
-    if (next == state) {
+  void _save(ReadingPreferences next, {bool persist = true}) {
+    if (next != state) {
+      state = next;
+    }
+    if (!persist) {
       return;
     }
-    state = next;
     unawaited(
       ref
           .read(keyValueStoreProvider)
-          .writeString(StorageKeys.readingPreferences, jsonEncode(next.toJson())),
+          .writeString(StorageKeys.readingPreferences, jsonEncode(state.toJson())),
     );
   }
 }

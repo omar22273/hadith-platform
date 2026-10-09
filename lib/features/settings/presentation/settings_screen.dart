@@ -77,7 +77,9 @@ class _Card extends StatelessWidget {
             children: <Widget>[
               Icon(icon, color: palette.amberText),
               const SizedBox(width: 8),
-              Text(title, style: AppTypography.heritageTitle(color: palette.ink, fontSize: 22)),
+              Expanded(
+                child: Text(title, style: AppTypography.heritageTitle(color: palette.ink, fontSize: 22)),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -258,7 +260,8 @@ class _ReadingSection extends ConsumerWidget {
           max: ReadingPreferences.maxMatnFontSize,
           divisions: (ReadingPreferences.maxMatnFontSize - ReadingPreferences.minMatnFontSize).round(),
           label: arabicDigits(reading.matnFontSize.round()),
-          onChanged: controller.setMatnFontSize,
+          onChanged: (double value) => controller.setMatnFontSize(value, persist: false),
+          onChangeEnd: controller.setMatnFontSize,
         ),
         SmoothSurface(
           color: palette.surfaceMuted,
@@ -291,7 +294,8 @@ class _ReadingSection extends ConsumerWidget {
           max: ReadingPreferences.maxTextScale,
           divisions: 8,
           label: arabicPercent(reading.textScale),
-          onChanged: controller.setTextScale,
+          onChanged: (double value) => controller.setTextScale(value, persist: false),
+          onChangeEnd: controller.setTextScale,
         ),
         Align(
           alignment: AlignmentDirectional.centerStart,
@@ -448,7 +452,7 @@ class _TierTile extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final String caption = unlocked
         ? (tier.requiredStreak == 0 ? 'الوتيرة الأساسية' : 'فُتحت بالاستمرارية')
-        : 'تُفتح بعد ${daysLabel(tier.requiredStreak)} متتالية · بقي ${daysLabel(remaining < 1 ? 1 : remaining)}';
+        : 'تُفتح بعد ${daysLabel(tier.requiredStreak)} على التوالي · بقي ${daysLabel(remaining < 1 ? 1 : remaining)}';
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Semantics(

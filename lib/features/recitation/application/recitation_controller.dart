@@ -105,7 +105,6 @@ class RecitationController extends Notifier<RecitationState> {
   AudioPlayerService? _player;
   StreamSubscription<Duration>? _position;
   StreamSubscription<AudioPhase>? _phase;
-  int _offsetMs = 0;
 
   @override
   RecitationState build() {
@@ -144,13 +143,25 @@ class RecitationController extends Notifier<RecitationState> {
     if (player == null || !ref.mounted) {
       return false;
     }
-    _offsetMs = 0;
+    return _play(player.playAll);
+  }
+
+  /// يشغل ويعيد حالة التشغيل في كل الأحوال؛ وخطأ التشغيل يُعرض تعذراً في الشبكة.
+  Future<bool> _play(Future<void> Function() action) async {
     state = state.copyWith(playing: true, clearActive: true);
-    await player.playAll();
-    if (ref.mounted) {
-      state = state.copyWith(playing: false, clearActive: true);
+    try {
+      await action();
+      return true;
+    } on Exception {
+      if (ref.mounted) {
+        state = state.copyWith(failure: AudioFailureKind.network);
+      }
+      return false;
+    } finally {
+      if (ref.mounted) {
+        state = state.copyWith(playing: false, clearActive: true);
+      }
     }
-    return true;
   }
 
   /// يشغل مقطع حفظ إن كانت التوقيتات متاحة.
@@ -168,16 +179,12 @@ class RecitationController extends Notifier<RecitationState> {
     if (player == null || !ref.mounted) {
       return false;
     }
-    _offsetMs = first.startMs;
-    state = state.copyWith(playing: true, clearActive: true);
-    await player.playRange(
-      start: Duration(milliseconds: first.startMs),
-      end: Duration(milliseconds: last.endMs),
+    return _play(
+      () => player.playRange(
+        start: Duration(milliseconds: first.startMs),
+        end: Duration(milliseconds: last.endMs),
+      ),
     );
-    if (ref.mounted) {
-      state = state.copyWith(playing: false, clearActive: true);
-    }
-    return true;
   }
 
   /// مدة مقطع الحفظ في التسجيل، أو null.
@@ -245,7 +252,7 @@ class RecitationController extends Notifier<RecitationState> {
     if (!ref.mounted || audio == null || !state.playing || audio.timings.isEmpty) {
       return;
     }
-    final int ms = position.inMilliseconds + _offsetMs;
+    final int ms = position.inMilliseconds;
     for (final WordTiming timing in audio.timings) {
       if (ms >= timing.startMs && ms < timing.endMs) {
         if (timing.segmentId != state.activeSegmentId || timing.tokenIndex != state.activeTokenIndex) {

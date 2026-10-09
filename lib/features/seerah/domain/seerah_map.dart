@@ -187,6 +187,10 @@ class SeerahRoute {
     final List<SeerahLeg> legs = <SeerahLeg>[];
     int? previousCluster;
     for (int s = 0; s < chronological.length; s++) {
+      if (!chronological[s].onRoute) {
+        // محطة خارج خط السير (كالهجرة إلى الحبشة): تظهر في موضعها ولا تُرسم لها قافلة.
+        continue;
+      }
       final int cluster = clusterOf[chronological[s].id]!;
       if (previousCluster != null && cluster != previousCluster) {
         legs.add(SeerahLeg(from: previousCluster, to: cluster, arrivalStationIndex: s));

@@ -8,6 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/diagnostics/diagnostic_views.dart';
 import '../core/navigation/app_tab.dart';
 import '../core/theme/app_palette.dart';
 import '../core/theme/app_typography.dart';
@@ -71,11 +72,18 @@ class _AppShellScreenState extends ConsumerState<AppShellScreen> {
       child: Scaffold(
         body: IndexedStack(
           index: current.index,
+          sizing: StackFit.expand,
           children: <Widget>[
             for (final AppTab tab in AppTab.values)
               _built.contains(tab)
-                  ? KeyedSubtree(key: PageStorageKey<AppTab>(tab), child: _screenFor(tab))
-                  : const SizedBox.shrink(),
+                  ? TickerMode(
+                      enabled: tab == current,
+                      child: KeyedSubtree(
+                        key: PageStorageKey<AppTab>(tab),
+                        child: SizedBox.expand(child: _screenFor(tab)),
+                      ),
+                    )
+                  : const DiagnosticLoadingView(),
           ],
         ),
         bottomNavigationBar: AppBottomBar(

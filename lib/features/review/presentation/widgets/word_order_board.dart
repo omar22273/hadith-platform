@@ -92,14 +92,15 @@ class WordOrderBoard extends ConsumerWidget {
           const SizedBox(height: 8),
           _Pool(board: board, onTapTile: attempt),
           const SizedBox(height: 10),
-          Row(
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            spacing: 8,
             children: <Widget>[
               TextButton.icon(
                 onPressed: board.placedTiles.isEmpty ? null : controller.undo,
                 icon: const Icon(Icons.undo_rounded),
                 label: const Text('تراجع'),
               ),
-              const Spacer(),
               TextButton.icon(
                 onPressed: controller.reset,
                 icon: const Icon(Icons.restart_alt_rounded),

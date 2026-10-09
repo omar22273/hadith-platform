@@ -70,11 +70,12 @@ class FlashcardDeckView extends ConsumerWidget {
       children: <Widget>[
         Row(
           children: <Widget>[
-            Text(
-              'البطاقة ${arabicDigits(done + 1)} من ${arabicDigits(deck.flashcards.length)}',
-              style: text.labelMedium?.copyWith(color: palette.inkSoft),
+            Expanded(
+              child: Text(
+                'البطاقة ${arabicDigits(done + 1)} من ${arabicDigits(deck.flashcards.length)}',
+                style: text.labelMedium?.copyWith(color: palette.inkSoft),
+              ),
             ),
-            const Spacer(),
             Text(
               'عرفتَ ${arabicDigits(session.known)}',
               style: text.labelMedium?.copyWith(color: palette.emeraldText, fontWeight: FontWeight.w600),
@@ -92,7 +93,12 @@ class FlashcardDeckView extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 14),
-        _FlipCard(card: card, flipped: session.flipped, onTap: controller.flip),
+        _FlipCard(
+          key: ValueKey<String>('card-$current-${session.known}-${session.repeats}'),
+          card: card,
+          flipped: session.flipped,
+          onTap: controller.flip,
+        ),
         const SizedBox(height: 14),
         if (session.flipped)
           Row(
@@ -126,7 +132,7 @@ class FlashcardDeckView extends ConsumerWidget {
 }
 
 class _FlipCard extends StatelessWidget {
-  const _FlipCard({required this.card, required this.flipped, required this.onTap});
+  const _FlipCard({super.key, required this.card, required this.flipped, required this.onTap});
 
   final GharibCard card;
   final bool flipped;

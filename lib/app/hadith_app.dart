@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/diagnostics/diagnostic_views.dart';
 import '../core/preferences/reading_preferences.dart';
 import '../core/preferences/theme_preference.dart';
 import '../core/theme/app_theme.dart';
@@ -39,7 +40,7 @@ class HadithApp extends ConsumerWidget {
         final double systemScale = media.textScaler.scale(14) / 14;
         return MediaQuery(
           data: media.copyWith(textScaler: TextScaler.linear(systemScale * reading.textScale)),
-          child: child ?? const SizedBox.shrink(),
+          child: child ?? const DiagnosticLoadingView(),
         );
       },
       home: const AppShellScreen(),

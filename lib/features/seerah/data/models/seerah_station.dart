@@ -156,6 +156,7 @@ class SeerahStationModel {
     required this.epoch,
     required this.timeLabel,
     required this.place,
+    required this.onRoute,
     required this.sceneDescription,
     required this.challenge,
     required this.propheticDecision,
@@ -172,6 +173,7 @@ class SeerahStationModel {
       epoch: readEnum(json, 'epoch', SeerahEpoch.fromWire),
       timeLabel: readStringOrNull(json, 'timeLabel'),
       place: readModel(json, 'place', SeerahPlace.fromJson),
+      onRoute: readBool(json, 'onRoute'),
       sceneDescription: readString(json, 'sceneDescription'),
       challenge: readString(json, 'challenge'),
       propheticDecision: readString(json, 'propheticDecision'),
@@ -197,6 +199,9 @@ class SeerahStationModel {
 
   /// موضع المشهد على الخريطة.
   final SeerahPlace place;
+
+  /// هل يدخل الموضع في خط سير النبي ﷺ على الخريطة؛ false إذا كان المشهد عن غيره، كهجرة الصحابة إلى الحبشة.
+  final bool onRoute;
 
   /// الوصف البصري والزماني للمشهد، مصوغاً من الشواهد وحدها.
   final String sceneDescription;
@@ -229,6 +234,7 @@ class SeerahStationModel {
       'epoch': epoch.wire,
       'timeLabel': timeLabel,
       'place': place.toJson(),
+      'onRoute': onRoute,
       'sceneDescription': sceneDescription,
       'challenge': challenge,
       'propheticDecision': propheticDecision,
@@ -249,6 +255,7 @@ class SeerahStationModel {
         epoch == other.epoch &&
         timeLabel == other.timeLabel &&
         place == other.place &&
+        onRoute == other.onRoute &&
         sceneDescription == other.sceneDescription &&
         challenge == other.challenge &&
         propheticDecision == other.propheticDecision &&
@@ -265,6 +272,7 @@ class SeerahStationModel {
       epoch,
       timeLabel,
       place,
+      onRoute,
       sceneDescription,
       challenge,
       propheticDecision,

@@ -73,7 +73,7 @@ class WirdCompleteSheet extends ConsumerWidget {
         if (pacing != null) ...<Widget>[
           Text(
             pacing.streakDays > 0
-                ? 'استمراريتك: ${daysLabel(pacing.streakDays)} متتالية'
+                ? 'استمراريتك: ${daysLabel(pacing.streakDays)} على التوالي'
                 : 'بداية طيبة؛ الثبات يوماً بعد يوم يفتح الوتيرة الأعلى.',
             textAlign: TextAlign.center,
             style: text.titleSmall?.copyWith(color: palette.emeraldText, fontWeight: FontWeight.w700),
@@ -82,7 +82,7 @@ class WirdCompleteSheet extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
-                'بقي ${daysLabel(pacing.daysToNextTier!)} متتالية لإتاحة «${hadithCountLabel(pacing.nextTier!.perDay)} يومياً» في الإعدادات.',
+                'بقي ${daysLabel(pacing.daysToNextTier!)} على التوالي لإتاحة «${hadithCountLabel(pacing.nextTier!.perDay)} يومياً» في الإعدادات.',
                 textAlign: TextAlign.center,
                 style: text.bodySmall?.copyWith(color: palette.inkSoft),
               ),
