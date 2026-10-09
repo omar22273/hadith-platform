@@ -3,8 +3,6 @@
 //
 // محرك الرسم Impeller هو الافتراضي على iOS وAndroid في إصدارات Flutter الحالية،
 // ولا يحتاج التطبيق إلى إعداد إضافي لتفعيله.
-import 'dart:ui' show PlatformDispatcher;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

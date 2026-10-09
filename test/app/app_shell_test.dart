@@ -4,6 +4,7 @@
 
 import 'dart:io';
 
+import 'package:flutter/material.dart' show Text;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,6 +58,14 @@ Future<void> _pumpApp(WidgetTester tester) async {
     ),
   );
   await _settle(tester);
+  if (find.byType(CaravanTrailView).evaluate().isEmpty) {
+    final String texts = find
+        .byType(Text)
+        .evaluate()
+        .map((Element e) => (e.widget as Text).data ?? '')
+        .join(' | ');
+    fail('Arbaeen path did not render. Visible texts: $texts');
+  }
 }
 
 void main() {
