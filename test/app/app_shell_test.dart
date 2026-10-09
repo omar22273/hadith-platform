@@ -74,6 +74,11 @@ Future<void> _pumpApp(WidgetTester tester) async {
     final String progress = container.read(journeyProgressProvider).toString();
     final String pacing = container.read(pacingProvider).toString();
     final String tree = find.byType(IndexedStack).evaluate().length.toString();
+    final String deep = tester.binding.rootElement!.toStringDeep();
+    final int at = deep.indexOf('IndexedStack');
+    final String dump = at < 0 ? 'no IndexedStack' : deep.substring(at, at + 6000 > deep.length ? deep.length : at + 6000);
+    // ignore: avoid_print
+    print('TREE>>>\n$dump\n<<<TREE');
     fail('Arbaeen path did not render. texts: $texts; stacks: $tree; journey: $journey; curriculum: $curriculum; progress: $progress; pacing: $pacing');
   }
 }
