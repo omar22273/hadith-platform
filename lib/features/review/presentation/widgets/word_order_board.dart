@@ -51,7 +51,8 @@ class WordOrderBoard extends ConsumerWidget {
         case PlacementOutcome.mismatch:
           HapticFeedback.selectionClick();
         case PlacementOutcome.completed:
-          HapticFeedback.mediumImpact();
+          // اكتمال المقطع: اهتزاز خفيف يوافق وميض النجاح الهادئ.
+          HapticFeedback.lightImpact();
         case PlacementOutcome.placed:
         case PlacementOutcome.ignored:
           break;
@@ -84,7 +85,8 @@ class WordOrderBoard extends ConsumerWidget {
           completed: board.completed,
           child: _Line(board: board, onDrop: attempt),
         ),
-        const SizedBox(height: 14),
+        _MismatchNotice(board: board),
+        const SizedBox(height: 10),
         if (board.completed)
           _CompletedBanner(mistakes: board.mistakes, onAgain: controller.reset)
         else ...<Widget>[
@@ -113,15 +115,120 @@ class WordOrderBoard extends ConsumerWidget {
           ),
         ],
         if (hasNext) ...<Widget>[
-          const SizedBox(height: 10),
-          // يتفعّل تلقائياً عند مطابقة المقطع الحالي، وقبل ذلك يبقى رمادياً.
-          FilledButton.icon(
-            onPressed: board.completed ? () => controller.select(state.index + 1) : null,
-            icon: const Icon(Icons.arrow_back_rounded),
-            label: const Text('المقطع التالي'),
+          const SizedBox(height: 12),
+          // لا يتفعّل إلا إذا طابق المقطع الحالي المتن المشكول مطابقة تامة؛
+          // والانتقال يمرّ عبر advance التي تتحقق من ذلك مرة ثانية في المتحكم.
+          _NextSegmentButton(
+            enabled: board.completed,
+            onPressed: () {
+              controller.advance();
+            },
           ),
         ],
       ],
+    );
+  }
+}
+
+/// تنبيه بصري لطيف عند كلمة غير مطابقة: لا حمرة ولا توبيخ، وتعود الكلمة إلى
+/// مكانها بين الكلمات المبعثرة. يزول بوضع الكلمة الصحيحة أو بالتراجع.
+class _MismatchNotice extends StatelessWidget {
+  const _MismatchNotice({required this.board});
+
+  final OrderBoard board;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+    final int? tileId = board.lastMismatchTile;
+    final Widget? notice = tileId == null || board.completed
+        ? null
+        : Semantics(
+            liveRegion: true,
+            container: true,
+            child: DecoratedBox(
+              key: const ValueKey<String>('order-mismatch-notice'),
+              decoration: ShapeDecoration(
+                color: palette.amberSoft,
+                shape: AppShapes.rounded(
+                  AppShapes.radiusSmall,
+                  side: BorderSide(color: palette.amber.withValues(alpha: 0.45)),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.info_outline_rounded, size: 20, color: palette.amberText),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'ليست هذه الكلمة التالية في المتن، فعادت إلى مكانها. جرّب كلمة أخرى.',
+                        style: AppTypography.ui(color: palette.amberText, fontSize: 13, height: 1.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 180),
+      alignment: Alignment.topCenter,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 180),
+        child: Padding(
+          key: ValueKey<int>(notice == null ? -1 : board.mismatchTick),
+          padding: EdgeInsets.only(top: notice == null ? 0 : 10),
+          child: notice ?? const SizedBox(width: double.infinity),
+        ),
+      ),
+    );
+  }
+}
+
+/// زر «المقطع التالي ←»: رمادي معطّل ما لم يكتمل المقطع، ثم عريض بارز زمردي.
+class _NextSegmentButton extends StatelessWidget {
+  const _NextSegmentButton({required this.enabled, required this.onPressed});
+
+  final bool enabled;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
+      width: double.infinity,
+      height: enabled ? 62 : 50,
+      child: FilledButton(
+        key: const ValueKey<String>('order-next-segment'),
+        onPressed: enabled ? onPressed : null,
+        style: FilledButton.styleFrom(
+          backgroundColor: palette.emerald,
+          foregroundColor: palette.onAccent,
+          disabledBackgroundColor: palette.lockedSoft,
+          disabledForegroundColor: palette.locked,
+          elevation: enabled ? 2 : 0,
+          shape: AppShapes.rounded(AppShapes.radiusMedium),
+          textStyle: AppTypography.ui(
+            color: palette.onAccent,
+            fontSize: enabled ? 18 : 15,
+            fontWeight: FontWeight.w700,
+            height: 1.3,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Flexible(child: Text('المقطع التالي', overflow: TextOverflow.ellipsis)),
+            const SizedBox(width: 10),
+            // arrow_forward ينعكس تلقائياً في الاتجاه من اليمين فيشير إلى اليسار «←».
+            Icon(Icons.arrow_forward_rounded, size: enabled ? 26 : 20),
+          ],
+        ),
+      ),
     );
   }
 }

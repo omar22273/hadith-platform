@@ -1,7 +1,7 @@
 name: hadith_platform
 description: منصة الحديث النبوي والتاريخ الإسلامي التفاعلية - الأربعون النووية ورحلة السيرة وميدان المراجعة.
 publish_to: none
-version: 2.1.0+4
+version: 2.2.0+5
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -17,6 +17,12 @@ dependencies:
   flutter_tts: ^4.2.5
   just_audio: ^0.10.6
   share_plus: ^13.0.0
+  path_provider: ^2.1.5
+  file_selector: ^1.0.3
+  crypto: ^3.0.6
+  flutter_local_notifications: ^22.3.1
+  flutter_timezone: ^5.0.1
+  timezone: '>=0.10.1 <1.0.0'
 
 dev_dependencies:
   flutter_test:

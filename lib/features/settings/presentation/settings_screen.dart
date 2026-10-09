@@ -21,6 +21,9 @@ import '../../admin/presentation/admin_export_screen.dart';
 import '../../journey/application/pacing_notifier.dart';
 import '../../journey/domain/pacing.dart';
 import '../../journey/presentation/widgets/wird_labels.dart';
+import '../../backup/presentation/backup_section.dart';
+import '../../reminders/presentation/reminder_section.dart';
+import 'widgets/settings_card.dart';
 
 /// شاشة الإعدادات.
 class SettingsScreen extends ConsumerWidget {
@@ -50,41 +53,13 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 14),
             const _ReceptionSection(),
             const SizedBox(height: 14),
+            const ReminderSection(),
+            const SizedBox(height: 14),
+            const BackupSection(),
+            const SizedBox(height: 14),
             const _AboutSection(),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _Card extends StatelessWidget {
-  const _Card({required this.title, required this.icon, required this.children});
-
-  final String title;
-  final IconData icon;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    return SmoothSurface(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Icon(icon, color: palette.amberText),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(title, style: AppTypography.heritageTitle(color: palette.ink, fontSize: 22)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          ...children,
-        ],
       ),
     );
   }
@@ -199,7 +174,7 @@ class _ThemeSection extends ConsumerWidget {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
     final ThemePreference preference = ref.watch(themePreferenceProvider);
-    return _Card(
+    return SettingsCard(
       title: 'السمة',
       icon: Icons.palette_outlined,
       children: <Widget>[
@@ -230,7 +205,7 @@ class _ReadingSection extends ConsumerWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final ReadingPreferences reading = ref.watch(readingPreferencesProvider);
     final ReadingPreferencesController controller = ref.read(readingPreferencesProvider.notifier);
-    return _Card(
+    return SettingsCard(
       title: 'الخطوط والحجم',
       icon: Icons.text_fields_rounded,
       children: <Widget>[
@@ -320,7 +295,7 @@ class _PacingSection extends ConsumerWidget {
     final AsyncValue<PacingState> pacingValue = ref.watch(pacingProvider);
     final PacingState? pacing = pacingValue.value;
     if (pacing == null) {
-      return _Card(
+      return SettingsCard(
         title: 'وتيرة الأوراد',
         icon: Icons.speed_rounded,
         children: <Widget>[
@@ -332,7 +307,7 @@ class _PacingSection extends ConsumerWidget {
       );
     }
     final PacingNotifier notifier = ref.read(pacingProvider.notifier);
-    return _Card(
+    return SettingsCard(
       title: 'وتيرة الأوراد',
       icon: Icons.speed_rounded,
       children: <Widget>[
@@ -505,7 +480,7 @@ class _ReceptionSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ReceptionMode mode = ref.watch(receptionModeProvider);
-    return _Card(
+    return SettingsCard(
       title: 'طريقة التلقي المفضلة',
       icon: Icons.hearing_rounded,
       children: <Widget>[
@@ -559,7 +534,7 @@ class _AboutSectionState extends ConsumerState<_AboutSection> {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
     final AppConfig config = ref.watch(appConfigProvider);
-    return _Card(
+    return SettingsCard(
       title: 'حول المنصة',
       icon: Icons.info_outline_rounded,
       children: <Widget>[

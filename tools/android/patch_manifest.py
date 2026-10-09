@@ -16,8 +16,16 @@ it on every run. This script then adds what the app needs at runtime:
 4. The Arabic application label.
 5. android:screenOrientation="portrait" on the main activity (portrait only),
    matching the SystemChrome lock in lib/main.dart.
+6. Local notifications (flutter_local_notifications): the POST_NOTIFICATIONS,
+   VIBRATE and RECEIVE_BOOT_COMPLETED permissions and the two receivers that
+   show scheduled notifications and restore them after a reboot.
+7. The Gradle setup the notifications plugin requires: core library
+   desugaring (compileOptions flag, multiDex and the desugar_jdk_libs
+   dependency), for both build.gradle.kts and build.gradle. If the generated
+   Android Gradle Plugin is older than the plugin's minimum it is raised, with
+   the Gradle wrapper raised to the version that AGP needs.
 
-The script is idempotent: running it twice leaves the manifest unchanged.
+The script is idempotent: running it twice leaves everything unchanged.
 """
 
 import os
@@ -33,6 +41,30 @@ NETWORK_CONFIG = """<?xml version="1.0" encoding="utf-8"?>
         <domain includeSubdomains="false">localhost</domain>
     </domain-config>
 </network-security-config>
+"""
+DESUGAR_LIB = 'com.android.tools:desugar_jdk_libs:2.1.4'
+MIN_AGP = (8, 11, 1)
+MIN_GRADLE = (8, 14)
+
+PERMISSIONS = (
+    'android.permission.POST_NOTIFICATIONS',
+    'android.permission.VIBRATE',
+    'android.permission.RECEIVE_BOOT_COMPLETED',
+)
+
+NOTIFICATION_RECEIVERS = """        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
+            android:exported="false" />
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
 """
 TTS_INTENT = """        <intent>
             <action android:name="android.intent.action.TTS_SERVICE" />
@@ -71,6 +103,16 @@ def patch(manifest: str) -> str:
             activity.group(0).replace('<activity', '<activity\n            android:screenOrientation="portrait"', 1),
             1,
         )
+    for permission in PERMISSIONS:
+        if permission not in manifest:
+            manifest = re.sub(
+                r'(<manifest\b[^>]*>)',
+                r'\1\n    <uses-permission android:name="%s" />' % permission,
+                manifest,
+                count=1,
+            )
+    if 'ScheduledNotificationReceiver' not in manifest:
+        manifest = re.sub(r'[ \t]*</application>', lambda m: NOTIFICATION_RECEIVERS + '    </application>', manifest, count=1)
     if 'android.intent.action.TTS_SERVICE' not in manifest:
         if '<queries>' in manifest:
             manifest = manifest.replace('<queries>', '<queries>\n' + TTS_INTENT.rstrip('\n'), 1)
@@ -81,6 +123,108 @@ def patch(manifest: str) -> str:
                 1,
             )
     return manifest
+
+
+def _insert_after_block_open(text: str, block: str, line: str, indent: str) -> str:
+    """Insert `line` right after the first `block {` opening, or return text unchanged."""
+    match = re.search(r'(^|\n)([ \t]*)%s\s*\{[ \t]*\n' % re.escape(block), text)
+    if match is None:
+        return text
+    return text[: match.end()] + indent + line + '\n' + text[match.end():]
+
+
+def patch_gradle(text: str, kotlin_dsl: bool) -> str:
+    """Enable core library desugaring for the app module (idempotent)."""
+    enabled = 'isCoreLibraryDesugaringEnabled = true' if kotlin_dsl else 'coreLibraryDesugaringEnabled true'
+    multidex = 'multiDexEnabled = true' if kotlin_dsl else 'multiDexEnabled true'
+    dependency = (
+        'coreLibraryDesugaring("%s")' % DESUGAR_LIB if kotlin_dsl else "coreLibraryDesugaring '%s'" % DESUGAR_LIB
+    )
+    if not re.search(r'[cC]oreLibraryDesugaring(Enabled)?\b', text):
+        if re.search(r'compileOptions\s*\{', text):
+            text = _insert_after_block_open(text, 'compileOptions', enabled, '        ')
+        else:
+            text = _insert_after_block_open(
+                text, 'android', 'compileOptions {\n        %s\n    }' % enabled, '    '
+            )
+    if 'multiDexEnabled' not in text:
+        text = _insert_after_block_open(text, 'defaultConfig', multidex, '        ')
+    if 'desugar_jdk_libs' not in text:
+        if re.search(r'^dependencies\s*\{', text, flags=re.MULTILINE):
+            text = re.sub(
+                r'^(dependencies\s*\{[ \t]*\n)',
+                lambda m: m.group(1) + '    ' + dependency + '\n',
+                text,
+                count=1,
+                flags=re.MULTILINE,
+            )
+        else:
+            text = text.rstrip('\n') + '\n\ndependencies {\n    ' + dependency + '\n}\n'
+    return text
+
+
+def _version_tuple(value: str) -> tuple:
+    parts = re.findall(r'\d+', value)
+    return tuple(int(part) for part in parts[:3])
+
+
+def raise_agp(android_dir: str) -> list:
+    """Raise AGP (and the Gradle wrapper it needs) when older than the plugin's minimum."""
+    notes = []
+    for name in ('settings.gradle.kts', 'settings.gradle'):
+        path = os.path.join(android_dir, name)
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding='utf-8') as handle:
+            text = handle.read()
+        match = re.search(
+            r'(com\.android\.application["\']\s*\)?\s*version\s*\(?\s*["\'])([0-9][0-9A-Za-z.\-]*)(["\'])',
+            text,
+        )
+        if match is None:
+            notes.append('AGP version not found in %s' % name)
+            continue
+        current = match.group(2)
+        notes.append('AGP in %s: %s' % (name, current))
+        if _version_tuple(current) < MIN_AGP:
+            text = text[: match.start(2)] + '.'.join(str(n) for n in MIN_AGP) + text[match.end(2):]
+            with open(path, 'w', encoding='utf-8') as handle:
+                handle.write(text)
+            notes.append('raised AGP to %s' % '.'.join(str(n) for n in MIN_AGP))
+            _raise_gradle_wrapper(android_dir, notes)
+    return notes
+
+
+def _raise_gradle_wrapper(android_dir: str, notes: list) -> None:
+    path = os.path.join(android_dir, 'gradle', 'wrapper', 'gradle-wrapper.properties')
+    if not os.path.exists(path):
+        return
+    with open(path, encoding='utf-8') as handle:
+        text = handle.read()
+    match = re.search(r'gradle-([0-9][0-9.]*)-(all|bin)\.zip', text)
+    if match is None:
+        return
+    notes.append('Gradle wrapper: %s' % match.group(1))
+    if _version_tuple(match.group(1)) < MIN_GRADLE:
+        text = text.replace(match.group(0), 'gradle-%s-all.zip' % '.'.join(str(n) for n in MIN_GRADLE))
+        with open(path, 'w', encoding='utf-8') as handle:
+            handle.write(text)
+        notes.append('raised Gradle wrapper to %s' % '.'.join(str(n) for n in MIN_GRADLE))
+
+
+def patch_app_gradle(android_dir: str) -> str:
+    for name, kotlin_dsl in (('build.gradle.kts', True), ('build.gradle', False)):
+        path = os.path.join(android_dir, 'app', name)
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding='utf-8') as handle:
+            original = handle.read()
+        patched = patch_gradle(original, kotlin_dsl)
+        if patched != original:
+            with open(path, 'w', encoding='utf-8') as handle:
+                handle.write(patched)
+        return '%s %s' % ('patched' if patched != original else 'already configured', path)
+    raise SystemExit('No app/build.gradle(.kts) found in %s.' % android_dir)
 
 
 def main(argv: list) -> int:
@@ -100,6 +244,9 @@ def main(argv: list) -> int:
     with open(os.path.join(xml_dir, 'network_security_config.xml'), 'w', encoding='utf-8') as handle:
         handle.write(NETWORK_CONFIG)
     print('patched' if patched != original else 'already configured', path)
+    print(patch_app_gradle(android))
+    for note in raise_agp(android):
+        print(note)
     return 0
 
 

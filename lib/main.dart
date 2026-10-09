@@ -11,6 +11,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/hadith_app.dart';
 import 'core/diagnostics/diagnostic_views.dart';
 import 'core/storage/key_value_store.dart';
+import 'features/reminders/application/notification_service.dart';
+import 'features/reminders/data/local_notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,6 +57,7 @@ Future<void> main() async {
     ProviderScope(
       overrides: [
         keyValueStoreProvider.overrideWithValue(store),
+        notificationServiceProvider.overrideWithValue(LocalNotificationService()),
       ],
       child: const HadithApp(),
     ),

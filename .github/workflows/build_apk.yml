@@ -29,6 +29,13 @@ jobs:
       - name: Configure Android manifest (internet, local audio cache proxy, TTS)
         run: python3 tools/android/patch_manifest.py android
 
+      - name: Show the effective Android configuration
+        run: |
+          echo "--- app/build.gradle(.kts)"; cat android/app/build.gradle* || true
+          echo "--- settings.gradle(.kts)"; cat android/settings.gradle* || true
+          echo "--- gradle-wrapper.properties"; cat android/gradle/wrapper/gradle-wrapper.properties || true
+          echo "--- AndroidManifest.xml"; cat android/app/src/main/AndroidManifest.xml
+
       - name: Remove dummy widget test
         run: rm -f test/widget_test.dart
 

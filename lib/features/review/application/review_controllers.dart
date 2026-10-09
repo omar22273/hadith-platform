@@ -161,6 +161,22 @@ class OrderChallengeController extends Notifier<OrderChallengeState> {
     return outcome;
   }
 
+  /// ينتقل إلى المقطع التالي، ولا ينتقل أبداً ما لم يُرتَّب المقطع الحالي
+  /// مطابقاً للمتن المشكول تمام المطابقة. يعيد true إن انتقل.
+  bool advance() {
+    final ReviewDeck? deck = ref.read(reviewDeckProvider).value;
+    final OrderBoard? board = state.board;
+    if (deck == null || board == null || !board.completed || !state.completed.contains(state.index)) {
+      return false;
+    }
+    final int next = state.index + 1;
+    if (next >= deck.orderChallenges.length) {
+      return false;
+    }
+    state = _stateFor(deck, next, state.completed);
+    return true;
+  }
+
   /// يتراجع عن آخر كلمة.
   void undo() {
     final OrderBoard? board = state.board;
@@ -182,7 +198,7 @@ class OrderChallengeController extends Notifier<OrderChallengeState> {
 
   /// ينتقل إلى تحدٍّ مفتوح. المقاطع اللاحقة المقفلة لا تُفتح بالنقر.
   void select(int index) {
-    if (index > openLimit) {
+    if (index < 0 || index > openLimit) {
       return;
     }
     state = _stateFor(ref.read(reviewDeckProvider).value, index, state.completed);
