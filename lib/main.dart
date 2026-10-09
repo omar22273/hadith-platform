@@ -15,6 +15,12 @@ import 'core/storage/key_value_store.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // الاتجاه الرأسي وحده: يمنع تشوه التخطيط عند تدوير الجهاز.
+  await SystemChrome.setPreferredOrientations(const <DeviceOrientation>[
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   // أي خطأ في البناء يُعرض نصاً مقروءاً بدل مساحة فارغة صامتة.
   ErrorWidget.builder = buildVisibleErrorWidget;
   FlutterError.onError = (FlutterErrorDetails details) {

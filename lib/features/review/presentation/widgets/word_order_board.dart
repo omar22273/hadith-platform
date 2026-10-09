@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/text/arabic_digits.dart';
 import '../../../../core/theme/app_palette.dart';
+import '../../../../core/theme/feedback_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/smooth_surface.dart';
@@ -41,6 +42,8 @@ class WordOrderBoard extends ConsumerWidget {
       );
     }
     final OrderChallenge challenge = deck.orderChallenges[state.index];
+    final int limit = openChallengeLimit(state.completed, deck.orderChallenges.length);
+    final bool hasNext = state.index + 1 < deck.orderChallenges.length;
 
     void attempt(int tileId) {
       final PlacementOutcome outcome = controller.place(tileId);
@@ -58,7 +61,13 @@ class WordOrderBoard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _ChallengePicker(deck: deck, selected: state.index, onSelect: controller.select),
+        _ChallengePicker(
+          count: deck.orderChallenges.length,
+          selected: state.index,
+          limit: limit,
+          completed: state.completed,
+          onSelect: controller.select,
+        ),
         const SizedBox(height: 12),
         Text(
           '${challenge.hadithTitle} · ${challenge.label}',
@@ -70,20 +79,14 @@ class WordOrderBoard extends ConsumerWidget {
           style: text.bodySmall?.copyWith(color: palette.inkSoft),
         ),
         const SizedBox(height: 12),
-        SmoothSurface(
-          color: board.completed ? palette.emeraldSoft : palette.surface,
-          borderColor: board.completed ? palette.emerald.withValues(alpha: 0.5) : palette.line,
-          padding: const EdgeInsets.all(14),
+        _CompletionFlash(
+          key: ValueKey<int>(state.index),
+          completed: board.completed,
           child: _Line(board: board, onDrop: attempt),
         ),
         const SizedBox(height: 14),
         if (board.completed)
-          _CompletedBanner(
-            mistakes: board.mistakes,
-            hasNext: state.index + 1 < deck.orderChallenges.length,
-            onNext: () => controller.select(state.index + 1),
-            onAgain: controller.reset,
-          )
+          _CompletedBanner(mistakes: board.mistakes, onAgain: controller.reset)
         else ...<Widget>[
           Text(
             'الكلمات المبعثرة',
@@ -109,46 +112,147 @@ class WordOrderBoard extends ConsumerWidget {
             ],
           ),
         ],
+        if (hasNext) ...<Widget>[
+          const SizedBox(height: 10),
+          // يتفعّل تلقائياً عند مطابقة المقطع الحالي، وقبل ذلك يبقى رمادياً.
+          FilledButton.icon(
+            onPressed: board.completed ? () => controller.select(state.index + 1) : null,
+            icon: const Icon(Icons.arrow_back_rounded),
+            label: const Text('المقطع التالي'),
+          ),
+        ],
       ],
     );
   }
 }
 
 class _ChallengePicker extends StatelessWidget {
-  const _ChallengePicker({required this.deck, required this.selected, required this.onSelect});
+  const _ChallengePicker({
+    required this.count,
+    required this.selected,
+    required this.limit,
+    required this.completed,
+    required this.onSelect,
+  });
 
-  final ReviewDeck deck;
+  final int count;
   final int selected;
+  final int limit;
+  final Set<int> completed;
   final ValueChanged<int> onSelect;
 
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
     return SizedBox(
-      height: 44,
+      height: 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: deck.orderChallenges.length,
+        itemCount: count,
         separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 8),
         itemBuilder: (BuildContext context, int index) {
           final bool active = index == selected;
-          return ChoiceChip(
-            selected: active,
-            onSelected: (bool value) => onSelect(index),
-            label: Text('المقطع ${arabicDigits(index + 1)}'),
-            selectedColor: palette.amberSoft,
-            backgroundColor: palette.surface,
-            side: BorderSide(color: active ? palette.amber : palette.line),
-            shape: AppShapes.rounded(AppShapes.radiusSmall),
-            showCheckmark: false,
-            labelStyle: AppTypography.ui(
-              color: active ? palette.amberText : palette.inkSoft,
-              fontSize: 13,
-              fontWeight: active ? FontWeight.w700 : FontWeight.w400,
+          final bool locked = index > limit;
+          final bool done = completed.contains(index);
+          final Color foreground = locked
+              ? palette.locked
+              : (done ? palette.emeraldText : (active ? palette.amberText : palette.inkSoft));
+          return Semantics(
+            enabled: !locked,
+            label: locked
+                ? 'المقطع ${arabicDigits(index + 1)} مقفل حتى إتمام ما قبله'
+                : 'المقطع ${arabicDigits(index + 1)}${done ? '، مكتمل' : ''}',
+            child: ExcludeSemantics(
+              child: ChoiceChip(
+                selected: active && !locked,
+                // null يعطّل الرقاقة فلا تُنقر وتظهر رمادية.
+                onSelected: locked ? null : (bool value) => onSelect(index),
+                avatar: Icon(
+                  locked ? Icons.lock_rounded : (done ? Icons.check_circle_rounded : Icons.edit_note_rounded),
+                  size: 18,
+                  color: foreground,
+                ),
+                label: Text('المقطع ${arabicDigits(index + 1)}'),
+                selectedColor: palette.amberSoft,
+                backgroundColor: locked ? palette.lockedSoft : (done ? palette.emeraldSoft : palette.surface),
+                disabledColor: palette.lockedSoft,
+                side: BorderSide(
+                  color: locked ? palette.line : (active ? palette.amber : (done ? palette.emerald : palette.line)),
+                ),
+                shape: AppShapes.rounded(AppShapes.radiusSmall),
+                showCheckmark: false,
+                labelStyle: AppTypography.ui(
+                  color: foreground,
+                  fontSize: 13,
+                  fontWeight: active ? FontWeight.w700 : FontWeight.w400,
+                ),
+              ),
             ),
           );
         },
       ),
+    );
+  }
+}
+
+/// وميض أخضر عند اكتمال المقطع، ثم يستقر على أخضر هادئ. بلا حركة إن طُلب تقليلها.
+class _CompletionFlash extends StatefulWidget {
+  const _CompletionFlash({super.key, required this.completed, required this.child});
+
+  final bool completed;
+  final Widget child;
+
+  @override
+  State<_CompletionFlash> createState() => _CompletionFlashState();
+}
+
+class _CompletionFlashState extends State<_CompletionFlash> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  );
+
+  @override
+  void didUpdateWidget(_CompletionFlash oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.completed && !oldWidget.completed) {
+      if (MediaQuery.disableAnimationsOf(context)) {
+        _controller.value = 1;
+      } else {
+        _controller.forward(from: 0);
+      }
+    } else if (!widget.completed) {
+      _controller.value = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+    final FeedbackColors feedback = FeedbackColors.of(context);
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (BuildContext context, Widget? child) {
+        // وميض: يرتفع اللون الأخضر سريعاً ثم يهدأ إلى الأخضر الفاتح.
+        final double pulse = widget.completed ? (1 - Curves.easeOut.transform(_controller.value)) : 0;
+        final Color fill = widget.completed
+            ? Color.lerp(palette.emeraldSoft, feedback.rightBorder.withValues(alpha: 0.55), pulse)!
+            : palette.surface;
+        return SmoothSurface(
+          color: fill,
+          borderColor: widget.completed ? feedback.rightBorder : palette.line,
+          borderWidth: widget.completed ? 2 : 1,
+          padding: const EdgeInsets.all(14),
+          child: child!,
+        );
+      },
+      child: widget.child,
     );
   }
 }
@@ -330,16 +434,9 @@ class _ShakingTile extends StatelessWidget {
 }
 
 class _CompletedBanner extends StatelessWidget {
-  const _CompletedBanner({
-    required this.mistakes,
-    required this.hasNext,
-    required this.onNext,
-    required this.onAgain,
-  });
+  const _CompletedBanner({required this.mistakes, required this.onAgain});
 
   final int mistakes;
-  final bool hasNext;
-  final VoidCallback onNext;
   final VoidCallback onAgain;
 
   @override
@@ -354,27 +451,13 @@ class _CompletedBanner extends StatelessWidget {
           textAlign: TextAlign.center,
           style: text.titleSmall?.copyWith(color: palette.emeraldText, fontWeight: FontWeight.w700),
         ),
-        const SizedBox(height: 10),
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: onAgain,
-                icon: const Icon(Icons.replay_rounded),
-                label: const Text('أعد المقطع'),
-              ),
-            ),
-            if (hasNext) ...<Widget>[
-              const SizedBox(width: 10),
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: onNext,
-                  icon: const Icon(Icons.arrow_forward_rounded),
-                  label: const Text('المقطع التالي'),
-                ),
-              ),
-            ],
-          ],
+        const SizedBox(height: 6),
+        Align(
+          child: TextButton.icon(
+            onPressed: onAgain,
+            icon: const Icon(Icons.replay_rounded),
+            label: const Text('أعد المقطع'),
+          ),
         ),
       ],
     );
