@@ -1862,6 +1862,7 @@
         "epoch",
         "timeLabel",
         "place",
+        "onRoute",
         "sceneDescription",
         "challenge",
         "propheticDecision",
@@ -1903,6 +1904,10 @@
         "place": {
           "$ref": "#/$defs/SeerahPlace",
           "description": "موضع المشهد على الخريطة."
+        },
+        "onRoute": {
+          "type": "boolean",
+          "description": "هل يدخل الموضع في خط سير النبي ﷺ على الخريطة؛ false إذا كان المشهد عن غيره، كهجرة الصحابة إلى الحبشة."
         },
         "sceneDescription": {
           "type": "string",

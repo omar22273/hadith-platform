@@ -41,12 +41,14 @@ class JourneyController extends AsyncNotifier<JourneySnapshot> {
       pacing: pacing,
       now: now,
     );
-    _armUnlockTimer(pacing.nextUnlockAt, now);
+    _armUnlockTimer(pacing.nextUnlockAt);
     return snapshot;
   }
 
-  void _armUnlockTimer(DateTime unlockAt, DateTime now) {
-    final Duration wait = unlockAt.difference(now) + const Duration(seconds: 1);
+  /// يقيس الانتظار من الساعة الحية لا من اللحظة المرجعية، فيُفتح الوِرد عند
+  /// الفجر تماماً ولو بقيت اللحظة المرجعية على وقت فتح التطبيق.
+  void _armUnlockTimer(DateTime unlockAt) {
+    final Duration wait = unlockAt.difference(ref.read(clockProvider)()) + const Duration(seconds: 1);
     final Timer timer = Timer(wait.isNegative ? Duration.zero : wait, () {
       if (ref.mounted) {
         ref.read(nowProvider.notifier).tick();

@@ -64,7 +64,7 @@ abstract interface class AudioPlayerService {
   /// مراحل المشغل.
   Stream<AudioPhase> get phaseStream;
 
-  /// موضع التشغيل داخل المقطع (أو داخل القصاصة عند تشغيل مدى).
+  /// موضع التشغيل المطلق داخل المقطع.
   Stream<Duration> get positionStream;
 
   /// يجلب المقطع ويخزنه مؤقتاً، ويرمي [AudioLoadException] عند الفشل.
@@ -138,9 +138,12 @@ class JustAudioPlayerService implements AudioPlayerService {
     }
   }
 
+  // لا يُستعمل setClip هنا: يقبل just_audio القصاصة مع UriAudioSource وحده،
+  // والمصدر المخزَّن مؤقتاً StreamAudioSource. فيُشغَّل المدى بالانتقال إلى
+  // بدايته ثم الإيقاف عند نهايته من مجرى الموضع، والمواضع كلها مطلقة.
+
   @override
   Future<void> playAll() async {
-    await _player.setClip();
     await _player.seek(Duration.zero);
     await _player.play();
     await _player.pause();
@@ -148,9 +151,17 @@ class JustAudioPlayerService implements AudioPlayerService {
 
   @override
   Future<void> playRange({required Duration start, required Duration end}) async {
-    await _player.setClip(start: start, end: end);
-    await _player.seek(Duration.zero);
-    await _player.play();
+    await _player.seek(start);
+    final StreamSubscription<Duration> watch = _player.positionStream.listen((Duration position) {
+      if (position >= end && _player.playing) {
+        unawaited(_player.pause());
+      }
+    });
+    try {
+      await _player.play();
+    } finally {
+      await watch.cancel();
+    }
     await _player.pause();
   }
 

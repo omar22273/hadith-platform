@@ -63,6 +63,9 @@ void main() {
   testWidgets('the shell builds all four tabs and opens the hidden admin gate', (WidgetTester tester) async {
     await _pumpApp(tester);
 
+    // الشريط السفلي لا يبتلع المساحة: جسم الغلاف يأخذ معظم ارتفاع الشاشة.
+    expect(tester.getSize(find.byType(IndexedStack)).height, greaterThan(600));
+    expect(tester.getSize(find.byType(AppBottomBar)).height, lessThan(120));
     expect(find.byType(CaravanTrailView), findsOneWidget);
     expect(find.byType(WirdNodeView), findsNWidgets(42));
     expect(find.text('الأعمال بالنيات'), findsWidgets);

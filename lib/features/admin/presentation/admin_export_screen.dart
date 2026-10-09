@@ -184,12 +184,13 @@ class _HadithTabState extends ConsumerState<_HadithTab> with AutomaticKeepAliveC
           children: <Widget>[
             if (items.isNotEmpty)
               DropdownButtonFormField<String>(
+                isExpanded: true,
                 decoration: const InputDecoration(labelText: 'تحميل حديث موجود للتعديل'),
                 items: <DropdownMenuItem<String>>[
                   for (final CurriculumItem item in items)
                     DropdownMenuItem<String>(
                       value: item.hadithId,
-                      child: Text('${arabicDigits(item.number)}. ${item.title}'),
+                      child: Text('${arabicDigits(item.number)}. ${item.title}', overflow: TextOverflow.ellipsis),
                     ),
                 ],
                 onChanged: _loading
@@ -460,10 +461,11 @@ class _SeerahTabState extends ConsumerState<_SeerahTab> with AutomaticKeepAliveC
             const SizedBox(height: 12),
             DropdownButtonFormField<int>(
               initialValue: _placeIndex,
+              isExpanded: true,
               decoration: const InputDecoration(labelText: 'الموضع (إحداثيات تقريبية)'),
               items: <DropdownMenuItem<int>>[
                 for (int i = 0; i < seerahPlacePresets.length; i++)
-                  DropdownMenuItem<int>(value: i, child: Text(seerahPlacePresets[i].name)),
+                  DropdownMenuItem<int>(value: i, child: Text(seerahPlacePresets[i].name, overflow: TextOverflow.ellipsis)),
               ],
               onChanged: (int? value) {
                 if (value != null) {

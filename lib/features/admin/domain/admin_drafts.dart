@@ -315,6 +315,7 @@ class SeerahDraftForm {
         longitude: place.longitude,
         coordinatesApproximate: true,
       ),
+      onRoute: true,
       sceneDescription: scene.trim(),
       challenge: challenge.trim(),
       propheticDecision: decision.trim(),
