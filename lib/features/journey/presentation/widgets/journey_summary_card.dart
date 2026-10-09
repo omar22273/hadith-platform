@@ -1,5 +1,6 @@
-// بطاقة التقدم أعلى المسار: نسبة التقدم، وموضع القافلة، وحالة وِرد اليوم
-// مع عدّ تنازلي هادئ إلى الفجر عند اكتمال وِرد اليوم.
+// بطاقة التقدم أعلى المسار: موضع القافلة ونسبة التقدم، والاستمرارية ووتيرة
+// الأوراد، وحالة وِرد اليوم مع عدّ تنازلي هادئ إلى الفجر عند بلوغ الحصة،
+// وزر مباشر إلى ميدان المراجعة.
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -9,11 +10,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/text/arabic_digits.dart';
 import '../../../../core/theme/app_palette.dart';
-import '../../../../core/time/clock.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/time/clock.dart';
 import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/smooth_surface.dart';
 import '../../domain/journey_snapshot.dart';
+import '../../domain/pacing.dart';
+import 'wird_labels.dart';
 
 /// بطاقة الملخص.
 class JourneySummaryCard extends StatelessWidget {
@@ -21,19 +24,28 @@ class JourneySummaryCard extends StatelessWidget {
     super.key,
     required this.snapshot,
     required this.onOpenToday,
+    required this.onOpenReview,
+    required this.onBypassLock,
   });
 
   /// اللقطة.
   final JourneySnapshot snapshot;
 
-  /// فتح بطاقة محطة القافلة.
+  /// فتح بطاقة وِرد اليوم.
   final VoidCallback onOpenToday;
+
+  /// الانتقال إلى ميدان المراجعة.
+  final VoidCallback onOpenReview;
+
+  /// تخطي قفل الفجر لأغراض التجربة.
+  final VoidCallback onBypassLock;
 
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
-    final StationView here = snapshot.caravanStation;
+    final WirdNode? here = snapshot.nodes.isEmpty ? null : snapshot.caravanNode;
+    final PacingState pacing = snapshot.pacing;
     return SmoothSurface(
       elevated: true,
       padding: const EdgeInsets.all(18),
@@ -47,18 +59,20 @@ class JourneySummaryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'المحطة ${arabicDigits(here.station.order)} من ${arabicDigits(snapshot.stations.length)} · ${here.region.name}',
+                      here == null
+                          ? 'مسار الأربعين'
+                          : '${wirdNumberLabel(here)} من ${arabicDigits(snapshot.plannedCount)} · '
+                              '${snapshot.segments[here.segmentIndex].title}',
                       style: text.labelMedium?.copyWith(color: palette.inkSoft),
                     ),
                     Text(
-                      here.station.name,
-                      style: AppTypography.heritageTitle(color: palette.ink, fontSize: 28),
+                      here == null ? '' : wirdTitle(here),
+                      style: AppTypography.heritageTitle(color: palette.ink, fontSize: 27),
                     ),
-                    if (here.station.event != null)
-                      Text(
-                        here.station.event!.title,
-                        style: text.bodySmall?.copyWith(color: palette.inkSoft),
-                      ),
+                    Text(
+                      'المكتمل ${arabicDigits(snapshot.completedCount)} · المُعدّ ${arabicDigits(snapshot.preparedCount)} من ${arabicDigits(snapshot.plannedCount)}',
+                      style: text.bodySmall?.copyWith(color: palette.inkSoft),
+                    ),
                   ],
                 ),
               ),
@@ -66,8 +80,33 @@ class JourneySummaryCard extends StatelessWidget {
               _ProgressRing(fraction: snapshot.progressFraction),
             ],
           ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: <Widget>[
+              SoftChip(
+                icon: Icons.local_fire_department_rounded,
+                label: pacing.streakDays > 0
+                    ? 'الاستمرارية: ${daysLabel(pacing.streakDays)}'
+                    : 'ابدأ سلسلة الاستمرارية اليوم',
+                background: palette.amberSoft,
+                foreground: palette.amberText,
+                borderColor: palette.amber.withValues(alpha: 0.35),
+              ),
+              SoftChip(
+                icon: Icons.speed_rounded,
+                label: 'الوتيرة: ${hadithCountLabel(pacing.dailyQuota)} يومياً',
+              ),
+            ],
+          ),
           const SizedBox(height: 14),
-          _TodayStrip(snapshot: snapshot, onOpenToday: onOpenToday),
+          _TodayStrip(
+            snapshot: snapshot,
+            onOpenToday: onOpenToday,
+            onOpenReview: onOpenReview,
+            onBypassLock: onBypassLock,
+          ),
         ],
       ),
     );
@@ -75,15 +114,26 @@ class JourneySummaryCard extends StatelessWidget {
 }
 
 class _TodayStrip extends StatelessWidget {
-  const _TodayStrip({required this.snapshot, required this.onOpenToday});
+  const _TodayStrip({
+    required this.snapshot,
+    required this.onOpenToday,
+    required this.onOpenReview,
+    required this.onBypassLock,
+  });
 
   final JourneySnapshot snapshot;
   final VoidCallback onOpenToday;
+  final VoidCallback onOpenReview;
+  final VoidCallback onBypassLock;
 
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
+    final PacingState pacing = snapshot.pacing;
+    final String quotaLine = pacing.lockBypassed && pacing.quotaReached
+        ? 'وِرد إضافي (القفل متخطّى للتجربة)'
+        : 'وِرد اليوم · ${arabicDigits(pacing.completedInWindow + 1)} من ${arabicDigits(pacing.dailyQuota)}';
     switch (snapshot.todayKind) {
       case TodayKind.available:
         return SmoothSurface(
@@ -92,7 +142,7 @@ class _TodayStrip extends StatelessWidget {
           radius: AppShapes.radiusMedium,
           padding: const EdgeInsetsDirectional.fromSTEB(14, 10, 10, 10),
           onTap: onOpenToday,
-          semanticLabel: 'وِرد اليوم: ${snapshot.nextItem?.title ?? ''}. افتح محطة اليوم',
+          semanticLabel: '$quotaLine: ${snapshot.nextItem?.title ?? ''}. افتح وِرد اليوم',
           child: Row(
             children: <Widget>[
               Expanded(
@@ -100,7 +150,7 @@ class _TodayStrip extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'وِرد اليوم ${arabicDigits(snapshot.nextDayNumber ?? 1)}',
+                      quotaLine,
                       style: text.labelSmall?.copyWith(
                         color: palette.amberText,
                         fontWeight: FontWeight.w600,
@@ -124,7 +174,7 @@ class _TodayStrip extends StatelessWidget {
           radius: AppShapes.radiusMedium,
           padding: const EdgeInsets.all(14),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Text(
                 snapshot.curriculum.dailyCap.completionMessage,
@@ -139,6 +189,20 @@ class _TodayStrip extends StatelessWidget {
                   target: snapshot.nextUnlockAt!,
                   usesFallback: snapshot.unlockUsesFallback,
                 ),
+              const SizedBox(height: 10),
+              FilledButton.icon(
+                onPressed: onOpenReview,
+                icon: const Icon(Icons.psychology_alt_rounded),
+                label: const Text('إلى ميدان المراجعة'),
+              ),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextButton.icon(
+                  onPressed: onBypassLock,
+                  icon: const Icon(Icons.science_outlined, size: 18),
+                  label: const Text('تخطي القفل يدوياً (للتجربة)'),
+                ),
+              ),
             ],
           ),
         );
@@ -148,15 +212,26 @@ class _TodayStrip extends StatelessWidget {
           borderColor: palette.emerald.withValues(alpha: 0.4),
           radius: AppShapes.radiusMedium,
           padding: const EdgeInsets.all(14),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Icon(Icons.verified_outlined, color: palette.emeraldText),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'أتممتَ الأوراد المتاحة في هذه النسخة من المنهج. تُضاف المحطات التالية مع اكتمال إعدادها ومراجعتها.',
-                  style: text.bodyMedium?.copyWith(color: palette.ink),
-                ),
+              Row(
+                children: <Widget>[
+                  Icon(Icons.verified_outlined, color: palette.emeraldText),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'أتممتَ الأوراد المُعدّة في هذا الإصدار. تُضاف الأحاديث التالية مع اكتمال توثيقها ومراجعتها.',
+                      style: text.bodyMedium?.copyWith(color: palette.ink),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              FilledButton.icon(
+                onPressed: onOpenReview,
+                icon: const Icon(Icons.psychology_alt_rounded),
+                label: const Text('إلى ميدان المراجعة'),
               ),
             ],
           ),
@@ -185,7 +260,7 @@ class _FajrCountdownState extends ConsumerState<FajrCountdown> {
   @override
   void initState() {
     super.initState();
-    _ticker = Timer.periodic(const Duration(seconds: 30), (Timer _) {
+    _ticker = Timer.periodic(const Duration(seconds: 30), (Timer timer) {
       if (mounted) {
         setState(() {});
       }
@@ -213,7 +288,7 @@ class _FajrCountdownState extends ConsumerState<FajrCountdown> {
           const SizedBox(width: 6),
           Expanded(
             child: Text(
-              'يُفتح وِرد الغد عند الفجر · $clock'
+              'يُفتح الوِرد الجديد عند الفجر · $clock'
               '${widget.usesFallback ? ' (الوقت الاحتياطي)' : ''} · بعد ${arabicCountdown(remaining)}',
               style: text.bodySmall?.copyWith(color: palette.inkSoft),
             ),
@@ -234,7 +309,7 @@ class _ProgressRing extends StatelessWidget {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
     return Semantics(
-      label: 'التقدم في المسار ${arabicPercent(fraction)}',
+      label: 'التقدم في الأربعين ${arabicPercent(fraction)}',
       child: SizedBox.square(
         dimension: 84,
         child: CustomPaint(
@@ -253,7 +328,7 @@ class _ProgressRing extends StatelessWidget {
                     style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700, height: 1.1),
                   ),
                   Text(
-                    'من المسار',
+                    'من الأربعين',
                     style: text.labelSmall?.copyWith(color: palette.inkSoft, height: 1.1),
                   ),
                 ],
@@ -282,7 +357,8 @@ class _RingPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = stroke;
     canvas.drawArc(rect, 0, math.pi * 2, false, base);
-    final double sweep = math.pi * 2 * fraction.clamp(0.0, 1.0);
+    final double bounded = fraction < 0 ? 0 : (fraction > 1 ? 1 : fraction);
+    final double sweep = math.pi * 2 * bounded;
     if (sweep > 0) {
       final Paint arc = Paint()
         ..color = fill

@@ -1,7 +1,8 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "2.0.0",
   "id": "arbaun_nawawiyya_journey",
   "title": "رحلة الأربعين النووية",
+  "plannedCount": 42,
   "dailyCap": {
     "newHadithPerDay": 1,
     "unlockAt": "fajr",
@@ -11,15 +12,15 @@
   "items": [
     {
       "hadithId": "nawawi40_001",
-      "assetPath": "assets/data/hadith/nawawi40/nawawi40_001.json",
-      "stationId": "makkah_dar_al_arqam",
-      "title": "الأعمال بالنيات"
+      "number": 1,
+      "title": "الأعمال بالنيات",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_001.json"
     },
     {
       "hadithId": "nawawi40_002",
-      "assetPath": "assets/data/hadith/nawawi40/nawawi40_002.json",
-      "stationId": "makkah_dar_al_arqam",
-      "title": "الإسلام والإيمان والإحسان"
+      "number": 2,
+      "title": "الإسلام والإيمان والإحسان",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_002.json"
     }
   ]
 }

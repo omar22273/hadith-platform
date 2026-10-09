@@ -2,13 +2,13 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/content/widgets/source_quote_tile.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/smooth_surface.dart';
 import '../../../hadith/data/models/models.dart';
 import '../../../hadith/domain/hadith_bundle.dart';
-import '../../../hadith/presentation/widgets/source_quote_tile.dart';
 
 /// مرحلة السياق.
 class ContextStage extends StatelessWidget {
@@ -123,8 +123,6 @@ class ContextStage extends StatelessWidget {
         return 'مكان وقوع الحدث';
       case PlaceRelation.subjectLocation:
         return 'مكان يدور عليه موضوع الحديث';
-      case PlaceRelation.transmissionLocation:
-        return 'مكان مرتبط بنقل الحديث';
     }
   }
 }
@@ -145,7 +143,7 @@ class _SourcesSection extends StatelessWidget {
         childrenPadding: EdgeInsets.zero,
         iconColor: palette.amberText,
         collapsedIconColor: palette.inkSoft,
-        title: SectionEyebrow('مصادر القصة بنصوصها', icon: Icons.format_quote_rounded),
+        title: const SectionEyebrow('مصادر القصة بنصوصها', icon: Icons.format_quote_rounded),
         children: <Widget>[
           for (final SourceRef ref in sources) ...<Widget>[
             SourceQuoteTile(reference: ref, source: bundle.sources.byId(ref.sourceId)),

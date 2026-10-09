@@ -4,10 +4,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hadith_platform/features/daily_session/domain/practice_engine.dart';
 import 'package:hadith_platform/features/daily_session/domain/sanad_tree.dart';
 import 'package:hadith_platform/features/daily_session/domain/variant_diff.dart';
 import 'package:hadith_platform/features/hadith/data/models/models.dart';
+import 'package:hadith_platform/features/hadith/domain/practice_engine.dart';
 
 HadithDailyModel _hadith(String id) {
   final String path = 'assets/data/hadith/nawawi40/$id.json';

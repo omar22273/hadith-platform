@@ -7,10 +7,10 @@ import 'package:flutter_riverpod/misc.dart';
 import '../../../core/storage/install_salt.dart';
 import '../../../core/text/stable_hash.dart';
 import '../../../core/time/clock.dart';
-import '../../hadith/application/content_providers.dart';
+import '../../hadith/application/hadith_providers.dart';
 import '../../hadith/data/models/models.dart';
+import '../../hadith/domain/practice_engine.dart';
 import '../../journey/application/journey_controller.dart';
-import '../domain/practice_engine.dart';
 import 'session_state.dart';
 
 /// نتيجة وضع بلاطة.
@@ -187,17 +187,20 @@ class SessionController extends Notifier<SessionState> {
     state = state.copyWith(chosenOptionId: optionId);
   }
 
-  /// يتم الوِرد. يُسجَّل في المسار إن كان وِرد اليوم لا مراجعة.
-  Future<void> finish({required bool countsTowardJourney}) async {
+  /// يتم الوِرد. يُسجَّل في المسار إن كان وِرد اليوم لا مراجعة، ويعيد نتيجة
+  /// التسجيل (null للمراجعة)، ومنها يُعرف بلوغ حصة اليوم.
+  Future<WirdCompletion?> finish({required bool countsTowardJourney}) async {
     if (state.finished) {
-      return;
+      return null;
     }
+    WirdCompletion? result;
     if (countsTowardJourney) {
-      await ref.read(journeyControllerProvider.notifier).completeWird(hadithId);
+      result = await ref.read(journeyControllerProvider.notifier).completeWird(hadithId);
     }
     if (ref.mounted) {
       state = state.copyWith(finished: true);
     }
+    return result;
   }
 }
 

@@ -51,7 +51,7 @@ class MatnText extends StatelessWidget {
       }
     }
 
-    final TextStyle base = AppTypography.matn(color: palette.ink, fontSize: fontSize);
+    final TextStyle base = AppTypography.matnOf(context, color: palette.ink, fontSize: fontSize);
     final List<InlineSpan> spans = <InlineSpan>[];
     bool first = true;
     for (final MatnSegment segment in matn.segments) {

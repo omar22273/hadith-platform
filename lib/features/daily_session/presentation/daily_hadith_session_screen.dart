@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_palette.dart';
-import '../../hadith/application/content_providers.dart';
-import '../../hadith/domain/content_repository.dart';
+import '../../hadith/application/hadith_providers.dart';
 import '../../hadith/domain/hadith_bundle.dart';
+import '../../hadith/domain/hadith_repository.dart';
+import '../../journey/application/journey_controller.dart';
+import '../../journey/presentation/widgets/wird_complete_sheet.dart';
 import '../application/session_controller.dart';
 import '../application/session_state.dart';
 import 'scholar/scholar_layer_view.dart';
@@ -74,8 +76,9 @@ class _DailyHadithSessionScreenState extends ConsumerState<DailyHadithSessionScr
       return;
     }
     setState(() => _finishing = true);
+    WirdCompletion? result;
     try {
-      await ref
+      result = await ref
           .read(sessionControllerProvider(widget.hadithId).notifier)
           .finish(countsTowardJourney: widget.countsTowardJourney);
     } on Object {
@@ -88,6 +91,9 @@ class _DailyHadithSessionScreenState extends ConsumerState<DailyHadithSessionScr
       if (mounted) {
         setState(() => _finishing = false);
       }
+    }
+    if (result == WirdCompletion.quotaReached && mounted) {
+      await showWirdCompleteSheet(context);
     }
   }
 

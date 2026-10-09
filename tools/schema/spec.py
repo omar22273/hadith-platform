@@ -35,14 +35,9 @@ ID = dict(pattern=r"^[a-z0-9]+(_[a-z0-9]+)*$")
 SEMVER = dict(pattern=r"^\d+\.\d+\.\d+$")
 
 ENUMS = [
-    Enum("JourneyAssignmentBasis", "hadith_daily_model.dart", "أساس ربط الحديث بمحطة القافلة.", [
-        ("thematic", "thematic", "ربط موضوعي تعليمي، لا يدّعي أن الحديث قيل في ذلك المكان."),
-        ("historical", "historical", "ربط تاريخي مُسنَد إلى مصدر."),
-    ]),
     Enum("PlaceRelation", "historical_context.dart", "علاقة المكان بالحديث.", [
         ("eventLocation", "event_location", "مكان وقوع الحدث نفسه."),
         ("subjectLocation", "subject_location", "مكان يدور عليه موضوع الحديث."),
-        ("transmissionLocation", "transmission_location", "مكان مرتبط برواية الحديث ونقله."),
     ]),
     Enum("SegmentVoice", "matn.dart", "صاحب الكلام في مقطع المتن.", [
         ("narration", "narration", "كلام الراوي وسياق الحكاية."),
@@ -82,7 +77,7 @@ ENUMS = [
         ("alignedSource", "aligned_source", "منقول من الكلمة المقابلة في مصدر مشكول بعد مطابقة الرسم."),
         ("orthographicRule", "orthographic_rule", "قاعدة إملائية حتمية (كسرة الهمزة تحت الألف)."),
     ]),
-    Enum("ReviewStatus", "provenance.dart", "حالة المراجعة العلمية.", [
+    Enum("ReviewStatus", "review_info.dart", "حالة المراجعة العلمية.", [
         ("pendingScholarlyReview", "pending_scholarly_review", "بانتظار مراجعة متخصص."),
         ("approved", "approved", "معتمد للنشر."),
         ("changesRequested", "changes_requested", "طُلبت تعديلات."),
@@ -113,6 +108,16 @@ ENUMS = [
     Enum("UnlockAnchor", "curriculum_manifest.dart", "متى يُفتح وِرد اليوم التالي.", [
         ("fajr", "fajr", "عند دخول وقت الفجر محلياً."),
     ]),
+    Enum("SeerahEpoch", "seerah_station.dart", "حقبة السيرة النبوية.", [
+        ("preMission", "pre_mission", "ما قبل البعثة."),
+        ("meccan", "meccan", "المرحلة المكية."),
+        ("medinan", "medinan", "المرحلة المدنية."),
+    ]),
+    Enum("SeerahScene", "seerah_station.dart", "المشهد الذي يشهد له النص المصدري.", [
+        ("setting", "setting", "المشهد الزماني والمكاني."),
+        ("challenge", "challenge", "المأزق أو التحدي."),
+        ("decision", "decision", "القرار النبوي ونتيجته."),
+    ]),
 ]
 
 MODELS = [
@@ -122,7 +127,7 @@ MODELS = [
         F("locator", "String?", "موضع الشاهد: الجزء والصفحة أو رقم الحديث."),
         F("quote", "String?", "نص الشاهد كما هو في المصدر، يُستعمل في التدقيق الآلي."),
     ]),
-    Model("TokenAnchor", "source_ref.dart", "مرساة تربط بيانات بكلمة أو أكثر من مقطع في المتن.", [
+    Model("TokenAnchor", "token_anchor.dart", "مرساة تربط بيانات بكلمة أو أكثر من مقطع في المتن.", [
         F("segmentId", "String", "معرّف المقطع.", **ID),
         F("tokenIndex", "int", "رقم أول كلمة داخل المقطع (يبدأ من صفر).", minimum=0),
         F("length", "int", "عدد الكلمات المشمولة.", minimum=1),
@@ -137,7 +142,7 @@ MODELS = [
               F("collection", "CollectionRef", "الكتاب الذي ينتمي إليه الحديث في المنهج."),
               F("title", "String", "عنوان وصفي قصير."),
               F("teaser", "Teaser", "لمحة التشويق التي تُعرض في ختام وِرد اليوم السابق."),
-              F("journey", "JourneyPlacement", "موضع الحديث في مسار القوافل."),
+              F("milestone", "String", "عنوان خطوة الحديث على مسار الأربعين."),
               F("context", "HistoricalContext", "المرحلة الأولى: سياق الورود والحدث التاريخي."),
               F("matn", "Matn", "المرحلة الثانية: المتن والبيان اللغوي والتخريج."),
               F("practice", "PracticeConfig", "المرحلة الثالثة: التثبيت والحفظ التراكمي."),
@@ -154,12 +159,6 @@ MODELS = [
     Model("Teaser", "hadith_daily_model.dart", "بطاقة التشويق للغد.", [
         F("text", "String", "نص اللمحة الغامضة."),
     ]),
-    Model("JourneyPlacement", "hadith_daily_model.dart", "موضع الحديث على خريطة الرحلة.", [
-        F("stationId", "String", "معرّف المحطة في فهرس الرحلة.", **ID),
-        F("stepInStation", "int", "رقم الخطوة داخل المحطة.", minimum=1),
-        F("milestone", "String", "عنوان الخطوة على الخريطة."),
-        F("assignmentBasis", "E:JourneyAssignmentBasis", "أساس الربط بالمحطة."),
-    ]),
     # ---------------------------------------------------------------- stage 1
     Model("HistoricalContext", "historical_context.dart", "بطاقة سياق الورود (70-80 كلمة).", [
         F("narrative", "String", "القصة المركزة بالزمان والمكان والدافع البشري."),
@@ -170,7 +169,6 @@ MODELS = [
     ]),
     Model("HistoricalPlace", "historical_context.dart", "مكان على الخريطة التاريخية.", [
         F("name", "String", "اسم المكان."),
-        F("stationId", "String?", "محطة الرحلة المقابلة إن وجدت."),
         F("relation", "E:PlaceRelation", "علاقة المكان بالحديث."),
         F("latitude", "double", "خط العرض.", minimum=-90, maximum=90),
         F("longitude", "double", "خط الطول.", minimum=-180, maximum=180),
@@ -201,7 +199,7 @@ MODELS = [
     ]),
     Model("AudioSync", "audio_sync.dart", "بيانات التلاوة والتتبع الصوتي التزامني.", [
         F("status", "E:AudioStatus", "حالة التسجيل."),
-        F("assetPath", "String?", "مسار الملف الصوتي في الأصول."),
+        F("remoteUrl", "String?", "رابط التسجيل على شبكة توزيع المحتوى إن خالف القالب العام في إعدادات التطبيق؛ null يعني القالب."),
         F("reciter", "String?", "اسم القارئ."),
         F("durationMs", "int?", "مدة التلاوة بالمللي ثانية.", minimum=0),
         F("timings", "List<WordTiming>", "توقيت كل كلمة؛ فارغة حتى تتم المزامنة."),
@@ -329,7 +327,7 @@ MODELS = [
         F("method", "E:EditMethod", "طريقة التصحيح."),
         F("source", "SourceRef?", "المصدر المشكول المنقول منه."),
     ]),
-    Model("ReviewInfo", "provenance.dart", "المراجعة العلمية.", [
+    Model("ReviewInfo", "review_info.dart", "المراجعة العلمية.", [
         F("status", "E:ReviewStatus", "الحالة."),
         F("reviewer", "String?", "المراجع."),
         F("reviewedAt", "String?", "تاريخ المراجعة YYYY-MM-DD.", pattern=r"^\d{4}-\d{2}-\d{2}$"),
@@ -364,33 +362,6 @@ MODELS = [
         F("sourceId", "String", "كتاب التراجم.", **ID),
         F("locator", "String?", "الموضع."),
         F("text", "String", "نص الترجمة كاملاً."),
-    ]),
-    # ---------------------------------------------------------------- journey catalog
-    Model("JourneyCatalog", "journey_catalog.dart", "فهرس مسار القوافل.", [
-        F("schemaVersion", "String", "إصدار المخطط.", **SEMVER),
-        F("regions", "List<JourneyRegion>", "المراحل الكبرى.", minItems=1),
-        F("stations", "List<JourneyStation>", "المحطات.", minItems=1),
-    ]),
-    Model("JourneyRegion", "journey_catalog.dart", "مرحلة كبرى من الرحلة.", [
-        F("id", "String", "المعرّف.", **ID),
-        F("order", "int", "الترتيب.", minimum=1),
-        F("name", "String", "الاسم."),
-        F("theme", "String", "موضوع أحاديثها."),
-    ]),
-    Model("JourneyStation", "journey_catalog.dart", "محطة على الخريطة.", [
-        F("id", "String", "المعرّف.", **ID),
-        F("regionId", "String", "المرحلة.", **ID),
-        F("order", "int", "الترتيب داخل الرحلة كلها.", minimum=1),
-        F("name", "String", "الاسم."),
-        F("description", "String", "وصف قصير."),
-        F("latitude", "double", "خط العرض.", minimum=-90, maximum=90),
-        F("longitude", "double", "خط الطول.", minimum=-180, maximum=180),
-        F("coordinatesApproximate", "bool", "هل الإحداثيات تقريبية."),
-        F("event", "StationEvent?", "الحدث التاريخي الموثق للمحطة."),
-    ]),
-    Model("StationEvent", "journey_catalog.dart", "حدث تاريخي موثق بنصوص مصادره.", [
-        F("title", "String", "عنوان الحدث كما يُعرض على الخريطة، مستخلص من نصوص الشواهد."),
-        F("sources", "List<SourceRef>", "شواهد الحدث منقولة بنصها مع مواضعها.", minItems=1),
     ]),
     # ---------------------------------------------------------------- wisdom bank
     Model("WisdomCatalog", "wisdom_catalog.dart", "بنك العبارات التراثية الموثقة لشاشة ختام الوِرد.", [
@@ -434,25 +405,76 @@ MODELS = [
         F("schemaVersion", "String", "إصدار المخطط.", **SEMVER),
         F("id", "String", "المعرّف.", **ID),
         F("title", "String", "العنوان."),
+        F("plannedCount", "int", "عدد أحاديث الكتاب كاملاً؛ يرسم المسار محطاتها كلها، وما لم يُعدّ منها يبقى مقفلاً.", minimum=1),
         F("dailyCap", "DailyCapPolicy", "قفل الوِرد اليومي."),
         F("items", "List<CurriculumItem>", "الأحاديث بالترتيب.", minItems=1),
     ]),
     Model("DailyCapPolicy", "curriculum_manifest.dart", "سياسة إغلاق الوِرد اليومي.", [
-        F("newHadithPerDay", "int", "عدد الأحاديث الجديدة يومياً.", minimum=1),
+        F("newHadithPerDay", "int", "عدد الأحاديث الجديدة يومياً للمستخدم الجديد؛ ترفعه الاستمرارية لاحقاً.", minimum=1),
         F("unlockAt", "E:UnlockAnchor", "وقت فتح الوِرد التالي."),
         F("fallbackLocalTime", "String", "وقت بديل HH:MM إن تعذر حساب الفجر.", pattern=r"^([01]\d|2[0-3]):[0-5]\d$"),
         F("completionMessage", "String", "رسالة الإتمام."),
     ]),
     Model("CurriculumItem", "curriculum_manifest.dart", "عنصر في المنهج.", [
         F("hadithId", "String", "معرّف الحديث.", **ID),
-        F("assetPath", "String", "مسار ملف الحديث في الأصول."),
-        F("stationId", "String", "محطة الحديث، فهرس سريع يطابق journey.stationId في ملف الحديث.", **ID),
+        F("number", "int", "رقم الحديث في الكتاب، فهرس سريع يطابق collection.numberInCollection في ملف الحديث.", minimum=1),
         F("title", "String", "عنوان الحديث، فهرس سريع يطابق title في ملف الحديث."),
+        F("assetPath", "String", "مسار ملف الحديث في الأصول."),
+    ]),
+    # ---------------------------------------------------------------- seerah
+    Model("SeerahDataset", "seerah_station.dart", "ملف محطات رحلة السيرة النبوية.", [
+        F("schemaVersion", "String", "إصدار المخطط.", **SEMVER),
+        F("id", "String", "المعرّف.", **ID),
+        F("title", "String", "العنوان."),
+        F("stations", "List<SeerahStationModel>", "المحطات مرتبة زمنياً.", minItems=1),
+    ]),
+    Model("SeerahStationModel", "seerah_station.dart",
+          "محطة في رحلة السيرة بمشاهدها الثلاثة: المشهد الزماني، والمأزق، والقرار النبوي.", [
+              F("id", "String", "معرّف المحطة.", **ID),
+              F("order", "int", "الترتيب الزمني في الرحلة.", minimum=1),
+              F("title", "String", "عنوان الحدث."),
+              F("epoch", "E:SeerahEpoch", "الحقبة."),
+              F("timeLabel", "String?", "وسم زمني مختصر مستخلص من الشواهد، أو null إن لم تذكره."),
+              F("place", "SeerahPlace", "موضع المشهد على الخريطة."),
+              F("sceneDescription", "String", "الوصف البصري والزماني للمشهد، مصوغاً من الشواهد وحدها."),
+              F("challenge", "String", "المأزق أو الحدث الواقعي، مصوغاً من الشواهد وحدها."),
+              F("propheticDecision", "String", "القرار النبوي ونتيجته، مصوغاً من الشواهد وحدها."),
+              F("evidence", "List<SeerahEvidence>", "النصوص المصدرية الموثقة منقولة بنصها.", minItems=1),
+              F("review", "ReviewInfo", "حالة المراجعة العلمية."),
+          ]),
+    Model("SeerahPlace", "seerah_station.dart", "موضع على الخريطة التاريخية.", [
+        F("name", "String", "اسم الموضع."),
+        F("latitude", "double", "خط العرض.", minimum=-90, maximum=90),
+        F("longitude", "double", "خط الطول.", minimum=-180, maximum=180),
+        F("coordinatesApproximate", "bool", "هل الإحداثيات تقريبية."),
+    ]),
+    Model("SeerahEvidence", "seerah_station.dart", "شاهد مصدري لمشهد من مشاهد المحطة.", [
+        F("scene", "E:SeerahScene", "المشهد الذي يشهد له النص."),
+        F("source", "SourceRef", "المصدر والموضع ونص الشاهد حرفياً."),
+    ]),
+    # ---------------------------------------------------------------- admin intake
+    Model("HadithDraft", "hadith_draft.dart", "مسودة حديث من لوحة الإدخال، تُحوَّل لاحقاً إلى HadithDailyModel بعد التوثيق.", [
+        F("schemaVersion", "String", "إصدار المخطط.", **SEMVER),
+        F("hadithId", "String", "المعرّف المقترح، مثل nawawi40_003.", **ID),
+        F("number", "int", "رقم الحديث في الأربعين.", minimum=1),
+        F("matn", "String", "المتن المشكول كما أُدخل حرفاً بحرف."),
+        F("topNarrator", "String", "الراوي الأعلى."),
+        F("gharib", "List<GharibDraft>", "المفردات وغريب الألفاظ."),
+        F("behavioralBenefits", "List<String>", "الفوائد السلوكية."),
+        F("review", "ReviewInfo", "حالة المراجعة العلمية."),
+    ]),
+    Model("GharibDraft", "hadith_draft.dart", "لفظة غريبة وبيانها في مسودة.", [
+        F("word", "String", "اللفظة كما في المتن."),
+        F("meaning", "String", "البيان."),
     ]),
 ]
 
 FILE_DOCS = {
-    "source_ref.dart": "الإحالات الموثقة ومراسي الكلمات.",
+    "source_ref.dart": "الإحالات الموثقة إلى المصادر.",
+    "token_anchor.dart": "مراسي الكلمات في المتن.",
+    "review_info.dart": "حالة المراجعة العلمية المشتركة بين الحديث والسيرة.",
+    "seerah_station.dart": "محطات رحلة السيرة ومشاهدها الثلاثة.",
+    "hadith_draft.dart": "مسودات الإدخال المصدّرة من لوحة الإدارة.",
     "hadith_daily_model.dart": "النموذج الجذري للوِرد اليومي.",
     "historical_context.dart": "المرحلة الأولى: سياق الورود.",
     "matn.dart": "المرحلة الثانية: المتن والغريب.",
@@ -463,8 +485,19 @@ FILE_DOCS = {
     "scholar_layer.dart": "طبقة طالب العلم: الإسناد والروايات.",
     "provenance.dart": "سجل التوثيق والمراجعة.",
     "narrator_profile.dart": "فهرس تراجم الرواة.",
-    "journey_catalog.dart": "فهرس مسار القوافل.",
     "source_catalog.dart": "فهرس المصادر.",
     "curriculum_manifest.dart": "ترتيب الأوراد وسياسة القفل اليومي.",
     "wisdom_catalog.dart": "بنك العبارات التراثية.",
+}
+
+# Output directory of each generated file, relative to lib/. Shared content
+# types live in core so that the hadith and seerah features never import each
+# other.
+DEFAULT_DIR = "features/hadith/data/models"
+FILE_DIRS = {
+    "source_ref.dart": "core/content/models",
+    "source_catalog.dart": "core/content/models",
+    "review_info.dart": "core/content/models",
+    "seerah_station.dart": "features/seerah/data/models",
+    "hadith_draft.dart": "features/admin/data/models",
 }

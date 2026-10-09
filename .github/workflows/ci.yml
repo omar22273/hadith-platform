@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [ 'feat/**' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Analyze and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Report toolchain
+        run: python3 tools/ci/annotate.py notice "Toolchain" --text "$(flutter --version)"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Validate data files against the schema
+        run: |
+          python3 -m pip install --quiet --break-system-packages jsonschema || python3 -m pip install --quiet jsonschema
+          python3 tools/schema/validate.py . > validate.txt 2>&1 && status=0 || status=$?
+          python3 tools/ci/annotate.py $([ $status -eq 0 ] && echo notice || echo error) "Data validation" --file validate.txt
+          exit $status
+
+      - name: Analyze
+        if: ${{ !cancelled() }}
+        run: |
+          flutter analyze > analyze.txt 2>&1 && status=0 || status=$?
+          python3 tools/ci/annotate.py $([ $status -eq 0 ] && echo notice || echo error) "flutter analyze" --file analyze.txt
+          exit $status
+
+      - name: Test
+        if: ${{ !cancelled() }}
+        run: |
+          flutter test --reporter json > test.json 2> test.err && status=0 || status=$?
+          python3 tools/ci/summarize_tests.py test.json test.err > test.txt
+          python3 tools/ci/annotate.py $([ $status -eq 0 ] && echo notice || echo error) "flutter test" --file test.txt
+          exit $status

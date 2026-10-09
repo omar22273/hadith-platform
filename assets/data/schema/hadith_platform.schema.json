@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://hadith-platform.app/schema/hadith_platform.schema.json",
   "title": "HadithDailyModel",
-  "description": "مخطط بيانات منصة الحديث النبوي. الجذر هو HadithDailyModel، والفهارس تُتحقق عبر $defs: SourceCatalog وNarratorCatalog وJourneyCatalog وCurriculumManifest وWisdomCatalog.",
+  "description": "مخطط بيانات منصة الحديث النبوي. الجذر هو HadithDailyModel، والملفات الأخرى تُتحقق عبر $defs: SourceCatalog وNarratorCatalog وCurriculumManifest وWisdomCatalog وSeerahDataset، ومسودات لوحة الإدخال عبر HadithDraft.",
   "$ref": "#/$defs/HadithDailyModel",
   "$defs": {
     "SourceRef": {
@@ -82,7 +82,7 @@
         "collection",
         "title",
         "teaser",
-        "journey",
+        "milestone",
         "context",
         "matn",
         "practice",
@@ -122,9 +122,10 @@
           "$ref": "#/$defs/Teaser",
           "description": "لمحة التشويق التي تُعرض في ختام وِرد اليوم السابق."
         },
-        "journey": {
-          "$ref": "#/$defs/JourneyPlacement",
-          "description": "موضع الحديث في مسار القوافل."
+        "milestone": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان خطوة الحديث على مسار الأربعين."
         },
         "context": {
           "$ref": "#/$defs/HistoricalContext",
@@ -199,42 +200,6 @@
         }
       }
     },
-    "JourneyPlacement": {
-      "type": "object",
-      "description": "موضع الحديث على خريطة الرحلة.",
-      "additionalProperties": false,
-      "required": [
-        "stationId",
-        "stepInStation",
-        "milestone",
-        "assignmentBasis"
-      ],
-      "properties": {
-        "stationId": {
-          "type": "string",
-          "minLength": 1,
-          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
-          "description": "معرّف المحطة في فهرس الرحلة."
-        },
-        "stepInStation": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "رقم الخطوة داخل المحطة."
-        },
-        "milestone": {
-          "type": "string",
-          "minLength": 1,
-          "description": "عنوان الخطوة على الخريطة."
-        },
-        "assignmentBasis": {
-          "enum": [
-            "thematic",
-            "historical"
-          ],
-          "description": "أساس الربط بالمحطة."
-        }
-      }
-    },
     "HistoricalContext": {
       "type": "object",
       "description": "بطاقة سياق الورود (70-80 كلمة).",
@@ -291,7 +256,6 @@
       "additionalProperties": false,
       "required": [
         "name",
-        "stationId",
         "relation",
         "latitude",
         "longitude",
@@ -303,18 +267,10 @@
           "minLength": 1,
           "description": "اسم المكان."
         },
-        "stationId": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "description": "محطة الرحلة المقابلة إن وجدت."
-        },
         "relation": {
           "enum": [
             "event_location",
-            "subject_location",
-            "transmission_location"
+            "subject_location"
           ],
           "description": "علاقة المكان بالحديث."
         },
@@ -475,7 +431,7 @@
       "additionalProperties": false,
       "required": [
         "status",
-        "assetPath",
+        "remoteUrl",
         "reciter",
         "durationMs",
         "timings"
@@ -489,12 +445,12 @@
           ],
           "description": "حالة التسجيل."
         },
-        "assetPath": {
+        "remoteUrl": {
           "type": [
             "string",
             "null"
           ],
-          "description": "مسار الملف الصوتي في الأصول."
+          "description": "رابط التسجيل على شبكة توزيع المحتوى إن خالف القالب العام في إعدادات التطبيق؛ null يعني القالب."
         },
         "reciter": {
           "type": [
@@ -1515,170 +1471,6 @@
         }
       }
     },
-    "JourneyCatalog": {
-      "type": "object",
-      "description": "فهرس مسار القوافل.",
-      "additionalProperties": false,
-      "required": [
-        "schemaVersion",
-        "regions",
-        "stations"
-      ],
-      "properties": {
-        "schemaVersion": {
-          "type": "string",
-          "minLength": 1,
-          "pattern": "^\\d+\\.\\d+\\.\\d+$",
-          "description": "إصدار المخطط."
-        },
-        "regions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/JourneyRegion"
-          },
-          "minItems": 1,
-          "description": "المراحل الكبرى."
-        },
-        "stations": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/JourneyStation"
-          },
-          "minItems": 1,
-          "description": "المحطات."
-        }
-      }
-    },
-    "JourneyRegion": {
-      "type": "object",
-      "description": "مرحلة كبرى من الرحلة.",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "order",
-        "name",
-        "theme"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "minLength": 1,
-          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
-          "description": "المعرّف."
-        },
-        "order": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "الترتيب."
-        },
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "description": "الاسم."
-        },
-        "theme": {
-          "type": "string",
-          "minLength": 1,
-          "description": "موضوع أحاديثها."
-        }
-      }
-    },
-    "JourneyStation": {
-      "type": "object",
-      "description": "محطة على الخريطة.",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "regionId",
-        "order",
-        "name",
-        "description",
-        "latitude",
-        "longitude",
-        "coordinatesApproximate",
-        "event"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "minLength": 1,
-          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
-          "description": "المعرّف."
-        },
-        "regionId": {
-          "type": "string",
-          "minLength": 1,
-          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
-          "description": "المرحلة."
-        },
-        "order": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "الترتيب داخل الرحلة كلها."
-        },
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "description": "الاسم."
-        },
-        "description": {
-          "type": "string",
-          "minLength": 1,
-          "description": "وصف قصير."
-        },
-        "latitude": {
-          "type": "number",
-          "minimum": -90,
-          "maximum": 90,
-          "description": "خط العرض."
-        },
-        "longitude": {
-          "type": "number",
-          "minimum": -180,
-          "maximum": 180,
-          "description": "خط الطول."
-        },
-        "coordinatesApproximate": {
-          "type": "boolean",
-          "description": "هل الإحداثيات تقريبية."
-        },
-        "event": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/StationEvent"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "الحدث التاريخي الموثق للمحطة."
-        }
-      }
-    },
-    "StationEvent": {
-      "type": "object",
-      "description": "حدث تاريخي موثق بنصوص مصادره.",
-      "additionalProperties": false,
-      "required": [
-        "title",
-        "sources"
-      ],
-      "properties": {
-        "title": {
-          "type": "string",
-          "minLength": 1,
-          "description": "عنوان الحدث كما يُعرض على الخريطة، مستخلص من نصوص الشواهد."
-        },
-        "sources": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/SourceRef"
-          },
-          "minItems": 1,
-          "description": "شواهد الحدث منقولة بنصها مع مواضعها."
-        }
-      }
-    },
     "WisdomCatalog": {
       "type": "object",
       "description": "بنك العبارات التراثية الموثقة لشاشة ختام الوِرد.",
@@ -1911,6 +1703,7 @@
         "schemaVersion",
         "id",
         "title",
+        "plannedCount",
         "dailyCap",
         "items"
       ],
@@ -1931,6 +1724,11 @@
           "type": "string",
           "minLength": 1,
           "description": "العنوان."
+        },
+        "plannedCount": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "عدد أحاديث الكتاب كاملاً؛ يرسم المسار محطاتها كلها، وما لم يُعدّ منها يبقى مقفلاً."
         },
         "dailyCap": {
           "$ref": "#/$defs/DailyCapPolicy",
@@ -1960,7 +1758,7 @@
         "newHadithPerDay": {
           "type": "integer",
           "minimum": 1,
-          "description": "عدد الأحاديث الجديدة يومياً."
+          "description": "عدد الأحاديث الجديدة يومياً للمستخدم الجديد؛ ترفعه الاستمرارية لاحقاً."
         },
         "unlockAt": {
           "enum": [
@@ -1987,9 +1785,9 @@
       "additionalProperties": false,
       "required": [
         "hadithId",
-        "assetPath",
-        "stationId",
-        "title"
+        "number",
+        "title",
+        "assetPath"
       ],
       "properties": {
         "hadithId": {
@@ -1998,21 +1796,281 @@
           "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
           "description": "معرّف الحديث."
         },
-        "assetPath": {
-          "type": "string",
-          "minLength": 1,
-          "description": "مسار ملف الحديث في الأصول."
-        },
-        "stationId": {
-          "type": "string",
-          "minLength": 1,
-          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
-          "description": "محطة الحديث، فهرس سريع يطابق journey.stationId في ملف الحديث."
+        "number": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "رقم الحديث في الكتاب، فهرس سريع يطابق collection.numberInCollection في ملف الحديث."
         },
         "title": {
           "type": "string",
           "minLength": 1,
           "description": "عنوان الحديث، فهرس سريع يطابق title في ملف الحديث."
+        },
+        "assetPath": {
+          "type": "string",
+          "minLength": 1,
+          "description": "مسار ملف الحديث في الأصول."
+        }
+      }
+    },
+    "SeerahDataset": {
+      "type": "object",
+      "description": "ملف محطات رحلة السيرة النبوية.",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "title",
+        "stations"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "إصدار المخطط."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "المعرّف."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "العنوان."
+        },
+        "stations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SeerahStationModel"
+          },
+          "minItems": 1,
+          "description": "المحطات مرتبة زمنياً."
+        }
+      }
+    },
+    "SeerahStationModel": {
+      "type": "object",
+      "description": "محطة في رحلة السيرة بمشاهدها الثلاثة: المشهد الزماني، والمأزق، والقرار النبوي.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "order",
+        "title",
+        "epoch",
+        "timeLabel",
+        "place",
+        "sceneDescription",
+        "challenge",
+        "propheticDecision",
+        "evidence",
+        "review"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف المحطة."
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "الترتيب الزمني في الرحلة."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان الحدث."
+        },
+        "epoch": {
+          "enum": [
+            "pre_mission",
+            "meccan",
+            "medinan"
+          ],
+          "description": "الحقبة."
+        },
+        "timeLabel": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "وسم زمني مختصر مستخلص من الشواهد، أو null إن لم تذكره."
+        },
+        "place": {
+          "$ref": "#/$defs/SeerahPlace",
+          "description": "موضع المشهد على الخريطة."
+        },
+        "sceneDescription": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الوصف البصري والزماني للمشهد، مصوغاً من الشواهد وحدها."
+        },
+        "challenge": {
+          "type": "string",
+          "minLength": 1,
+          "description": "المأزق أو الحدث الواقعي، مصوغاً من الشواهد وحدها."
+        },
+        "propheticDecision": {
+          "type": "string",
+          "minLength": 1,
+          "description": "القرار النبوي ونتيجته، مصوغاً من الشواهد وحدها."
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SeerahEvidence"
+          },
+          "minItems": 1,
+          "description": "النصوص المصدرية الموثقة منقولة بنصها."
+        },
+        "review": {
+          "$ref": "#/$defs/ReviewInfo",
+          "description": "حالة المراجعة العلمية."
+        }
+      }
+    },
+    "SeerahPlace": {
+      "type": "object",
+      "description": "موضع على الخريطة التاريخية.",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "latitude",
+        "longitude",
+        "coordinatesApproximate"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "اسم الموضع."
+        },
+        "latitude": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "خط العرض."
+        },
+        "longitude": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "خط الطول."
+        },
+        "coordinatesApproximate": {
+          "type": "boolean",
+          "description": "هل الإحداثيات تقريبية."
+        }
+      }
+    },
+    "SeerahEvidence": {
+      "type": "object",
+      "description": "شاهد مصدري لمشهد من مشاهد المحطة.",
+      "additionalProperties": false,
+      "required": [
+        "scene",
+        "source"
+      ],
+      "properties": {
+        "scene": {
+          "enum": [
+            "setting",
+            "challenge",
+            "decision"
+          ],
+          "description": "المشهد الذي يشهد له النص."
+        },
+        "source": {
+          "$ref": "#/$defs/SourceRef",
+          "description": "المصدر والموضع ونص الشاهد حرفياً."
+        }
+      }
+    },
+    "HadithDraft": {
+      "type": "object",
+      "description": "مسودة حديث من لوحة الإدخال، تُحوَّل لاحقاً إلى HadithDailyModel بعد التوثيق.",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "hadithId",
+        "number",
+        "matn",
+        "topNarrator",
+        "gharib",
+        "behavioralBenefits",
+        "review"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "إصدار المخطط."
+        },
+        "hadithId": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "المعرّف المقترح، مثل nawawi40_003."
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "رقم الحديث في الأربعين."
+        },
+        "matn": {
+          "type": "string",
+          "minLength": 1,
+          "description": "المتن المشكول كما أُدخل حرفاً بحرف."
+        },
+        "topNarrator": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الراوي الأعلى."
+        },
+        "gharib": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/GharibDraft"
+          },
+          "description": "المفردات وغريب الألفاظ."
+        },
+        "behavioralBenefits": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "الفوائد السلوكية."
+        },
+        "review": {
+          "$ref": "#/$defs/ReviewInfo",
+          "description": "حالة المراجعة العلمية."
+        }
+      }
+    },
+    "GharibDraft": {
+      "type": "object",
+      "description": "لفظة غريبة وبيانها في مسودة.",
+      "additionalProperties": false,
+      "required": [
+        "word",
+        "meaning"
+      ],
+      "properties": {
+        "word": {
+          "type": "string",
+          "minLength": 1,
+          "description": "اللفظة كما في المتن."
+        },
+        "meaning": {
+          "type": "string",
+          "minLength": 1,
+          "description": "البيان."
         }
       }
     }

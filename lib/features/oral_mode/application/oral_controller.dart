@@ -13,7 +13,7 @@ import 'package:flutter_riverpod/misc.dart';
 
 import '../../../core/audio/speech_service.dart';
 import '../../../core/storage/key_value_store.dart';
-import '../../hadith/application/content_providers.dart';
+import '../../hadith/application/hadith_providers.dart';
 import '../../hadith/data/models/models.dart';
 import '../../journey/application/journey_controller.dart';
 import '../../recitation/application/recitation_controller.dart';
@@ -371,17 +371,19 @@ class OralController extends Notifier<OralState> {
   }
 
   /// إتمام المجلس، ويُسجَّل وِرداً إن كان وِرد اليوم.
-  Future<void> finish({required bool countsTowardJourney}) async {
+  Future<WirdCompletion?> finish({required bool countsTowardJourney}) async {
     if (state.finished || !state.canFinish) {
-      return;
+      return null;
     }
     _begin();
+    WirdCompletion? result;
     if (countsTowardJourney) {
-      await ref.read(journeyControllerProvider.notifier).completeWird(hadithId);
+      result = await ref.read(journeyControllerProvider.notifier).completeWird(hadithId);
     }
     if (ref.mounted) {
       state = state.copyWith(finished: true, playing: false);
     }
+    return result;
   }
 
   Future<void> _narrate(int token, List<String> lines) async {

@@ -1,4 +1,4 @@
-// هندسة المسار المتعرج: مواضع رؤوس المراحل والمحطات، ومنحنيات S بينها.
+// هندسة المسار المتعرج: مواضع رؤوس المجموعات والعقد، ومنحنيات S بينها.
 //
 // الحساب حتمي من عرض الشاشة وحجم الخط، فيرسم الرسام والودجات المواضع نفسها.
 
@@ -6,25 +6,23 @@ import 'dart:ui' show Offset, Path, PathMetric, Rect, Tangent;
 
 import 'package:flutter/foundation.dart';
 
-import '../../domain/journey_snapshot.dart';
-
-/// رأس مرحلة في المسار.
+/// صندوق رأس مجموعة.
 @immutable
 class TrailHeaderBox {
   const TrailHeaderBox({
     required this.rect,
-    required this.regionId,
-    required this.firstStationIndex,
+    required this.groupIndex,
+    required this.firstNodeIndex,
   });
 
-  /// المستطيل.
+  /// موضع الرأس.
   final Rect rect;
 
-  /// المرحلة.
-  final String regionId;
+  /// رقم المجموعة.
+  final int groupIndex;
 
-  /// أول محطة فيها.
-  final int firstStationIndex;
+  /// أول عقدة في المجموعة.
+  final int firstNodeIndex;
 }
 
 /// تخطيط المسار.
@@ -42,16 +40,17 @@ class TrailLayout {
     required this.segments,
   });
 
-  /// يحسب التخطيط. أول محطة على اليمين (بداية السطر العربي) ثم يتعرج المسار.
+  /// يحسب التخطيط. [groupOfNode] رقم مجموعة كل عقدة بترتيبها، ويوضع رأس
+  /// مجموعة قبل أول عقدة منها.
   factory TrailLayout.compute({
     required double width,
     required double textScale,
-    required List<StationView> stations,
+    required List<int> groupOfNode,
   }) {
-    final double scale = textScale.clamp(1.0, 1.3).toDouble();
-    final double rowHeight = 138 * scale;
-    final double headerHeight = 116 * scale;
-    const double nodeRadius = 30;
+    final double scale = textScale < 1 ? 1 : (textScale > 1.3 ? 1.3 : textScale);
+    final double rowHeight = 120 * scale;
+    final double headerHeight = 104 * scale;
+    const double nodeRadius = 28;
     const double top = 8;
     const double headerGap = 6;
     const double bottom = 120;
@@ -61,15 +60,14 @@ class TrailLayout {
     final List<double> rowTops = <double>[];
     final List<Offset> centers = <Offset>[];
     double y = top;
-    for (int k = 0; k < stations.length; k++) {
-      final StationView view = stations[k];
-      final bool newRegion = k == 0 || stations[k - 1].station.regionId != view.station.regionId;
-      if (newRegion) {
+    for (int k = 0; k < groupOfNode.length; k++) {
+      final bool newGroup = k == 0 || groupOfNode[k - 1] != groupOfNode[k];
+      if (newGroup) {
         headers.add(
           TrailHeaderBox(
             rect: Rect.fromLTWH(sidePadding, y, width - sidePadding * 2, headerHeight),
-            regionId: view.station.regionId,
-            firstStationIndex: k,
+            groupIndex: groupOfNode[k],
+            firstNodeIndex: k,
           ),
         );
         y += headerHeight + headerGap;
@@ -105,41 +103,42 @@ class TrailLayout {
     );
   }
 
-  /// العرض.
+  /// عرض المسار.
   final double width;
 
   /// الارتفاع الكلي.
   final double height;
 
-  /// ارتفاع صف المحطة.
+  /// ارتفاع صف العقدة.
   final double rowHeight;
 
-  /// ارتفاع رأس المرحلة.
+  /// ارتفاع رأس المجموعة.
   final double headerHeight;
 
-  /// نصف قطر عقدة المحطة.
+  /// نصف قطر العقدة.
   final double nodeRadius;
 
-  /// رؤوس المراحل.
+  /// رؤوس المجموعات.
   final List<TrailHeaderBox> headers;
 
-  /// أعلى صف كل محطة.
+  /// أعلى كل صف عقدة.
   final List<double> rowTops;
 
   /// مراكز العقد.
   final List<Offset> nodeCenters;
 
-  /// المقطع k يصل المحطة k بالمحطة k + 1.
+  /// منحنيات المسار بين كل عقدتين متتاليتين.
   final List<Path> segments;
 
-  /// هل العقدة على يمين الشاشة.
-  bool isRightSide(int stationIndex) => nodeCenters[stationIndex].dx > width / 2;
+  /// هل العقدة في يمين المسار.
+  bool isRightSide(int nodeIndex) => nodeCenters[nodeIndex].dx > width / 2;
 
-  /// نقطة على المقطع k عند النسبة t من طوله.
+  /// نقطة على منحنى بنسبة t، لحركة القافلة.
   Offset pointAlong(int segmentIndex, double t) {
     final Path path = segments[segmentIndex];
+    final double clamped = t < 0 ? 0 : (t > 1 ? 1 : t);
     for (final PathMetric metric in path.computeMetrics()) {
-      final Tangent? tangent = metric.getTangentForOffset(metric.length * t.clamp(0.0, 1.0));
+      final Tangent? tangent = metric.getTangentForOffset(metric.length * clamped);
       if (tangent != null) {
         return tangent.position;
       }

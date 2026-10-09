@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "2.0.0",
   "id": "nawawi40_002",
   "sequence": 2,
   "collection": {
@@ -11,23 +11,11 @@
   "teaser": {
     "text": "غداً: زائرٌ غريب يدخل مجلس النبي ﷺ لا يعرفه أحد، ويسأل أسئلةً يعجب منها الصحابة… فمن يكون؟"
   },
-  "journey": {
-    "stationId": "makkah_dar_al_arqam",
-    "stepInStation": 2,
-    "milestone": "مجلس تعليم الدين",
-    "assignmentBasis": "thematic"
-  },
+  "milestone": "مجلس تعليم الدين",
   "context": {
     "narrative": "في البصرة كان معبد الجهني أولَ من تكلّم في القدر. فخرج يحيى بن يعمر وصاحبه حميد بن عبد الرحمن الحميري حاجَّين أو معتمرَين، يرجوان لقاء أحدٍ من أصحاب النبي ﷺ يسألانه عما يقول هؤلاء في القدر. فوُفِّق لهما عبد الله بن عمر داخلاً المسجد، فاكتنفاه عن يمينه وشماله، وحدّثه يحيى خبر القوم. فتبرّأ ابن عمر منهم، ثم قال: حدّثني أبي عمر بن الخطاب… وساق هذا الحديث الجامع في الإسلام والإيمان والإحسان.",
     "humanMotive": "حرص طالبَي علم على الرجوع إلى أصحاب النبي ﷺ حين ظهرت في بلدهما مقالة جديدة.",
-    "place": {
-      "name": "البصرة",
-      "stationId": "rashidun_basra",
-      "relation": "transmission_location",
-      "latitude": 30.5085,
-      "longitude": 47.7804,
-      "coordinatesApproximate": true
-    },
+    "place": null,
     "sources": [
       {
         "sourceId": "sahih_muslim",
@@ -327,7 +315,7 @@
     ],
     "audio": {
       "status": "not_recorded",
-      "assetPath": null,
+      "remoteUrl": null,
       "reciter": null,
       "durationMs": null,
       "timings": []

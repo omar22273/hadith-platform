@@ -1,19 +1,18 @@
 // المرحلة الثانية: المتن الشريف والبيان اللغوي اللمسي.
 // اللفظة المظللة تُفتح ببطاقة شرح مدمجة من كتب الغريب بنصوصها.
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/content/widgets/source_quote_tile.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/smooth_surface.dart';
 import '../../../hadith/data/models/models.dart';
 import '../../../hadith/domain/hadith_bundle.dart';
-import '../../../hadith/presentation/widgets/source_quote_tile.dart';
 import '../../../recitation/application/recitation_controller.dart';
+import '../../../recitation/presentation/recitation_bar.dart';
 import '../../application/session_controller.dart';
 import '../../application/session_state.dart';
 import '../widgets/matn_text.dart';
@@ -86,7 +85,7 @@ class MatnStage extends ConsumerWidget {
                     ref.read(sessionControllerProvider(hadith.id).notifier).selectGharib(id),
               ),
               const SizedBox(height: 10),
-              _RecitationRow(hadithId: hadith.id, recitation: recitation),
+              RecitationBar(hadithId: hadith.id),
             ],
           ),
         ),
@@ -136,59 +135,6 @@ class _LegendDot extends StatelessWidget {
   }
 }
 
-class _RecitationRow extends ConsumerWidget {
-  const _RecitationRow({required this.hadithId, required this.recitation});
-
-  final String hadithId;
-  final RecitationState recitation;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AppPalette palette = AppPalette.of(context);
-    final TextTheme text = Theme.of(context).textTheme;
-    if (!recitation.canPlay) {
-      return Row(
-        children: <Widget>[
-          Icon(Icons.mic_none_rounded, size: 18, color: palette.inkSoft),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              recitation.availability == RecitationAvailability.unavailable
-                  ? 'تعذّر تحميل ملف التلاوة على هذا الجهاز.'
-                  : 'التلاوة المتقنة قيد التسجيل بصوت قارئ؛ ولا يُقرأ المتن بصوت آلي.',
-              style: text.labelSmall?.copyWith(color: palette.inkSoft),
-            ),
-          ),
-        ],
-      );
-    }
-    final RecitationController controller = ref.read(recitationControllerProvider(hadithId).notifier);
-    return Row(
-      children: <Widget>[
-        FilledButton.icon(
-          onPressed: () {
-            if (recitation.playing) {
-              unawaited(controller.stop());
-            } else {
-              unawaited(controller.playAll());
-            }
-          },
-          icon: Icon(recitation.playing ? Icons.stop_rounded : Icons.volume_up_rounded),
-          label: Text(recitation.playing ? 'إيقاف' : 'استمع إلى التلاوة'),
-        ),
-        const SizedBox(width: 10),
-        if (recitation.reciter != null)
-          Expanded(
-            child: Text(
-              'بصوت ${recitation.reciter}',
-              style: text.labelSmall?.copyWith(color: palette.inkSoft),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
 class _GharibCard extends StatelessWidget {
   const _GharibCard({required this.entry, required this.bundle, required this.onClose});
 
@@ -213,7 +159,8 @@ class _GharibCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   entry.headword,
-                  style: AppTypography.matn(
+                  style: AppTypography.matnOf(
+                    context,
                     color: palette.amberText,
                     fontSize: 26,
                     fontWeight: FontWeight.w700,

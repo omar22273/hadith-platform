@@ -10,7 +10,6 @@ import 'package:hadith_platform/features/hadith/data/models/models.dart';
 
 const String _narratorsPath = 'assets/data/catalogs/narrators.json';
 const String _sourcesPath = 'assets/data/catalogs/sources.json';
-const String _journeyPath = 'assets/data/catalogs/journey_stations.json';
 const String _curriculumPath =
     'assets/data/curriculum/nawawi40_curriculum.json';
 const String _wisdomPath = 'assets/data/catalogs/wisdom_bank.json';
@@ -26,10 +25,8 @@ void main() {
   final NarratorCatalog narrators =
       NarratorCatalog.fromJson(_load(_narratorsPath));
   final SourceCatalog sources = SourceCatalog.fromJson(_load(_sourcesPath));
-  final JourneyCatalog journey = JourneyCatalog.fromJson(_load(_journeyPath));
   final HadithIntegrityChecker checker = HadithIntegrityChecker(
     narrators: narrators,
-    journey: journey,
     sources: sources,
   );
 
@@ -56,11 +53,6 @@ void main() {
     test('SourceCatalog', () {
       final JsonMap json = _load(_sourcesPath);
       expect(SourceCatalog.fromJson(json).toJson(), equals(json));
-    });
-
-    test('JourneyCatalog', () {
-      final JsonMap json = _load(_journeyPath);
-      expect(JourneyCatalog.fromJson(json).toJson(), equals(json));
     });
 
     test('CurriculumManifest', () {
@@ -111,22 +103,30 @@ void main() {
       for (final CurriculumItem item in curriculum.items) {
         final HadithDailyModel model =
             HadithDailyModel.fromJson(_load(item.assetPath));
-        expect(model.journey.stationId, item.stationId);
         expect(model.title, item.title);
-        expect(journey.stationById(item.stationId), isNotNull);
+        expect(model.collection.numberInCollection, item.number);
+        expect(model.milestone.trim(), isNotEmpty);
       }
     });
 
-    test('every station event cites catalogued sources with quotes', () {
-      for (final JourneyStation station in journey.stations) {
-        final StationEvent? event = station.event;
-        expect(event, isNotNull, reason: station.id);
-        for (final SourceRef ref in event!.sources) {
-          expect(sources.byId(ref.sourceId), isNotNull, reason: ref.sourceId);
-          expect(ref.quote, isNotNull);
-          expect(ref.locator, isNotNull);
+    test('hadith data carries no post-prophetic geographic stations', () {
+      for (final CurriculumItem item in curriculum.items) {
+        final JsonMap json = _load(item.assetPath);
+        expect(json.containsKey('journey'), isFalse, reason: item.hadithId);
+        final Object? place = (json['context'] as Map<String, dynamic>)['place'];
+        if (place is Map<String, dynamic>) {
+          expect(place.containsKey('stationId'), isFalse, reason: item.hadithId);
+          expect(place['relation'], isNot('transmission_location'));
         }
       }
+      expect(File('assets/data/catalogs/journey_stations.json').existsSync(), isFalse);
+    });
+
+    test('the planned path covers the whole collection', () {
+      expect(curriculum.plannedCount, 42);
+      final Set<int> numbers = <int>{for (final CurriculumItem item in curriculum.items) item.number};
+      expect(numbers.length, curriculum.items.length);
+      expect(numbers.every((int n) => n >= 1 && n <= curriculum.plannedCount), isTrue);
     });
 
     test('every wisdom entry is quoted verbatim with its speaker', () {
@@ -182,7 +182,7 @@ void main() {
   group('parsing errors', () {
     test('a missing key throws JsonParseException', () {
       expect(
-        () => SourceRef.fromJson(<String, dynamic>{'locator': null}),
+        () => SourceRef.fromJson(const <String, dynamic>{'locator': null}),
         throwsA(isA<JsonParseException>()),
       );
     });

@@ -1,5 +1,9 @@
-// متحكم التلاوة والتتبع الصوتي التزامني: يضيء الكلمة الجارية من توقيتات
-// AudioSync، ويشغل مقطع حفظ بعينه في التلقين بالترديد.
+// متحكم التلاوة والتتبع الصوتي التزامني: يبث تلاوة القارئ المتقن من شبكة
+// توزيع المحتوى مع تخزينها مؤقتاً، ويضيء الكلمة الجارية من توقيتات AudioSync،
+// ويشغل مقطع حفظ بعينه في التلقين بالترديد.
+//
+// المتن لا يُسمع إلا من تسجيل قارئ (AudioStatus.recorded أو aligned)؛ وما لم
+// يُسجَّل بعد لا يُجلب له شيء ولا يُستبدل بصوت آلي.
 
 import 'dart:async';
 
@@ -7,23 +11,21 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 
-import '../../hadith/application/content_providers.dart';
+import '../../../core/audio/audio_player_service.dart';
+import '../../../core/config/app_config.dart';
+import '../../hadith/application/hadith_providers.dart';
 import '../../hadith/data/models/models.dart';
-import '../data/recitation_player.dart';
 
-/// توفر التلاوة.
+/// توافر التلاوة.
 enum RecitationAvailability {
-  /// لم تُسجَّل بعد: لا صوت للمتن.
+  /// لم يُسجَّل المتن بعد.
   notRecorded,
 
-  /// مسجلة دون مزامنة كلمات.
+  /// مسجل دون توقيتات كلمات.
   recorded,
 
-  /// مسجلة ومتزامنة كلمة كلمة.
+  /// مسجل ومتزامن كلمةً كلمة.
   aligned,
-
-  /// تعذر تحميل الملف.
-  unavailable,
 }
 
 /// حالة التلاوة.
@@ -31,45 +33,60 @@ enum RecitationAvailability {
 class RecitationState {
   const RecitationState({
     required this.availability,
+    required this.phase,
     required this.playing,
+    this.failure,
     this.reciter,
     this.activeSegmentId,
     this.activeTokenIndex,
   });
 
-  /// التوفر.
+  /// التوافر.
   final RecitationAvailability availability;
 
-  /// هل تعمل الآن.
+  /// مرحلة المشغل (جلب، تخزين مؤقت، تشغيل...).
+  final AudioPhase phase;
+
+  /// هل التلاوة جارية بطلب المستخدم.
   final bool playing;
+
+  /// سبب آخر تعذر في الجلب، أو null.
+  final AudioFailureKind? failure;
 
   /// القارئ.
   final String? reciter;
 
-  /// مقطع الكلمة الجارية.
+  /// المقطع الجاري.
   final String? activeSegmentId;
 
-  /// رقم الكلمة الجارية.
+  /// الكلمة الجارية.
   final int? activeTokenIndex;
 
-  /// هل يمكن سماع المتن.
+  /// هل يمكن التشغيل.
   bool get canPlay =>
       availability == RecitationAvailability.recorded || availability == RecitationAvailability.aligned;
 
   /// هل يمكن تشغيل مقطع بعينه.
-  bool get canPlayChunks => availability == RecitationAvailability.aligned;
+  bool get canPlayChunks => availability == RecitationAvailability.aligned && failure == null;
 
-  /// نسخة معدلة. تمرير clearActive يمسح الكلمة الجارية.
+  /// هل يُجلب المقطع أو يُخزَّن مؤقتاً الآن.
+  bool get isBusy => phase == AudioPhase.loading || phase == AudioPhase.buffering;
+
+  /// نسخة معدلة.
   RecitationState copyWith({
-    RecitationAvailability? availability,
+    AudioPhase? phase,
     bool? playing,
+    AudioFailureKind? failure,
+    bool clearFailure = false,
     String? activeSegmentId,
     int? activeTokenIndex,
     bool clearActive = false,
   }) {
     return RecitationState(
-      availability: availability ?? this.availability,
+      availability: availability,
+      phase: phase ?? this.phase,
       playing: playing ?? this.playing,
+      failure: clearFailure ? null : (failure ?? this.failure),
       reciter: reciter,
       activeSegmentId: clearActive ? null : (activeSegmentId ?? this.activeSegmentId),
       activeTokenIndex: clearActive ? null : (activeTokenIndex ?? this.activeTokenIndex),
@@ -77,7 +94,7 @@ class RecitationState {
   }
 }
 
-/// المتحكم لكل حديث.
+/// المتحكم.
 class RecitationController extends Notifier<RecitationState> {
   RecitationController(this.hadithId);
 
@@ -85,8 +102,9 @@ class RecitationController extends Notifier<RecitationState> {
   final String hadithId;
 
   AudioSync? _audio;
-  RecitationPlayer? _player;
+  AudioPlayerService? _player;
   StreamSubscription<Duration>? _position;
+  StreamSubscription<AudioPhase>? _phase;
   int _offsetMs = 0;
 
   @override
@@ -96,7 +114,7 @@ class RecitationController extends Notifier<RecitationState> {
     final AudioSync? audio = hadith?.matn.audio;
     _audio = audio;
     final RecitationAvailability availability;
-    if (audio == null || audio.assetPath == null || audio.status == AudioStatus.notRecorded) {
+    if (audio == null || audio.status == AudioStatus.notRecorded) {
       availability = RecitationAvailability.notRecorded;
     } else if (audio.status == AudioStatus.aligned && audio.timings.isNotEmpty) {
       availability = RecitationAvailability.aligned;
@@ -105,14 +123,24 @@ class RecitationController extends Notifier<RecitationState> {
     }
     return RecitationState(
       availability: availability,
+      phase: AudioPhase.idle,
       playing: false,
       reciter: audio?.reciter,
     );
   }
 
-  /// يشغل التلاوة كاملة. يعيد false إن لم تتوفر.
+  /// رابط التلاوة: رابط الحديث إن وُجد، وإلا قالب CDN في إعدادات التطبيق.
+  Uri get audioUrl {
+    final String? override = _audio?.remoteUrl;
+    if (override != null && override.isNotEmpty) {
+      return Uri.parse(override);
+    }
+    return ref.read(appConfigProvider).audioUrlFor(hadithId);
+  }
+
+  /// يشغل التلاوة كاملة.
   Future<bool> playAll() async {
-    final RecitationPlayer? player = await _ensurePlayer();
+    final AudioPlayerService? player = await _ensureLoaded();
     if (player == null || !ref.mounted) {
       return false;
     }
@@ -125,7 +153,7 @@ class RecitationController extends Notifier<RecitationState> {
     return true;
   }
 
-  /// يشغل مقطع حفظ من أول كلمة إلى آخرها. يتطلب تلاوة متزامنة.
+  /// يشغل مقطع حفظ إن كانت التوقيتات متاحة.
   Future<bool> playChunk(PracticeChunk chunk) async {
     final AudioSync? audio = _audio;
     if (!state.canPlayChunks || audio == null) {
@@ -136,7 +164,7 @@ class RecitationController extends Notifier<RecitationState> {
     if (first == null || last == null || last.endMs <= first.startMs) {
       return false;
     }
-    final RecitationPlayer? player = await _ensurePlayer();
+    final AudioPlayerService? player = await _ensureLoaded();
     if (player == null || !ref.mounted) {
       return false;
     }
@@ -152,7 +180,7 @@ class RecitationController extends Notifier<RecitationState> {
     return true;
   }
 
-  /// مدة مقطع الحفظ في التلاوة المتزامنة.
+  /// مدة مقطع الحفظ في التسجيل، أو null.
   Duration? chunkDuration(PracticeChunk chunk) {
     final AudioSync? audio = _audio;
     if (audio == null) {
@@ -166,7 +194,7 @@ class RecitationController extends Notifier<RecitationState> {
     return Duration(milliseconds: last.endMs - first.startMs);
   }
 
-  /// يوقف التلاوة.
+  /// يوقف التشغيل.
   Future<void> stop() async {
     await _player?.stop();
     if (ref.mounted) {
@@ -174,25 +202,42 @@ class RecitationController extends Notifier<RecitationState> {
     }
   }
 
-  Future<RecitationPlayer?> _ensurePlayer() async {
-    final AudioSync? audio = _audio;
-    final String? asset = audio?.assetPath;
-    if (!state.canPlay || asset == null) {
+  /// يمسح سبب التعذر ويعيد المحاولة بالتشغيل.
+  Future<bool> retry() async {
+    state = state.copyWith(clearFailure: true);
+    return playAll();
+  }
+
+  Future<AudioPlayerService?> _ensureLoaded() async {
+    if (!state.canPlay) {
       return null;
     }
-    final RecitationPlayer player = _player ??= RecitationPlayer();
-    final bool loaded = await player.load(asset);
-    if (!ref.mounted) {
-      return null;
-    }
-    if (!loaded) {
+    final AudioPlayerService player = _player ??= ref.read(audioPlayerFactoryProvider)();
+    _phase ??= player.phaseStream.listen(_onPhase);
+    _position ??= player.positionStream.listen(_onPosition);
+    state = state.copyWith(phase: AudioPhase.loading, clearFailure: true);
+    try {
+      await player.load(audioUrl, timeout: ref.read(appConfigProvider).audioLoadTimeout);
+    } on AudioLoadException catch (error) {
       if (ref.mounted) {
-        state = state.copyWith(availability: RecitationAvailability.unavailable, playing: false);
+        state = state.copyWith(phase: AudioPhase.idle, playing: false, failure: error.kind);
       }
       return null;
     }
-    _position ??= player.positionStream.listen(_onPosition);
+    if (!ref.mounted) {
+      return null;
+    }
+    if (state.phase == AudioPhase.loading) {
+      state = state.copyWith(phase: AudioPhase.ready);
+    }
     return player;
+  }
+
+  void _onPhase(AudioPhase phase) {
+    if (!ref.mounted || phase == state.phase) {
+      return;
+    }
+    state = state.copyWith(phase: phase);
   }
 
   void _onPosition(Duration position) {
@@ -225,8 +270,10 @@ class RecitationController extends Notifier<RecitationState> {
 
   void _release() {
     unawaited(_position?.cancel());
+    unawaited(_phase?.cancel());
     _position = null;
-    final RecitationPlayer? player = _player;
+    _phase = null;
+    final AudioPlayerService? player = _player;
     _player = null;
     if (player != null) {
       unawaited(player.dispose());

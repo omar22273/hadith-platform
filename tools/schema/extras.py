@@ -82,38 +82,6 @@ EXTRAS = {
     return null;
   }
 """,
-    "JourneyCatalog": """
-  /// يعيد المحطة بمعرّفها، أو null إن لم توجد.
-  JourneyStation? stationById(String stationId) {
-    for (final JourneyStation station in stations) {
-      if (station.id == stationId) {
-        return station;
-      }
-    }
-    return null;
-  }
-
-  /// يعيد المرحلة بمعرّفها، أو null إن لم توجد.
-  JourneyRegion? regionById(String regionId) {
-    for (final JourneyRegion region in regions) {
-      if (region.id == regionId) {
-        return region;
-      }
-    }
-    return null;
-  }
-
-  /// محطات مرحلة واحدة مرتبة حسب مسار الرحلة.
-  List<JourneyStation> stationsInRegion(String regionId) {
-    final List<JourneyStation> result = stations
-        .where((JourneyStation station) => station.regionId == regionId)
-        .toList()
-      ..sort(
-        (JourneyStation a, JourneyStation b) => a.order.compareTo(b.order),
-      );
-    return List<JourneyStation>.unmodifiable(result);
-  }
-""",
     "SourceCatalog": """
   /// يعيد المصدر بمعرّفه، أو null إن لم يوجد.
   SourceWork? byId(String sourceId) {
@@ -134,6 +102,34 @@ EXTRAS = {
       }
     }
     return null;
+  }
+""",
+    "SeerahDataset": """
+  /// يعيد المحطة بمعرّفها، أو null إن لم توجد.
+  SeerahStationModel? stationById(String stationId) {
+    for (final SeerahStationModel station in stations) {
+      if (station.id == stationId) {
+        return station;
+      }
+    }
+    return null;
+  }
+
+  /// المحطات مرتبة زمنياً بحقل order.
+  List<SeerahStationModel> get chronological {
+    final List<SeerahStationModel> result = List<SeerahStationModel>.of(stations)
+      ..sort(
+        (SeerahStationModel a, SeerahStationModel b) => a.order.compareTo(b.order),
+      );
+    return List<SeerahStationModel>.unmodifiable(result);
+  }
+""",
+    "SeerahStationModel": """
+  /// شواهد مشهد واحد بترتيبها في الملف.
+  List<SeerahEvidence> evidenceFor(SeerahScene scene) {
+    return List<SeerahEvidence>.unmodifiable(
+      evidence.where((SeerahEvidence item) => item.scene == scene),
+    );
   }
 """,
 }
