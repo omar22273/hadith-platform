@@ -88,34 +88,30 @@ void main() {
   });
 
   testWidgets('seerah: station search and the full-narrative sheet', (WidgetTester tester) async {
-    await pumpApp(tester);
+    // شاشة طويلة لتظهر البطاقة كلها بلا تمرير.
+    await pumpApp(tester, size: const Size(412, 1800));
     await tester.tap(_navLabel('رحلة السيرة'));
     await settle(tester);
-
-    await tester.scrollUntilVisible(
-      find.text('التفاصيل والرواية الكاملة'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.ensureVisible(find.text('التفاصيل والرواية الكاملة'));
-    await settle(tester);
-    await tester.tap(find.text('التفاصيل والرواية الكاملة'));
-    await settle(tester);
-    expect(find.byType(DraggableScrollableSheet), findsOneWidget);
-    expect(find.text('المشهد الزماني'), findsWidgets);
-    expect(find.text('المأزق والتحدي'), findsWidgets);
-    expect(find.text('القرار والنتيجة النبوية'), findsWidgets);
-    expect(find.textContaining('النص'), findsWidgets);
-
-    await tester.fling(find.byType(DraggableScrollableSheet), const Offset(0, 600), 2000);
-    await settle(tester);
-    expect(find.byType(DraggableScrollableSheet), findsNothing);
 
     await tester.tap(find.byTooltip('بحث في المحطات'));
     await settle(tester);
     await tester.enterText(find.byType(TextField), 'المولد');
     await settle(tester);
     expect(find.text('المولد في عام الفيل'), findsOneWidget);
+    await tester.tap(find.byTooltip('إغلاق البحث'));
+    await settle(tester);
+
+    await tester.tap(find.text('التفاصيل والرواية الكاملة'));
+    await settle(tester);
+    expect(find.byType(DraggableScrollableSheet), findsOneWidget);
+    expect(find.text('المشهد الزماني'), findsWidgets);
+    expect(find.text('المأزق والتحدي'), findsWidgets);
+    expect(find.text('القرار والنتيجة النبوية'), findsWidgets);
+    expect(find.text('النص المصدري'), findsWidgets);
+
+    await tester.fling(find.byType(DraggableScrollableSheet), const Offset(0, 900), 3000);
+    await settle(tester);
+    expect(find.byType(DraggableScrollableSheet), findsNothing);
   });
 
   testWidgets('word-order challenges unlock one after another', (WidgetTester tester) async {
@@ -165,6 +161,7 @@ void main() {
     final List<MethodCall> calls = _recordPlatformCalls(tester);
     final ProviderContainer container = await pumpApp(
       tester,
+      size: const Size(412, 2600),
       stored: <String, String>{StorageKeys.journeyProgress: completedProgressJson()},
     );
     await tester.tap(_navLabel('ميدان المراجعة'));
@@ -179,16 +176,12 @@ void main() {
     );
     final ScenarioOption right = scenario.alignedOption!;
 
-    await tester.scrollUntilVisible(find.text(wrong.text), 200, scrollable: find.byType(Scrollable).first);
-    await tester.ensureVisible(find.text(wrong.text));
     await tester.tap(find.text(wrong.text));
     await settle(tester);
     expect(find.text('لماذا هذا هو الخيار النبوي؟'), findsOneWidget);
     expect(find.text('ليس هذا مقصد الحديث'), findsOneWidget);
     expect(calls.where((MethodCall c) => c.method == 'HapticFeedback.vibrate'), isNotEmpty);
 
-    await tester.ensureVisible(find.text(right.text).first);
-    await settle(tester);
     await tester.tap(find.text(right.text).first);
     await settle(tester);
     expect(find.text('الخيار النبوي'), findsWidgets);
