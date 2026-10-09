@@ -19,6 +19,7 @@ import 'package:hadith_platform/features/hadith/application/hadith_providers.dar
 import 'package:hadith_platform/features/journey/application/journey_controller.dart';
 import 'package:hadith_platform/features/journey/application/journey_progress_controller.dart';
 import 'package:hadith_platform/features/journey/application/pacing_notifier.dart';
+import 'package:hadith_platform/features/journey/presentation/arbaeen_path_screen.dart';
 import 'package:hadith_platform/features/journey/presentation/widgets/caravan_trail_view.dart';
 import 'package:hadith_platform/features/journey/presentation/widgets/wird_node.dart';
 import 'package:hadith_platform/features/settings/presentation/settings_screen.dart';
@@ -67,6 +68,21 @@ Future<void> _pumpApp(WidgetTester tester) async {
         .evaluate()
         .map((Element e) => (e.widget as Text).data ?? '')
         .join(' | ');
+    final ProviderContainer container = ProviderScope.containerOf(tester.element(find.byType(AppShellScreen)));
+    final String journey = container.read(journeyControllerProvider).toString();
+    final String curriculum = container.read(curriculumProvider).toString();
+    final String progress = container.read(journeyProgressProvider).toString();
+    final String pacing = container.read(pacingProvider).toString();
+    final String tree = find.byType(IndexedStack).evaluate().length.toString();
+    final StringBuffer buffer = StringBuffer();
+    for (final Type type in <Type>[IndexedStack, ArbaeenPathScreen, SafeArea, CustomScrollView, SliverToBoxAdapter, Viewport, Scaffold]) {
+      for (final Element e in find.byType(type, skipOffstage: false).evaluate()) {
+        final RenderObject? ro = e.renderObject;
+        buffer.write('$type=${ro is RenderBox ? ro.size : ro?.runtimeType} ');
+      }
+    }
+    // ignore: avoid_print
+    print('TREE>>> ${buffer.toString()} <<<TREE');
     final ProviderContainer container = ProviderScope.containerOf(tester.element(find.byType(AppShellScreen)));
     final String journey = container.read(journeyControllerProvider).toString();
     final String curriculum = container.read(curriculumProvider).toString();
