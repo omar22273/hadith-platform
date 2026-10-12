@@ -8,10 +8,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Unit-test the Android patch and verification scripts
+      - name: Unit-test the static Android project and the APK verifier
         run: python3 -m unittest discover -s tools/android -p 'test_*.py' -v
 
       - name: Set up Java
@@ -24,27 +26,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: '3.47.7'
           cache: true
-
-      - name: Generate Android Scaffolding
-        run: flutter create --platforms=android --org app.hadithplatform --project-name hadith_platform .
-
-      - name: Configure Android manifest, signing and Gradle
-        run: python3 tools/android/patch_manifest.py android
-
-      - name: Show the effective Android configuration
-        run: |
-          {
-            echo "--- app/build.gradle(.kts)"; cat android/app/build.gradle* || true
-            echo "--- settings.gradle(.kts)"; cat android/settings.gradle* || true
-            echo "--- gradle-wrapper.properties"; cat android/gradle/wrapper/gradle-wrapper.properties || true
-            echo "--- AndroidManifest.xml"; cat android/app/src/main/AndroidManifest.xml
-          } > android-config.txt
-          cat android-config.txt
-          python3 tools/ci/annotate.py notice "Android configuration" --file android-config.txt
-
-      - name: Remove dummy widget test
-        run: rm -f test/widget_test.dart
 
       - name: Install Dependencies
         run: flutter pub get
@@ -57,12 +40,43 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
+      # The android/ project is committed as plain files (manifest, Gradle, the
+      # stable debug keystore); nothing is generated or patched here. The APK
+      # is aligned and signed once more with apksigner so that v1, v2 and v3
+      # are all present, then inspected with aapt dump badging and checked
+      # with apksigner verify. Any failure stops the job before the upload.
+      - name: Align, sign (v1+v2+v3) and inspect the APK (aapt dump badging, apksigner verify)
+        run: |
+          set -euo pipefail
+          BT="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)"
+          echo "build-tools: $BT"
+          AAPT="$BT/aapt"
+          if [ ! -x "$AAPT" ]; then AAPT="$BT/aapt2"; fi
+          mkdir -p dist
+          SRC=build/app/outputs/flutter-apk/app-release.apk
+          "$BT/zipalign" -p -f 4 "$SRC" dist/aligned.apk
+          "$BT/apksigner" sign \
+            --ks tools/android/hadith-stable.keystore \
+            --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey \
+            --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+            --out dist/app-release.apk dist/aligned.apk
+          rm -f dist/aligned.apk dist/*.idsig
+          "$BT/zipalign" -c -p 4 dist/app-release.apk
+          {
+            echo "== $AAPT dump badging"
+            "$AAPT" dump badging dist/app-release.apk | grep -E "^(package|sdkVersion|minSdkVersion|targetSdkVersion|application-label:|launchable-activity|native-code)" || true
+            echo "== apksigner verify (v1 required via --min-sdk-version 23)"
+            "$BT/apksigner" verify --verbose --print-certs --min-sdk-version 23 dist/app-release.apk
+          } 2>&1 | tee sign-report.txt
+          grep -q "Verified using v1 scheme (JAR signing): true" sign-report.txt
+          grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" sign-report.txt
+          python3 tools/ci/annotate.py notice "APK signing and badging" --file sign-report.txt
+
       # Fails the build, and so blocks the upload, if the APK cannot be
       # installed: malformed manifest structure, unsigned, or a broken archive.
       - name: Verify the APK (manifest structure and signature)
-        if: ${{ !cancelled() }}
         run: |
-          python3 tools/android/verify_apk.py build/app/outputs/flutter-apk > apk-report.txt 2>&1 && status=0 || status=$?
+          python3 tools/android/verify_apk.py dist > apk-report.txt 2>&1 && status=0 || status=$?
           cat apk-report.txt
           python3 tools/ci/annotate.py $([ $status -eq 0 ] && echo notice || echo error) "APK verification" --file apk-report.txt
           exit $status
@@ -71,7 +85,22 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: build/app/outputs/flutter-apk/*.apk
+          path: dist/app-release.apk
+
+      # A public direct link to the plain .apk (no zip, no GitHub sign-in):
+      # https://github.com/<owner>/<repo>/releases/download/apk-latest/app-release.apk
+      - name: Publish the APK as the apk-latest release
+        if: ${{ github.ref == 'refs/heads/main' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SHA256="$(sha256sum dist/app-release.apk | cut -d' ' -f1)"
+          gh release delete apk-latest --cleanup-tag --yes || true
+          gh release create apk-latest dist/app-release.apk \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "Latest APK (${GITHUB_SHA::7})" \
+            --notes "Signed v1+v2+v3, inspected with aapt dump badging and apksigner verify. Commit ${GITHUB_SHA}. SHA-256: ${SHA256}"
 
   # Installs the finished APK on an emulator the way a phone would and launches
   # it. Informational: it never blocks the APK, which is already uploaded.

@@ -11,7 +11,7 @@ Exit status 0 only when every APK passes. For each APK it checks:
    expects: <uses-permission> and <queries> directly under <manifest>,
    components only under <application>, exactly one <application>, and the
    launcher activity exported.
-3. The signature verifies (apksigner verify), v2 and v3 are both present, and the
+3. The signature verifies (apksigner verify), v1, v2 and v3 are all present, and the
    certificate is the committed stable public key (stable_key.sha256), so every
    build can be installed over the previous one.
 
@@ -225,7 +225,9 @@ def pinned_fingerprint():
 
 def signature_report(apksigner: str, path: str) -> tuple:
     """(problems, info lines) from `apksigner verify`."""
-    code, output = run([apksigner, 'verify', '--verbose', '--print-certs', path])
+    # --min-sdk-version 23 makes apksigner demand (and report) the v1 JAR signature too,
+    # which it would otherwise skip for an app whose minSdk is 24 or higher.
+    code, output = run([apksigner, 'verify', '--verbose', '--print-certs', '--min-sdk-version', '23', path])
     info = [line.strip() for line in output.splitlines() if line.strip()][:14]
     if code != 0:
         return ['apksigner rejected the APK (exit %d): %s' % (code, ' | '.join(info[:4]) or 'no output')], info
@@ -233,7 +235,7 @@ def signature_report(apksigner: str, path: str) -> tuple:
     schemes = {m.group(1): m.group(2) for m in re.finditer(r'Verified using (v\d(?:\.\d)?) scheme[^:]*:\s*(true|false)', output)}
     if not any(schemes.get(v) == 'true' for v in ('v2', 'v3', 'v3.1', 'v4')):
         problems.append('The APK is not signed with the v2 or newer scheme (found: %s).' % (schemes or 'none'))
-    for scheme in ('v2', 'v3'):
+    for scheme in ('v1', 'v2', 'v3'):
         if schemes.get(scheme) != 'true':
             problems.append('The APK is not signed with the %s scheme (found: %s).' % (scheme, schemes or 'none'))
     if 'Number of signers: 0' in output:
