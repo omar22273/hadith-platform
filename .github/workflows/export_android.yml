@@ -4,6 +4,9 @@ on:
   push:
     branches: [ export/android ]
 
+permissions:
+  contents: write
+
 jobs:
   export:
     runs-on: ubuntu-latest
@@ -27,12 +30,12 @@ jobs:
           find android -type f -not -path '*/build/*' -not -path '*/.gradle/*' | sort
           cat android/.gitignore
           cat android/gradle.properties
-      - uses: actions/upload-artifact@v4
-        with:
-          name: android-scaffold
-          include-hidden-files: true
-          path: |
-            android
-            !android/.gradle
-            !android/build
-            !android/app/build
+      - name: Push the scaffold to a branch
+        run: |
+          git config user.name "scaffold-export"
+          git config user.email "scaffold-export@users.noreply.github.com"
+          git checkout -b export/android-files
+          git add -f android
+          git reset -q android/local.properties android/.gradle android/build android/app/build 2>/dev/null || true
+          git commit -qm "scaffold export"
+          git push -f origin export/android-files
