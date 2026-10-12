@@ -168,14 +168,14 @@ class SignatureReportTest(unittest.TestCase):
             va.run = original
 
     @staticmethod
-    def _output(v2: str = 'true', v3: str = 'true', digest: str = '') -> str:
+    def _output(v1: str = 'true', v2: str = 'true', v3: str = 'true', digest: str = '') -> str:
         return (
             'Verifies\n'
-            'Verified using v1 scheme (JAR signing): true\n'
+            'Verified using v1 scheme (JAR signing): %s\n'
             'Verified using v2 scheme (APK Signature Scheme v2): %s\n'
             'Verified using v3 scheme (APK Signature Scheme v3): %s\n'
             'Number of signers: 1\n'
-            'Signer #1 certificate SHA-256 digest: %s\n' % (v2, v3, digest)
+            'Signer #1 certificate SHA-256 digest: %s\n' % (v1, v2, v3, digest)
         )
 
     def test_the_pinned_fingerprint_is_a_sha256_hex_string(self) -> None:
@@ -190,6 +190,10 @@ class SignatureReportTest(unittest.TestCase):
     def test_another_certificate_is_rejected(self) -> None:
         problems, _ = self._report(self._output(digest='0' * 64))
         self.assertTrue(any('stable key' in problem for problem in problems))
+
+    def test_missing_v1_is_rejected(self) -> None:
+        problems, _ = self._report(self._output(v1='false', digest=self.PINNED))
+        self.assertTrue(any('v1' in problem for problem in problems))
 
     def test_missing_v2_or_v3_is_rejected(self) -> None:
         self.assertTrue(self._report(self._output(v2='false', digest=self.PINNED))[0])
