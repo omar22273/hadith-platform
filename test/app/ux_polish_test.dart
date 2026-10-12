@@ -103,9 +103,18 @@ void main() {
     final Finder pageScrollable = find
         .descendant(of: find.byKey(const ValueKey<String>('narrative-scroll')), matching: find.byType(Scrollable))
         .first;
-    for (final String title in <String>['المشهد الزماني', 'المأزق والتحدي', 'القرار والنتيجة النبوية']) {
-      await tester.scrollUntilVisible(find.text(title).first, 300, scrollable: pageScrollable);
-      expect(find.text(title), findsWidgets);
+    const Map<String, String> scenes = <String, String>{
+      'setting': 'المشهد الزماني',
+      'challenge': 'المأزق والتحدي',
+      'decision': 'القرار والنتيجة النبوية',
+    };
+    for (final MapEntry<String, String> scene in scenes.entries) {
+      await tester.scrollUntilVisible(
+        find.byKey(ValueKey<String>('narrative-scene-${scene.key}')),
+        300,
+        scrollable: pageScrollable,
+      );
+      expect(find.text(scene.value), findsWidgets);
     }
     expect(find.textContaining('مصدر'), findsWidgets);
 

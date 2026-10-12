@@ -328,13 +328,15 @@ class _EvidenceSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Row(
+        // Wrap لا Row: على الهاتف الضيق مع الخط الكبير تنزل الشارة إلى سطر ثانٍ بدل أن تتجاوز.
+        Wrap(
+          spacing: 12,
+          runSpacing: 6,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: <Widget>[
-            Expanded(
-              child: Text(
-                item.evidence.length == 1 ? 'المصدر' : 'المصادر (${arabicDigits(item.evidence.length)})',
-                style: text.labelLarge?.copyWith(color: palette.inkSoft, fontWeight: FontWeight.w700),
-              ),
+            Text(
+              item.evidence.length == 1 ? 'المصدر' : 'المصادر (${arabicDigits(item.evidence.length)})',
+              style: text.labelLarge?.copyWith(color: palette.inkSoft, fontWeight: FontWeight.w700),
             ),
             SoftChip(label: reviewStatusLabel(item.review.status), icon: Icons.fact_check_outlined),
           ],
