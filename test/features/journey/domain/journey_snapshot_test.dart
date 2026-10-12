@@ -209,8 +209,13 @@ void main() {
       expect(snapshot.segments.last.title, 'تتمة الأربعين');
       expect(snapshot.nodes[0].status, WirdNodeStatus.today);
       expect(snapshot.nodes[1].status, WirdNodeStatus.upcoming);
-      expect(snapshot.nodes[2].status, WirdNodeStatus.inPreparation);
-      expect(snapshot.nodes[2].item, isNull);
+      for (int index = 1; index < 10; index++) {
+        expect(snapshot.nodes[index].status, WirdNodeStatus.upcoming, reason: 'node $index');
+        expect(snapshot.nodes[index].item, isNotNull, reason: 'node $index');
+      }
+      expect(snapshot.preparedCount, 10);
+      expect(snapshot.nodes[10].status, WirdNodeStatus.inPreparation);
+      expect(snapshot.nodes[10].item, isNull);
       expect(snapshot.todayKind, TodayKind.available);
       expect(snapshot.caravanIndex, 0);
     });
