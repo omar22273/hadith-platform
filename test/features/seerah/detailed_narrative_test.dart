@@ -13,7 +13,6 @@ import 'package:hadith_platform/core/content/models/content_models.dart';
 import 'package:hadith_platform/core/json/json_reader.dart';
 import 'package:hadith_platform/core/preferences/reading_preferences.dart';
 import 'package:hadith_platform/core/storage/key_value_store.dart';
-import 'package:hadith_platform/features/seerah/application/seerah_providers.dart';
 import 'package:hadith_platform/features/seerah/data/models/seerah_station.dart';
 import 'package:hadith_platform/features/seerah/domain/seerah_integrity.dart';
 import 'package:hadith_platform/features/seerah/presentation/seerah_narrative_screen.dart';
@@ -85,13 +84,11 @@ void main() {
   group('the full-narrative screen', () {
     Future<ProviderContainer> openScreen(
       WidgetTester tester, {
-      required SeerahStationModel Function(SeerahDataset) pick,
+      required SeerahStationModel station,
       Map<String, String>? stored,
       Size size = const Size(412, 1800),
     }) async {
       final ProviderContainer container = await pumpApp(tester, size: size, stored: stored);
-      final SeerahDataset loaded = await container.read(seerahDatasetProvider.future);
-      final SeerahStationModel station = pick(loaded);
       final NavigatorState navigator = tester.state<NavigatorState>(find.byType(Navigator).first);
       navigator.push<void>(
         MaterialPageRoute<void>(builder: (BuildContext _) => SeerahNarrativeScreen(station: station)),
@@ -110,7 +107,7 @@ void main() {
     testWidgets('shows the paragraphs in a heritage font tied to the settings font size', (WidgetTester tester) async {
       final ProviderContainer container = await openScreen(
         tester,
-        pick: (SeerahDataset d) => _withNarrative(d.chronological.first, '$_first\n\n$_second'),
+        station: _withNarrative(base, '$_first\n\n$_second'),
         stored: <String, String>{
           StorageKeys.readingPreferences: jsonEncode(<String, Object>{
             'matnFontSize': 38,
@@ -144,7 +141,7 @@ void main() {
     testWidgets('the slider on the screen moves the same preference the settings use, and saves it', (WidgetTester tester) async {
       final ProviderContainer container = await openScreen(
         tester,
-        pick: (SeerahDataset d) => _withNarrative(d.chronological.first, _first),
+        station: _withNarrative(base, _first),
         stored: <String, String>{
           StorageKeys.readingPreferences: jsonEncode(<String, Object>{
             'matnFontSize': 30,
@@ -166,7 +163,7 @@ void main() {
     });
 
     testWidgets('without a narrative the verified scenes stand alone, with a note', (WidgetTester tester) async {
-      await openScreen(tester, pick: (SeerahDataset d) => d.chronological.first);
+      await openScreen(tester, station: base);
 
       expect(find.byKey(const ValueKey<String>('narrative-pending-note')), findsOneWidget);
       expect(find.byKey(const ValueKey<String>('narrative-body')), findsNothing);
@@ -181,7 +178,7 @@ void main() {
       await openScreen(
         tester,
         size: const Size(360, 640),
-        pick: (SeerahDataset d) => _withNarrative(d.chronological.first, longNarrative),
+        station: _withNarrative(base, longNarrative),
       );
 
       final Finder scrollable = find.descendant(

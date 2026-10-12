@@ -13,9 +13,11 @@ assets/data/
   curriculum/nawawi40_curriculum.json  ترتيب الأوراد وسياسة القفل اليومي وعدد أحاديث الكتاب
   seerah_dataset.json                  محطات رحلة السيرة بمشاهدها الثلاثة وشواهدها
   seerah_map_land.json                 يابسة خريطة السيرة (Natural Earth، ملكية عامة)
+  adhkar/adhkar_catalog.json           أذكار وِرد الأذكار (بذرة الاختبار: ذكران) بشواهدها الحرفية
 lib/core/content/models/               النماذج المشتركة: SourceRef وSourceCatalog وReviewInfo
 lib/features/hadith/data/models/       نماذج الحديث (models.dart للاستيراد)
 lib/features/seerah/data/models/       نماذج السيرة: SeerahDataset وSeerahStationModel
+lib/features/adhkar/data/models/       نماذج الأذكار: AdhkarCatalog وDhikrItem
 lib/features/admin/data/models/        مسودات لوحة الإدخال: HadithDraft وGharibDraft
 ```
 
@@ -67,6 +69,22 @@ lib/features/admin/data/models/        مسودات لوحة الإدخال: Had
 - السيرة النبوية لابن هشام.
 - الطبقات الكبرى لابن سعد.
 - صحيح البخاري.
+
+## وِرد الأذكار (AdhkarCatalog وDhikrItem)
+
+| الحقل | المعنى |
+|---|---|
+| `AdhkarCatalog.items` | الأذكار بترتيب عرضها في الوِرد (`itemsInOrder` يرتبها بحقل `order`) |
+| `DhikrItem.id` / `order` / `title` | المعرّف الفريد، والترتيب في الوِرد، وعنوان الذكر |
+| `DhikrItem.text` | نص الذكر مشكولاً **جزءاً حرفياً** من نص أحد شواهده |
+| `DhikrItem.count` | العدد المسنون الثابت (١ إلى ١٠٠٠)؛ بلوغه يقفل الذكر فلا يزيد العدّ عليه |
+| `DhikrItem.evidence` | الشواهد: `SourceRef` فيه معرّف المصدر وموضعه ونص الحديث حرفياً |
+| `DhikrItem.review` | حالة المراجعة العلمية؛ كلا ذكري البذرة `pending_scholarly_review` |
+
+- **فحص السلامة** (`checkAdhkarCatalog`): معرّفات وترتيب فريدان، وعنوان ونص غير فارغين، وعدد موجب، وشاهد لكل ذكر بموضعه ونصه ومصدره المعروف في `sources.json`، وأن يكون نص الذكر جزءاً من نص أحد الشواهد. ويتحقق `tools/schema/validate.py` من الملف بالمخطط.
+- **أصل النصوص**: لم تُكتب من الذاكرة. يستخرجها `tools/content/build_adhkar_seed.py` آلياً من إصدار `fawazahmed0/hadith-api` المثبت في الإيداع `df57907` (صحيح البخاري ٦٣٠٦ وصحيح مسلم ٥٩٦ وصحيح البخاري ٨٤٣)، ويقطع اللفظ المعدود من نص الشاهد دون تعديل ضبطه.
+- **الأعداد**: العدد ٣٣ في «تسبيح دبر الصلاة المكتوبة» منصوص عليه في الشاهدين. أما العدد ١ في «سيّد الاستغفار» فحدده مالك المنتج لبذرة الاختبار لأن الحديث لا يذكر عدداً، وهذا مدوّن في `review.notes`.
+- **مؤجل لحزمة المحتوى النهائية**: التحميد والتكبير والتهليل وبقية الأذكار، وحفظ تقدم الأذكار والنسخ الاحتياطي له.
 
 ## الخط الأحمر داخل البيانات
 
