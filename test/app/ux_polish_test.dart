@@ -96,13 +96,18 @@ void main() {
     await tester.tap(find.text('الرواية الكاملة وتفاصيل الحدث'));
     await settle(tester);
     expect(find.byType(SeerahNarrativeScreen), findsOneWidget);
-    expect(find.text('المشهد الزماني'), findsWidgets);
-    expect(find.text('المأزق والتحدي'), findsWidgets);
-    expect(find.text('القرار والنتيجة النبوية'), findsWidgets);
-    expect(find.text('النص المصدري'), findsWidgets);
     // ملف البيانات الحالي بلا رواية مفصلة: يظهر التنبيه وتبقى المشاهد الموثقة.
     expect(find.byKey(const ValueKey<String>('narrative-pending-note')), findsOneWidget);
     expect(find.byKey(const ValueKey<String>('narrative-body')), findsNothing);
+    // القائمة كسولة: كل مشهد يُبنى حين يُمرَّر إليه.
+    final Finder pageScrollable = find
+        .descendant(of: find.byKey(const ValueKey<String>('narrative-scroll')), matching: find.byType(Scrollable))
+        .first;
+    for (final String title in <String>['المشهد الزماني', 'المأزق والتحدي', 'القرار والنتيجة النبوية']) {
+      await tester.scrollUntilVisible(find.text(title).first, 300, scrollable: pageScrollable);
+      expect(find.text(title), findsWidgets);
+    }
+    expect(find.textContaining('مصدر'), findsWidgets);
 
     await tester.tap(find.byType(BackButton));
     await settle(tester);

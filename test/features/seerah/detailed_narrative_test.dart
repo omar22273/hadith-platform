@@ -97,6 +97,19 @@ void main() {
       return container;
     }
 
+    /// المحرك الرأسي للصفحة وحده (كل نص قابل للتحديد يحمل Scrollable داخلياً).
+    Finder pageScrollable() {
+      return find.descendant(
+        of: find.byKey(const ValueKey<String>('narrative-scroll')),
+        matching: find.byType(Scrollable),
+      ).first;
+    }
+
+    /// القائمة كسولة: ما بعد الشاشة لا يُبنى، فيُمرَّر إليه أولاً.
+    Future<void> scrollTo(WidgetTester tester, Finder target) async {
+      await tester.scrollUntilVisible(target, 300, scrollable: pageScrollable());
+    }
+
     double fontSizeOf(WidgetTester tester, String text) {
       final SelectableText widget = tester.widget<SelectableText>(
         find.byWidgetPredicate((Widget w) => w is SelectableText && w.data == text),
@@ -121,12 +134,11 @@ void main() {
       expect(find.byKey(const ValueKey<String>('narrative-pending-note')), findsNothing);
       expect(find.text(_first), findsOneWidget);
       expect(find.text(_second), findsOneWidget);
-      for (final SeerahScene scene in SeerahScene.values) {
-        expect(find.byKey(ValueKey<String>('narrative-scene-${scene.wire}')), findsOneWidget);
-      }
 
       // خط أميري التراثي، وحجمه 21 مضروباً في معامل الإعدادات (38 ÷ 27).
-      final SelectableText paragraph = tester.widget<SelectableText>(find.widgetWithText(SelectableText, _first));
+      final SelectableText paragraph = tester.widget<SelectableText>(
+        find.byWidgetPredicate((Widget w) => w is SelectableText && w.data == _first),
+      );
       expect(paragraph.style!.fontFamily, 'Amiri');
       expect(fontSizeOf(tester, _first), closeTo(21 * 38 / 27, 0.01));
 
@@ -135,6 +147,13 @@ void main() {
       await settle(tester);
       expect(fontSizeOf(tester, _first), closeTo(21 * 22 / 27, 0.01));
       expect(fontSizeOf(tester, _second), closeTo(21 * 22 / 27, 0.01));
+
+      // المشاهد الثلاثة الموثقة تحت الرواية (القائمة كسولة فيُمرَّر إليها).
+      for (final SeerahScene scene in SeerahScene.values) {
+        final Finder block = find.byKey(ValueKey<String>('narrative-scene-${scene.wire}'));
+        await scrollTo(tester, block);
+        expect(block, findsOneWidget);
+      }
       expect(tester.takeException(), isNull);
     });
 
@@ -167,10 +186,13 @@ void main() {
 
       expect(find.byKey(const ValueKey<String>('narrative-pending-note')), findsOneWidget);
       expect(find.byKey(const ValueKey<String>('narrative-body')), findsNothing);
-      expect(find.text(base.sceneDescription), findsOneWidget);
-      expect(find.text(base.challenge), findsOneWidget);
-      expect(find.text(base.propheticDecision), findsOneWidget);
       expect(find.text('بانتظار المراجعة العلمية'), findsOneWidget);
+      await scrollTo(tester, find.text(base.sceneDescription));
+      expect(find.text(base.sceneDescription), findsOneWidget);
+      await scrollTo(tester, find.text(base.challenge));
+      expect(find.text(base.challenge), findsOneWidget);
+      await scrollTo(tester, find.text(base.propheticDecision));
+      expect(find.text(base.propheticDecision), findsOneWidget);
     });
 
     testWidgets('a long narrative scrolls smoothly down to the last scene on a small phone', (WidgetTester tester) async {
@@ -181,14 +203,10 @@ void main() {
         station: _withNarrative(base, longNarrative),
       );
 
-      final Finder scrollable = find.descendant(
-        of: find.byKey(const ValueKey<String>('narrative-scroll')),
-        matching: find.byType(Scrollable),
-      );
       await tester.scrollUntilVisible(
         find.byKey(const ValueKey<String>('narrative-scene-decision')),
         400,
-        scrollable: scrollable,
+        scrollable: pageScrollable(),
       );
       expect(find.byKey(const ValueKey<String>('narrative-scene-decision')), findsOneWidget);
       expect(tester.takeException(), isNull);

@@ -57,6 +57,16 @@ Future<ProviderContainer> _openAdhkar(WidgetTester tester, {Size size = const Si
   return container;
 }
 
+/// يختار الذكر ذا الترتيب [index] من الرقائق، فيُظهر الرقاقة أولاً إن كانت
+/// خلف الحافة (الخطوط الاختبارية أعرض من الحقيقية).
+Future<void> _selectDhikr(WidgetTester tester, int index) async {
+  final Finder pill = find.byKey(ValueKey<String>('adhkar-pill-$index'));
+  await tester.ensureVisible(pill);
+  await tester.pump();
+  await tester.tap(pill);
+  await settle(tester);
+}
+
 void main() {
   final JsonMap raw = _load('assets/data/adhkar/adhkar_catalog.json');
   final AdhkarCatalog catalog = AdhkarCatalog.fromJson(raw);
@@ -181,8 +191,7 @@ void main() {
       final List<String> haptics = _recordHaptics(tester);
       final ProviderContainer container = await _openAdhkar(tester);
       // انتقل إلى الذكر ذي الثلاث والثلاثين.
-      await tester.tap(find.byKey(const ValueKey<String>('adhkar-pill-1')));
-      await settle(tester);
+      await _selectDhikr(tester, 1);
       expect(container.read(adhkarWirdProvider).index, 1);
 
       final Finder card = find.byKey(const ValueKey<String>('dhikr-card-tap'));
@@ -211,8 +220,7 @@ void main() {
     testWidgets('reaching the number gives a double medium haptic, a green halo and a permanent lock', (WidgetTester tester) async {
       final List<String> haptics = _recordHaptics(tester);
       final ProviderContainer container = await _openAdhkar(tester);
-      await tester.tap(find.byKey(const ValueKey<String>('adhkar-pill-1')));
-      await settle(tester);
+      await _selectDhikr(tester, 1);
 
       final Finder card = find.byKey(const ValueKey<String>('dhikr-card-tap'));
       AnimatedContainer surface() =>
@@ -291,6 +299,20 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('the pill row brings the current dhikr fully into view when the wird advances on its own', (WidgetTester tester) async {
+      _recordHaptics(tester);
+      final ProviderContainer container = await _openAdhkar(tester, size: const Size(360, 1400));
+      await tester.tap(find.byKey(const ValueKey<String>('dhikr-card-tap')));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 1500));
+      await settle(tester);
+
+      expect(container.read(adhkarWirdProvider).index, 1);
+      final Rect pill = tester.getRect(find.byKey(const ValueKey<String>('adhkar-pill-1')));
+      expect(pill.left, greaterThanOrEqualTo(-0.5), reason: 'not hidden behind the left edge');
+      expect(pill.right, lessThanOrEqualTo(360.5), reason: 'not hidden behind the right edge');
+    });
+
     testWidgets('the sources sit under the card with their verbatim quote and locator', (WidgetTester tester) async {
       await _openAdhkar(tester);
       final DhikrItem first = catalog.itemsInOrder.first;
@@ -304,13 +326,12 @@ void main() {
       await tester.tap(_navLabel('وِرد الأذكار'));
       await settle(tester);
       expect(find.byType(AdhkarScreen), findsOneWidget);
-      await tester.tap(find.byKey(const ValueKey<String>('adhkar-pill-1')));
-      await settle(tester);
+      await _selectDhikr(tester, 1);
       expect(tester.takeException(), isNull);
       await tester.scrollUntilVisible(
         find.byKey(const ValueKey<String>('dhikr-remaining')),
         200,
-        scrollable: find.descendant(of: find.byKey(const ValueKey<String>('adhkar-scroll')), matching: find.byType(Scrollable)),
+        scrollable: find.descendant(of: find.byKey(const ValueKey<String>('adhkar-scroll')), matching: find.byType(Scrollable)).first,
       );
       expect(tester.takeException(), isNull);
     });

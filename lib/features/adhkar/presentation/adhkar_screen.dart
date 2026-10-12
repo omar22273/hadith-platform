@@ -148,8 +148,9 @@ class _AdhkarBodyState extends ConsumerState<_AdhkarBody> {
   }
 }
 
-/// أذكار الوِرد رقائق أفقية: الحالي مظلل، والمكتمل بعلامة.
-class _ItemPills extends StatelessWidget {
+/// أذكار الوِرد رقائق أفقية: الحالي مظلل، والمكتمل بعلامة. يتوسط الذكر الحالي
+/// الشريط كلما تغير (باللمس أو بالانتقال التلقائي) فلا يختفي خلف الحافة.
+class _ItemPills extends StatefulWidget {
   const _ItemPills({required this.items, required this.wird, required this.onSelect});
 
   final List<DhikrItem> items;
@@ -157,46 +158,111 @@ class _ItemPills extends StatelessWidget {
   final ValueChanged<int> onSelect;
 
   @override
+  State<_ItemPills> createState() => _ItemPillsState();
+}
+
+class _ItemPillsState extends State<_ItemPills> {
+  final ScrollController _controller = ScrollController();
+  final Map<int, GlobalKey> _anchors = <int, GlobalKey>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _revealCurrent();
+  }
+
+  @override
+  void didUpdateWidget(_ItemPills oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.wird.index != widget.wird.index) {
+      _revealCurrent();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  GlobalKey _anchorOf(int index) => _anchors.putIfAbsent(index, () => GlobalKey());
+
+  /// يحرك شريط الرقائق وحده (لا الصفحة) ليتوسط الذكر الحالي.
+  void _revealCurrent() {
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      if (!mounted || !_controller.hasClients) {
+        return;
+      }
+      final RenderObject? target = _anchorOf(widget.wird.index).currentContext?.findRenderObject();
+      if (target == null) {
+        return;
+      }
+      final bool still = MediaQuery.disableAnimationsOf(context);
+      unawaited(
+        _controller.position.ensureVisible(
+          target,
+          alignment: 0.5,
+          duration: still ? Duration.zero : const Duration(milliseconds: 260),
+          curve: Curves.easeInOutCubic,
+        ),
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
-    return SizedBox(
-      height: 48,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: items.length,
-        separatorBuilder: (BuildContext context, int _) => const SizedBox(width: 8),
-        itemBuilder: (BuildContext context, int i) {
-          final bool current = i == wird.index;
-          final bool done = wird.isDone(items, i);
-          final Color foreground = done ? palette.emeraldText : (current ? palette.amberText : palette.inkSoft);
-          return Semantics(
-            label: 'الذكر ${arabicDigits(i + 1)}: ${items[i].title}${done ? '، مكتمل' : ''}',
-            child: ExcludeSemantics(
-              child: ChoiceChip(
-                key: ValueKey<String>('adhkar-pill-$i'),
-                selected: current,
-                onSelected: (bool _) => onSelect(i),
-                avatar: Icon(
-                  done ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                  size: 18,
-                  color: foreground,
+    final List<DhikrItem> items = widget.items;
+    final AdhkarWirdState wird = widget.wird;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return SizedBox(
+          height: 48,
+          child: ListView.separated(
+            controller: _controller,
+            scrollDirection: Axis.horizontal,
+            itemCount: items.length,
+            separatorBuilder: (BuildContext context, int _) => const SizedBox(width: 8),
+            itemBuilder: (BuildContext context, int i) {
+              final bool current = i == wird.index;
+              final bool done = wird.isDone(items, i);
+              final Color foreground = done ? palette.emeraldText : (current ? palette.amberText : palette.inkSoft);
+              return KeyedSubtree(
+                key: _anchorOf(i),
+                child: Semantics(
+                  label: 'الذكر ${arabicDigits(i + 1)}: ${items[i].title}${done ? '، مكتمل' : ''}',
+                  child: ExcludeSemantics(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+                      child: ChoiceChip(
+                        key: ValueKey<String>('adhkar-pill-$i'),
+                        selected: current,
+                        onSelected: (bool _) => widget.onSelect(i),
+                        avatar: Icon(
+                          done ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                          size: 18,
+                          color: foreground,
+                        ),
+                        label: Text(items[i].title, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        selectedColor: palette.amberSoft,
+                        backgroundColor: done ? palette.emeraldSoft : palette.surface,
+                        side: BorderSide(color: done ? palette.emerald : (current ? palette.amber : palette.line)),
+                        shape: AppShapes.rounded(AppShapes.radiusSmall),
+                        showCheckmark: false,
+                        labelStyle: AppTypography.ui(
+                          color: foreground,
+                          fontSize: 13,
+                          fontWeight: current ? FontWeight.w700 : FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                label: Text(items[i].title),
-                selectedColor: palette.amberSoft,
-                backgroundColor: done ? palette.emeraldSoft : palette.surface,
-                side: BorderSide(color: done ? palette.emerald : (current ? palette.amber : palette.line)),
-                shape: AppShapes.rounded(AppShapes.radiusSmall),
-                showCheckmark: false,
-                labelStyle: AppTypography.ui(
-                  color: foreground,
-                  fontSize: 13,
-                  fontWeight: current ? FontWeight.w700 : FontWeight.w400,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
