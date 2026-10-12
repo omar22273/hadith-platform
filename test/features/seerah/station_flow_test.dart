@@ -183,22 +183,26 @@ void main() {
     });
 
     testWidgets('survives a narrow phone with the largest fonts, revealed and unfolded', (WidgetTester tester) async {
-      await openStation(tester, badr, size: const Size(360, 740), textScale: 1.3);
+      // العرض ضيق والخط كبير، والارتفاع طويل كي يُبنى الخيار الأول دون تمرير.
+      await openStation(tester, badr, size: const Size(360, 6000), textScale: 1.3);
       expect(tester.takeException(), isNull);
 
-      // الشاشة ضيقة والخط كبير: الخيار الأول قد يقع تحت حافة الشاشة، فيُمرَّر إليه.
-      final Finder scroll = find.descendant(of: key('station-scroll'), matching: find.byType(Scrollable)).first;
-      await tester.scrollUntilVisible(key('station-option-0'), 200, scrollable: scroll);
       await tester.tap(key('station-option-0'));
       await settle(tester);
       expect(tester.takeException(), isNull);
       expect(key('station-continue'), findsOneWidget, reason: 'choosing an option reveals the decision');
 
-      await tester.scrollUntilVisible(key('station-narrative'), 300, scrollable: scroll);
       await tester.tap(find.text('الرواية التاريخية وتفاصيل الأحداث'));
       await settle(tester);
       expect(tester.takeException(), isNull);
       expect(key('station-continue'), findsOneWidget);
+
+      // ثم تقصر الشاشة إلى هاتف صغير والحال كما هي (مكشوف ومفتوح الرواية).
+      tester.view.physicalSize = const Size(360, 740) * 3;
+      await settle(tester);
+      expect(tester.takeException(), isNull);
+      expect(key('station-continue'), findsOneWidget);
+      expect(tester.getRect(key('station-continue')).bottom, lessThanOrEqualTo(740));
     });
   });
 }

@@ -113,12 +113,17 @@ void main() {
             assetJsonSourceProvider.overrideWithValue(AssetJsonSource(DiskBundle())),
             seerahDatasetProvider.overrideWith((Ref ref) async => custom),
           ],
-          child: MaterialApp(
-            theme: AppTheme.light(),
-            locale: const Locale('ar'),
-            supportedLocales: const <Locale>[Locale('ar')],
-            localizationsDelegates: GlobalMaterialLocalizations.delegates,
-            home: SeerahStationScreen(stationId: station.id),
+          // السمة تتبع إعدادات القراءة كما في HadithApp، فيتغير حجم خط الرواية بتغيرها.
+          child: Consumer(
+            builder: (BuildContext context, WidgetRef ref, Widget? _) {
+              return MaterialApp(
+                theme: AppTheme.light(reading: ref.watch(readingPreferencesProvider).readingTheme),
+                locale: const Locale('ar'),
+                supportedLocales: const <Locale>[Locale('ar')],
+                localizationsDelegates: GlobalMaterialLocalizations.delegates,
+                home: SeerahStationScreen(stationId: station.id),
+              );
+            },
           ),
         ),
       );
