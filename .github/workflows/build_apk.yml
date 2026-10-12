@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Unit-test the Android patch and verification scripts
+        run: python3 -m unittest discover -s tools/android -p 'test_*.py' -v
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -26,15 +29,19 @@ jobs:
       - name: Generate Android Scaffolding
         run: flutter create --platforms=android --org app.hadithplatform --project-name hadith_platform .
 
-      - name: Configure Android manifest (internet, local audio cache proxy, TTS)
+      - name: Configure Android manifest, signing and Gradle
         run: python3 tools/android/patch_manifest.py android
 
       - name: Show the effective Android configuration
         run: |
-          echo "--- app/build.gradle(.kts)"; cat android/app/build.gradle* || true
-          echo "--- settings.gradle(.kts)"; cat android/settings.gradle* || true
-          echo "--- gradle-wrapper.properties"; cat android/gradle/wrapper/gradle-wrapper.properties || true
-          echo "--- AndroidManifest.xml"; cat android/app/src/main/AndroidManifest.xml
+          {
+            echo "--- app/build.gradle(.kts)"; cat android/app/build.gradle* || true
+            echo "--- settings.gradle(.kts)"; cat android/settings.gradle* || true
+            echo "--- gradle-wrapper.properties"; cat android/gradle/wrapper/gradle-wrapper.properties || true
+            echo "--- AndroidManifest.xml"; cat android/app/src/main/AndroidManifest.xml
+          } > android-config.txt
+          cat android-config.txt
+          python3 tools/ci/annotate.py notice "Android configuration" --file android-config.txt
 
       - name: Remove dummy widget test
         run: rm -f test/widget_test.dart
@@ -45,8 +52,20 @@ jobs:
       - name: Run Integrity Tests
         run: flutter test || true
 
+      # One universal APK (arm64, arm32 and x86_64 inside) instead of three
+      # per-ABI files: there is no wrong file to pick on a phone.
       - name: Build APK
-        run: flutter build apk --split-per-abi
+        run: flutter build apk --release
+
+      # Fails the build, and so blocks the upload, if the APK cannot be
+      # installed: malformed manifest structure, unsigned, or a broken archive.
+      - name: Verify the APK (manifest structure and signature)
+        if: ${{ !cancelled() }}
+        run: |
+          python3 tools/android/verify_apk.py build/app/outputs/flutter-apk > apk-report.txt 2>&1 && status=0 || status=$?
+          cat apk-report.txt
+          python3 tools/ci/annotate.py $([ $status -eq 0 ] && echo notice || echo error) "APK verification" --file apk-report.txt
+          exit $status
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
