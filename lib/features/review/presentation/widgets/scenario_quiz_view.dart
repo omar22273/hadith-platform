@@ -36,7 +36,7 @@ class ScenarioQuizView extends ConsumerWidget {
     final ScenarioQuizController controller = ref.read(scenarioQuizProvider.notifier);
     if (deck.scenarios.isEmpty) {
       return Text(
-        'لا مواقف في الأوراد المكتملة بعد.',
+        'لا مواقف في بطاقات اليوم.',
         textAlign: TextAlign.center,
         style: text.bodyMedium?.copyWith(color: palette.inkSoft),
       );

@@ -214,7 +214,11 @@ class SessionController extends Notifier<SessionState> {
       return PlacementResult.ignored;
     }
     if (!drill.fits(tileId, placed.length)) {
-      state = state.copyWith(mistakeTileId: tileId, mistakeTick: state.mistakeTick + 1);
+      state = state.copyWith(
+        mistakeTileId: tileId,
+        mistakeTick: state.mistakeTick + 1,
+        mistakeStreak: state.mistakeStreak + 1,
+      );
       return PlacementResult.mismatch;
     }
     final List<int> updated = List<int>.unmodifiable(<int>[...placed, tileId]);

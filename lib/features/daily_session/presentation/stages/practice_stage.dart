@@ -18,6 +18,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/completion_flash.dart';
 import '../../../../core/ui/gated_next_button.dart';
+import '../../../../core/ui/hint_glow.dart';
 import '../../../../core/ui/smooth_surface.dart';
 import '../../../hadith/domain/practice_engine.dart';
 import '../../application/session_controller.dart';
@@ -204,6 +205,9 @@ class _ReconstructionBoard extends StatelessWidget {
     final bool hasNext = index + 1 < engine.drills.length;
     final int limit = openDrillLimit(engine.drills.length, state.completedDrills);
     final TextStyle wordStyle = AppTypography.matnOf(context, color: palette.ink, fontSize: 23, fontWeight: FontWeight.w700);
+    // بعد ثلاث محاولات خاطئة متتالية في المقطع تومض الكلمة الصحيحة التالية
+    // بكهرماني هادئ؛ القفل كما هو: لا تُوضع الكلمة عنه ولا يتفعّل «التالي».
+    final int? hintTile = drill.hintTile(state.placedTiles, state.mistakeStreak);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -338,6 +342,7 @@ class _ReconstructionBoard extends StatelessWidget {
                     label: tile.token.core,
                     style: wordStyle,
                     shakeTick: tile.id == state.mistakeTileId ? state.mistakeTick : 0,
+                    hinted: tile.id == hintTile,
                     onTap: () => _attempt(tile.id),
                   ),
             ],
@@ -381,12 +386,16 @@ class _Tile extends StatelessWidget {
     required this.label,
     required this.style,
     required this.shakeTick,
+    required this.hinted,
     required this.onTap,
   });
 
   final String label;
   final TextStyle style;
   final int shakeTick;
+
+  /// هل هي الكلمة الصحيحة التالية بعد ثلاث محاولات خاطئة متتالية.
+  final bool hinted;
   final VoidCallback onTap;
 
   @override
@@ -400,15 +409,18 @@ class _Tile extends StatelessWidget {
         final double offset = math.sin(t * math.pi * 5) * (1 - t) * 7;
         return Transform.translate(offset: Offset(offset, 0), child: child);
       },
-      child: SmoothSurface(
-        color: palette.surface,
-        borderColor: palette.line,
-        radius: AppShapes.radiusMedium,
-        elevated: true,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-        onTap: onTap,
-        semanticLabel: label,
-        child: Text(label, style: style.copyWith(height: 1.9)),
+      child: HintGlow(
+        active: hinted,
+        child: SmoothSurface(
+          color: palette.surface,
+          borderColor: palette.line,
+          radius: AppShapes.radiusMedium,
+          elevated: true,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+          onTap: onTap,
+          semanticLabel: hinted ? '$label، تلميح: هذه الكلمة التالية' : label,
+          child: Text(label, style: style.copyWith(height: 1.9)),
+        ),
       ),
     );
   }

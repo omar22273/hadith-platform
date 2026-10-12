@@ -1,6 +1,9 @@
 // التبويب الثالث: ميدان المراجعة. تفعيل الاسترجاع وتثبيت الأوراد المكتملة
 // بثلاثة أقسام: بطاقات غريب الألفاظ، وتحدي ترتيب كلمات المتن المشكولة
 // بالسحب والإفلات، واختبارات السيناريوهات التثبيتية.
+//
+// المعروض حصة اليوم فقط (اثنتا عشرة بطاقة كحد أقصى)، ولا يظهر في الميدان
+// رقم تراكمي لما لم يُراجَع.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,10 +71,10 @@ class _Arena extends ConsumerWidget {
                 'ميدان المراجعة',
                 style: AppTypography.heritageTitle(color: palette.ink, fontSize: 34),
               ),
+              // عدد بطاقات اليوم وحده (لا يتجاوز السقف)؛ لا يُعرض أي رقم تراكمي.
               Text(
-                'من ${arabicDigits(deck.hadithCount)} ${deck.hadithCount == 1 ? 'حديث مكتمل' : 'أحاديث مكتملة'} · '
-                '${arabicDigits(deck.flashcards.length)} لفظة · ${arabicDigits(deck.orderChallenges.length)} مقطعاً · '
-                '${arabicDigits(deck.scenarios.length)} موقفاً',
+                'بطاقات اليوم: ${arabicDigits(deck.cardCount)}',
+                key: const ValueKey<String>('review-daily-count'),
                 style: text.bodySmall?.copyWith(color: palette.inkSoft),
               ),
             ],

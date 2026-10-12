@@ -115,6 +115,7 @@ class OrderBoard {
     required this.mistakes,
     required this.lastMismatchTile,
     required this.mismatchTick,
+    this.streak = 0,
   });
 
   /// لوحة جديدة.
@@ -143,6 +144,14 @@ class OrderBoard {
   /// عدّاد يتغير مع كل عدم مطابقة لإعادة تشغيل الاهتزاز.
   final int mismatchTick;
 
+  /// المحاولات غير المطابقة المتتالية؛ تُصفَّر بكلمة صحيحة أو بالتراجع. ببلوغها
+  /// الحد يومض التلميح على الكلمة الصحيحة التالية.
+  final int streak;
+
+  /// بلاطة التلميح بعد ثلاث محاولات خاطئة متتالية، وإلا null. التلميح بصري
+  /// فقط: لا يضع الكلمة ولا يغيّر شروط اكتمال المقطع.
+  int? get hintTileId => completed ? null : drill.hintTile(placedTiles, streak);
+
   /// الموضع التالي.
   int get nextPosition => placedTiles.length;
 
@@ -165,6 +174,7 @@ class OrderBoard {
           mistakes: mistakes + 1,
           lastMismatchTile: tileId,
           mismatchTick: mismatchTick + 1,
+          streak: streak + 1,
         ),
         PlacementOutcome.mismatch,
       );

@@ -227,4 +227,92 @@ void main() {
     expect(container.read(sessionControllerProvider(_id)).stage, SessionStage.reflection);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('three consecutive wrong taps make the next correct word glow amber, and nothing unlocks', (WidgetTester tester) async {
+    _recordHaptics(tester);
+    final ProviderContainer container = await _openSession(tester);
+    final SessionController controller = container.read(sessionControllerProvider(_id).notifier);
+    final PracticeEngine engine = container.read(practiceEngineProvider(_id))!;
+    final ChunkDrill drill = engine.drills.first;
+    controller.goTo(SessionStage.practice);
+    await settle(tester);
+
+    final Finder glow = find.byKey(const ValueKey<String>('hint-glow'));
+    Future<void> tapWrong() async {
+      await tester.tap(_tileFinder(0, _tile(container, drill, container.read(sessionControllerProvider(_id)).placedTiles.length, matching: false)));
+      await settle(tester);
+    }
+
+    // خطآن لا يكفيان.
+    await tapWrong();
+    await tapWrong();
+    expect(container.read(sessionControllerProvider(_id)).mistakeStreak, 2);
+    expect(glow, findsNothing);
+
+    // الثالث يُضيء الكلمة الصحيحة التالية وحدها.
+    await tapWrong();
+    expect(container.read(sessionControllerProvider(_id)).mistakeStreak, 3);
+    final int right = _tile(container, drill, 0, matching: true);
+    expect(glow, findsOneWidget);
+    expect(find.descendant(of: _tileFinder(0, right), matching: glow), findsOneWidget);
+
+    // التلميح بصري فقط: لم توضع كلمة، والقفل كما هو.
+    expect(container.read(sessionControllerProvider(_id)).placedTiles, isEmpty);
+    expect(_button(tester, 'practice-next').onPressed, isNull);
+    expect(_button(tester, 'session-next').onPressed, isNull);
+    expect(controller.advanceFromDrill(), isFalse);
+
+    // خطأ رابع لا يغيّر الكلمة المضيئة.
+    await tapWrong();
+    expect(find.descendant(of: _tileFinder(0, right), matching: glow), findsOneWidget);
+
+    // لمس الكلمة المضيئة يضعها ويطفئ التلميح ويصفّر العدّاد.
+    await tester.tap(_tileFinder(0, right));
+    await settle(tester);
+    expect(container.read(sessionControllerProvider(_id)).placedTiles, <int>[right]);
+    expect(container.read(sessionControllerProvider(_id)).mistakeStreak, 0);
+    expect(glow, findsNothing);
+
+    // «متتالية»: خطآن ثم كلمة صحيحة ثم خطأ لا تُضيء شيئاً.
+    await tapWrong();
+    await tapWrong();
+    await tester.tap(_tileFinder(0, _tile(container, drill, 1, matching: true)));
+    await settle(tester);
+    await tapWrong();
+    expect(container.read(sessionControllerProvider(_id)).mistakeStreak, 1);
+    expect(glow, findsNothing);
+
+    // البدء من جديد والتراجع يصفّران العدّاد.
+    await tapWrong();
+    await tapWrong();
+    expect(glow, findsOneWidget);
+    controller.undoTile();
+    await settle(tester);
+    expect(container.read(sessionControllerProvider(_id)).mistakeStreak, 0);
+    expect(glow, findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a hint never changes what completes a drill, and solving after it works as before', (WidgetTester tester) async {
+    _recordHaptics(tester);
+    final ProviderContainer container = await _openSession(tester);
+    final SessionController controller = container.read(sessionControllerProvider(_id).notifier);
+    final PracticeEngine engine = container.read(practiceEngineProvider(_id))!;
+    final ChunkDrill drill = engine.drills.first;
+    controller.goTo(SessionStage.practice);
+    await settle(tester);
+
+    for (int i = 0; i < hintAfterMistakes; i++) {
+      controller.placeTile(_tile(container, drill, 0, matching: false));
+    }
+    await settle(tester);
+    expect(find.byKey(const ValueKey<String>('hint-glow')), findsOneWidget);
+
+    // الحل الكامل بعد التلميح يعمل كما هو، ويطفئ التلميح.
+    _solveCurrent(container, drill);
+    await settle(tester);
+    expect(controller.currentDrillMatches, isTrue);
+    expect(find.byKey(const ValueKey<String>('hint-glow')), findsNothing);
+    expect(_button(tester, 'practice-next').onPressed, isNotNull);
+  });
 }

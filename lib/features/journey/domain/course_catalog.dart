@@ -77,9 +77,9 @@ abstract final class CourseCatalog {
       order: 2,
     ),
     CurriculumCourse(
-      id: 'sahih_al_bukhari',
-      title: 'صحيح البخاري',
-      author: 'الإمام البخاري',
+      id: 'muttafaq_alayh',
+      title: 'المتفق عليه: نخبة الصحيحين',
+      author: 'الإمامان البخاري ومسلم',
       status: CourseStatus.locked,
       order: 3,
     ),

@@ -56,15 +56,16 @@ void main() {
     expect(find.textContaining('المُعدّ'), findsNothing);
 
     await tester.scrollUntilVisible(
-      find.text('صحيح البخاري'),
+      find.text('المتفق عليه: نخبة الصحيحين'),
       400,
       scrollable: find.byType(Scrollable).first,
     );
-    await tester.ensureVisible(find.text('صحيح البخاري'));
+    await tester.ensureVisible(find.text('المتفق عليه: نخبة الصحيحين'));
     for (final CurriculumCourse course in CourseCatalog.lockedCourses) {
       expect(find.text(course.title), findsOneWidget);
     }
     expect(find.text(CourseCatalog.lockedNote), findsNWidgets(3));
+    expect(find.text('صحيح البخاري'), findsNothing, reason: 'the fourth course is now «المتفق عليه: نخبة الصحيحين»');
   });
 
   testWidgets('hadith search finds a hadith by an unvocalized word', (WidgetTester tester) async {

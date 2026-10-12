@@ -172,4 +172,34 @@ void main() {
     expect(tester.widget<FilledButton>(find.byKey(const ValueKey<String>('order-next-segment'))).onPressed, isNull);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('three consecutive wrong taps light the next correct word, which still locks the next button', (WidgetTester tester) async {
+    final ProviderContainer container = await _openWordOrder(tester);
+    final ReviewDeck deck = await container.read(reviewDeckProvider.future);
+    final ChunkDrill drill = deck.orderChallenges.first.drill;
+    final Finder glow = find.byKey(const ValueKey<String>('hint-glow'));
+    final Finder nextButton = find.byKey(const ValueKey<String>('order-next-segment'));
+    _recordHaptics(tester);
+
+    for (int i = 0; i < hintAfterMistakes - 1; i++) {
+      await tester.tap(_draggable(_tile(container, drill, 0, matching: false)));
+      await settle(tester);
+    }
+    expect(glow, findsNothing);
+
+    await tester.tap(_draggable(_tile(container, drill, 0, matching: false)));
+    await settle(tester);
+    final int right = _tile(container, drill, 0, matching: true);
+    expect(glow, findsOneWidget);
+    expect(find.descendant(of: _draggable(right), matching: glow), findsOneWidget);
+    expect(container.read(orderChallengeProvider).board!.placedTiles, isEmpty, reason: 'a hint never places a word');
+    expect(tester.widget<FilledButton>(nextButton).onPressed, isNull);
+
+    // لمس الكلمة المضيئة يضعها في السطر العلوي مباشرة (بلا سحب) ويطفئ التلميح.
+    await tester.tap(_draggable(right));
+    await settle(tester);
+    expect(container.read(orderChallengeProvider).board!.placedTiles, <int>[right]);
+    expect(glow, findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }

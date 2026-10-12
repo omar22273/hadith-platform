@@ -30,7 +30,7 @@ class FlashcardDeckView extends ConsumerWidget {
     final FlashcardSession session = ref.watch(flashcardSessionProvider);
     final FlashcardSessionController controller = ref.read(flashcardSessionProvider.notifier);
     if (deck.flashcards.isEmpty) {
-      return const _Note(text: 'لا ألفاظ غريبة في الأوراد المكتملة بعد.');
+      return const _Note(text: 'لا ألفاظ غريبة في بطاقات اليوم.');
     }
     final int? current = session.current;
     if (current == null || current >= deck.flashcards.length) {
@@ -44,7 +44,7 @@ class FlashcardDeckView extends ConsumerWidget {
             Icon(Icons.verified_rounded, size: 40, color: palette.emeraldText),
             const SizedBox(height: 8),
             Text(
-              'أتممتَ البطاقات كلها',
+              'أتممتَ بطاقات اليوم',
               textAlign: TextAlign.center,
               style: AppTypography.heritageTitle(color: palette.ink, fontSize: 24),
             ),

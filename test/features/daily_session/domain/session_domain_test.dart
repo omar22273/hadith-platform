@@ -36,6 +36,24 @@ void main() {
       }
     });
 
+    test('the hint is the next correct word, and only after three consecutive mistakes', () {
+      for (final ChunkDrill drill in engine.drills) {
+        final List<int> placed = <int>[];
+        for (int position = 0; position < drill.tokens.length; position++) {
+          expect(drill.hintTile(placed, 0), isNull);
+          expect(drill.hintTile(placed, hintAfterMistakes - 1), isNull, reason: 'two mistakes are not enough');
+          final int? hint = drill.hintTile(placed, hintAfterMistakes);
+          expect(hint, isNotNull);
+          expect(placed, isNot(contains(hint)));
+          expect(drill.fits(hint!, position), isTrue, reason: 'it is a word that belongs at ${position + 1}');
+          expect(drill.hintTile(placed, hintAfterMistakes + 4), hint, reason: 'it stays on the same word');
+          placed.add(hint);
+        }
+        expect(drill.hintTile(placed, hintAfterMistakes), isNull, reason: 'nothing to hint once complete');
+        expect(drill.nextTileAfter(placed), isNull);
+      }
+    });
+
     test('the same seed gives the same shuffle', () {
       final PracticeEngine again = PracticeEngine.fromHadith(first, seed: 20261009);
       for (int d = 0; d < engine.drills.length; d++) {
