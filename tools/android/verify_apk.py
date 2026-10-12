@@ -11,8 +11,9 @@ Exit status 0 only when every APK passes. For each APK it checks:
    expects: <uses-permission> and <queries> directly under <manifest>,
    components only under <application>, exactly one <application>, and the
    launcher activity exported.
-3. The signature verifies (apksigner verify) and at least v2 is present, which
-   is what a device needs to install the file directly.
+3. The signature verifies (apksigner verify), v2 and v3 are both present, and the
+   certificate is the committed stable public key (stable_key.sha256), so every
+   build can be installed over the previous one.
 
 A readable report is printed; CI publishes it as an annotation so it can be read
 from the run page.
@@ -209,6 +210,19 @@ def run(command: list) -> tuple:
     return done.returncode, (done.stdout or '') + (done.stderr or '')
 
 
+PINNED_FINGERPRINT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stable_key.sha256')
+
+
+def pinned_fingerprint():
+    """SHA-256 of the committed stable signing certificate, or None when no file pins it."""
+    try:
+        with open(PINNED_FINGERPRINT_FILE, encoding='utf-8') as handle:
+            value = handle.read().strip().lower()
+    except OSError:
+        return None
+    return value or None
+
+
 def signature_report(apksigner: str, path: str) -> tuple:
     """(problems, info lines) from `apksigner verify`."""
     code, output = run([apksigner, 'verify', '--verbose', '--print-certs', path])
@@ -219,8 +233,27 @@ def signature_report(apksigner: str, path: str) -> tuple:
     schemes = {m.group(1): m.group(2) for m in re.finditer(r'Verified using (v\d(?:\.\d)?) scheme[^:]*:\s*(true|false)', output)}
     if not any(schemes.get(v) == 'true' for v in ('v2', 'v3', 'v3.1', 'v4')):
         problems.append('The APK is not signed with the v2 or newer scheme (found: %s).' % (schemes or 'none'))
+    for scheme in ('v2', 'v3'):
+        if schemes.get(scheme) != 'true':
+            problems.append('The APK is not signed with the %s scheme (found: %s).' % (scheme, schemes or 'none'))
     if 'Number of signers: 0' in output:
         problems.append('The APK has no signer.')
+    certificate = re.search(r'certificate SHA-256 digest:\s*([0-9a-fA-F]{64})', output)
+    if certificate is None:
+        problems.append('The signing certificate fingerprint could not be read.')
+    else:
+        fingerprint = certificate.group(1).lower()
+        info.append('signing certificate sha256: %s' % fingerprint)
+        expected = pinned_fingerprint()
+        if expected is None:
+            info.append('no pinned fingerprint file: certificate stability not checked')
+        elif fingerprint != expected:
+            problems.append(
+                'The APK is signed with certificate %s, not the stable key %s: it could not be installed '
+                'over a build signed with the stable key.' % (fingerprint, expected)
+            )
+        else:
+            info.append('certificate matches the stable public key (builds install over each other)')
     return problems, info
 
 
@@ -248,7 +281,7 @@ def verify_apk(path: str, tools: dict) -> tuple:
         if code != 0:
             failures.append('aapt2 could not parse the APK (exit %d): %s' % (code, badging.strip()[:300]))
         else:
-            for key in ('package:', 'sdkVersion:', 'targetSdkVersion:', 'application-label', 'native-code:', 'launchable-activity:'):
+            for key in ('package:', 'sdkVersion:', 'minSdkVersion:', 'targetSdkVersion:', 'application-label', 'native-code:', 'launchable-activity:'):
                 for line in badging.splitlines():
                     if line.startswith(key):
                         lines.append(line.strip())

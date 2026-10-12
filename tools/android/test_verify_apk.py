@@ -156,5 +156,49 @@ class ZipTest(unittest.TestCase):
             self.assertEqual(va.main(['verify_apk.py', folder]), 1)
 
 
+class SignatureReportTest(unittest.TestCase):
+    PINNED = va.pinned_fingerprint()
+
+    def _report(self, output: str, code: int = 0) -> tuple:
+        original = va.run
+        va.run = lambda command: (code, output)
+        try:
+            return va.signature_report('apksigner', 'app.apk')
+        finally:
+            va.run = original
+
+    @staticmethod
+    def _output(v2: str = 'true', v3: str = 'true', digest: str = '') -> str:
+        return (
+            'Verifies\n'
+            'Verified using v1 scheme (JAR signing): true\n'
+            'Verified using v2 scheme (APK Signature Scheme v2): %s\n'
+            'Verified using v3 scheme (APK Signature Scheme v3): %s\n'
+            'Number of signers: 1\n'
+            'Signer #1 certificate SHA-256 digest: %s\n' % (v2, v3, digest)
+        )
+
+    def test_the_pinned_fingerprint_is_a_sha256_hex_string(self) -> None:
+        self.assertIsNotNone(self.PINNED)
+        self.assertRegex(self.PINNED, r'^[0-9a-f]{64}$')
+
+    def test_a_v1_v2_v3_apk_with_the_stable_certificate_passes(self) -> None:
+        problems, info = self._report(self._output(digest=self.PINNED))
+        self.assertEqual(problems, [])
+        self.assertTrue(any(line.startswith('signing certificate sha256: ') for line in info))
+
+    def test_another_certificate_is_rejected(self) -> None:
+        problems, _ = self._report(self._output(digest='0' * 64))
+        self.assertTrue(any('stable key' in problem for problem in problems))
+
+    def test_missing_v2_or_v3_is_rejected(self) -> None:
+        self.assertTrue(self._report(self._output(v2='false', digest=self.PINNED))[0])
+        self.assertTrue(self._report(self._output(v3='false', digest=self.PINNED))[0])
+
+    def test_apksigner_failure_is_reported(self) -> None:
+        problems, _ = self._report('DOES NOT VERIFY', code=1)
+        self.assertTrue(problems)
+
+
 if __name__ == '__main__':
     unittest.main()

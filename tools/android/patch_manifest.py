@@ -28,7 +28,11 @@ it on every run. This script then adds what the app needs at runtime:
 8. The launcher activity is forced to android:exported="true" (Android 12+
    refuses to install or start a launcher activity without it).
 9. The release build type is signed with the debug signing config, so the APK
-   that CI uploads is always signed and installable directly on a device.
+   that CI uploads is always signed and installable directly on a device. That
+   debug config is pointed at the committed, deliberately public keystore
+   tools/android/hadith-stable.keystore (v1, v2 and v3 signing all enabled), so
+   every build carries the same certificate and installs over the previous one
+   without clearing data.
 10. The patched manifest is parsed as XML and its structure checked
    (validate_manifest): permissions and <queries> directly under <manifest>,
    components only under <application>, exported set where required. The script
@@ -60,6 +64,25 @@ MIN_GRADLE = (8, 14)
 ANDROID_NS = 'http://schemas.android.com/apk/res/android'
 SIGNING_KTS = 'signingConfig = signingConfigs.getByName("debug")'
 SIGNING_GROOVY = 'signingConfig signingConfigs.debug'
+STABLE_KEYSTORE = 'hadith-stable.keystore'
+STABLE_KEY_KTS = '''getByName("debug") {
+            storeFile = rootProject.file("../tools/android/%s")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
+        }''' % STABLE_KEYSTORE
+STABLE_KEY_GROOVY = '''debug {
+            storeFile rootProject.file("../tools/android/%s")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+            enableV1Signing true
+            enableV2Signing true
+            enableV3Signing true
+        }''' % STABLE_KEYSTORE
 
 PERMISSIONS = (
     'android.permission.POST_NOTIFICATIONS',
@@ -301,6 +324,24 @@ def ensure_release_signing(text: str, kotlin_dsl: bool) -> str:
     return text[:start] + indent + line + text[end:]
 
 
+def ensure_stable_signing_key(text: str, kotlin_dsl: bool) -> str:
+    """Point the debug signing config at the committed public keystore (idempotent).
+
+    The key is public on purpose (alias androiddebugkey, password android): it
+    only exists so that every CI build is signed by the same certificate and a
+    new APK can be installed over the previous one. It is not a secret and
+    protects nothing.
+    """
+    if STABLE_KEYSTORE in text:
+        return text
+    entry = STABLE_KEY_KTS if kotlin_dsl else STABLE_KEY_GROOVY
+    existing = _find_block(text, 'signingConfigs')
+    if existing is not None:
+        return text[: existing[0] + 1] + '\n        ' + entry + text[existing[0] + 1:]
+    block = 'signingConfigs {\n        ' + entry + '\n    }'
+    return _insert_after_block_open(text, 'android', block, '    ')
+
+
 def patch_gradle(text: str, kotlin_dsl: bool) -> str:
     """Enable core library desugaring and debug-signed release builds (idempotent)."""
     enabled = 'isCoreLibraryDesugaringEnabled = true' if kotlin_dsl else 'coreLibraryDesugaringEnabled true'
@@ -328,7 +369,7 @@ def patch_gradle(text: str, kotlin_dsl: bool) -> str:
             )
         else:
             text = text.rstrip('\n') + '\n\ndependencies {\n    ' + dependency + '\n}\n'
-    return ensure_release_signing(text, kotlin_dsl)
+    return ensure_stable_signing_key(ensure_release_signing(text, kotlin_dsl), kotlin_dsl)
 
 
 def _version_tuple(value: str) -> tuple:
