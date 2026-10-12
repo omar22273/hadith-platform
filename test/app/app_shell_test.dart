@@ -15,7 +15,7 @@ import 'package:hadith_platform/core/navigation/app_tab.dart';
 import 'package:hadith_platform/core/storage/key_value_store.dart';
 import 'package:hadith_platform/core/time/clock.dart';
 import 'package:hadith_platform/features/adhkar/presentation/adhkar_screen.dart';
-import 'package:hadith_platform/features/adhkar/presentation/widgets/dhikr_card.dart';
+import 'package:hadith_platform/features/adhkar/presentation/widgets/dhikr_page.dart';
 import 'package:hadith_platform/features/admin/presentation/admin_export_screen.dart';
 import 'package:hadith_platform/features/daily_session/presentation/daily_hadith_session_screen.dart';
 import 'package:hadith_platform/features/journey/presentation/widgets/caravan_trail_view.dart';
@@ -97,7 +97,7 @@ void main() {
     await tester.tap(_navLabel('وِرد الأذكار'));
     await _settle(tester);
     expect(find.byType(AdhkarScreen), findsOneWidget);
-    expect(find.byType(DhikrCard), findsOneWidget);
+    expect(find.byType(DhikrPage), findsOneWidget);
 
     await tester.tap(_navLabel('ميدان المراجعة'));
     await _settle(tester);
@@ -105,7 +105,7 @@ void main() {
 
     await tester.tap(_navLabel('الإعدادات'));
     await _settle(tester);
-    final Finder version = find.text('Version 2.2.1');
+    final Finder version = find.text('Version 2.3.0');
     await tester.scrollUntilVisible(
       version,
       300,

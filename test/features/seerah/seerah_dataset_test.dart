@@ -69,6 +69,60 @@ void main() {
     expect(checkSeerahDataset(tampered, sources: sources), isNotEmpty);
   });
 
+  test('only the station whose source states the alternatives carries dilemma options, verbatim', () {
+    for (final SeerahStationModel station in dataset.stations) {
+      final List<String>? options = station.dilemmaOptions;
+      if (station.id != 'badr_hubab_counsel') {
+        expect(options, isNull, reason: station.id);
+        continue;
+      }
+      expect(options, hasLength(2));
+      final List<String> quotes = <String>[
+        for (final SeerahEvidence item in station.evidenceFor(SeerahScene.challenge)) item.source.quote!,
+      ];
+      for (final String option in options!) {
+        expect(quotes.any((String q) => q.contains(option)), isTrue, reason: option);
+      }
+    }
+  });
+
+  group('the dilemma options integrity rule', () {
+    SeerahDataset withOptions(List<String> options) {
+      final SeerahStationModel badr = dataset.stationById('badr_hubab_counsel')!;
+      return SeerahDataset(
+        schemaVersion: dataset.schemaVersion,
+        id: dataset.id,
+        title: dataset.title,
+        stations: <SeerahStationModel>[
+          SeerahStationModel.fromJson(<String, dynamic>{...badr.toJson(), 'dilemma_options': options}),
+        ],
+      );
+    }
+
+    test('an option that is not in the challenge quotes is rejected', () {
+      final List<String> issues = checkSeerahDataset(
+        withOptions(<String>['الرأي والحرب والمكيدة', 'خيار لا أصل له في الشاهد']),
+        sources: sources,
+      );
+      expect(issues, contains(contains('dilemma_options[1]')));
+    });
+
+    test('fewer than two options, or a repeated one, is rejected', () {
+      expect(checkSeerahDataset(withOptions(<String>['الرأي والحرب والمكيدة']), sources: sources), contains(contains('two distinct')));
+      expect(
+        checkSeerahDataset(withOptions(<String>['الرأي والحرب والمكيدة', 'الرأي والحرب والمكيدة']), sources: sources),
+        contains(contains('two distinct')),
+      );
+    });
+
+    test('the schema allows the key but never requires it', () {
+      final JsonMap schema = _load('assets/data/schema/hadith_platform.schema.json');
+      final JsonMap station = asJsonMap(asJsonMap(schema['\$defs'], 'defs')['SeerahStationModel'], 'station');
+      expect(asJsonMap(station['properties'], 'properties').containsKey('dilemma_options'), isTrue);
+      expect(station['required'] as List<dynamic>, isNot(contains('dilemma_options')));
+    });
+  });
+
   test('stations cluster into places and the route follows their order', () {
     final SeerahRoute route = SeerahRoute.build(dataset.chronological);
     final List<String> names = route.clusters.map((SeerahPlaceCluster c) => c.name).toList();

@@ -104,7 +104,8 @@ def from_json_expr(f):
         fn = "readModelOrNull" if p["nullable"] else "readModel"
         return f"{fn}(json, {k}, {p['name']}.fromJson)"
     if p["item"] == "String":
-        return f"readStringList(json, {k})"
+        fn = "readStringListOrNull" if p["nullable"] else "readStringList"
+        return f"{fn}(json, {k})"
     return f"readModelList(json, {k}, {p['item']}.fromJson)"
 
 
@@ -118,7 +119,8 @@ def to_json_expr(f):
     if p["kind"] == "model":
         return f"{f.name}{q}.toJson()"
     if p["item"] == "String":
-        return f"List<String>.of({f.name})"
+        # الحقل العام لا يُرقّى بعد فحص null، فتلزم علامة التأكيد في الاختياري.
+        return f"List<String>.of({f.name}{'!' if p['nullable'] else ''})"
     return f"{f.name}.map(({p['item']} item) => item.toJson()).toList()"
 
 
@@ -215,7 +217,8 @@ def gen_model(m: Model):
     out += "    return Object.hashAll(<Object?>[\n"
     for f in m.fields:
         if is_list(f):
-            out += f"      Object.hashAll({f.name}),\n"
+            fallback = " ?? const <Object?>[]" if parse_type(f.type)["nullable"] else ""
+            out += f"      Object.hashAll({f.name}{fallback}),\n"
         else:
             out += f"      {f.name},\n"
     out += "    ]);\n"

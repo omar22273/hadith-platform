@@ -1,6 +1,6 @@
 // التبويب الثاني: رحلة السيرة النبوية من عام الفيل إلى الرفيق الأعلى.
 // خريطة تاريخية تفاعلية مستقلة عن مسار الأحاديث، وشريط زمن بالحقب الثلاث،
-// وبطاقة المحطة المختارة تفتح مشاهدها الثلاثة.
+// وبطاقة المحطة المختارة بزر واحد «ابدأ المحطة» يفتح شاشتها الموحدة.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,8 +18,7 @@ import '../application/seerah_providers.dart';
 import '../data/models/seerah_station.dart';
 import '../domain/seerah_map.dart';
 import '../domain/seerah_repository.dart';
-import 'seerah_narrative_screen.dart';
-import 'seerah_scene_screen.dart';
+import 'seerah_station_screen.dart';
 import 'widgets/seerah_labels.dart';
 import 'widgets/seerah_map_view.dart';
 import 'widgets/seerah_timeline.dart';
@@ -109,19 +108,11 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
       ref.read(selectedSeerahStationProvider.notifier).select(stations[index].id);
     }
 
-    Future<void> openScenes(SeerahStationModel station) async {
+    Future<void> startStation(SeerahStationModel station) async {
       ref.read(selectedSeerahStationProvider.notifier).select(station.id);
       await Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
-          builder: (BuildContext routeContext) => SeerahSceneScreen(stationId: station.id),
-        ),
-      );
-    }
-
-    Future<void> openNarrative(SeerahStationModel station) async {
-      await Navigator.of(context).push<void>(
-        MaterialPageRoute<void>(
-          builder: (BuildContext routeContext) => SeerahNarrativeScreen(station: station),
+          builder: (BuildContext routeContext) => SeerahStationScreen(stationId: station.id),
         ),
       );
     }
@@ -247,7 +238,7 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
                         style: AppTypography.heritageTitle(color: palette.ink, fontSize: 30),
                       ),
                       Text(
-                        'ثلاثة مشاهد لكل محطة · أتممتَ ${arabicDigits(visitedCount)} من ${arabicDigits(stations.length)}',
+                        'أتممتَ ${arabicDigits(visitedCount)} من ${arabicDigits(stations.length)} محطة',
                         style: text.bodySmall?.copyWith(color: palette.inkSoft),
                       ),
                     ],
@@ -306,8 +297,7 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
               station: selected,
               total: stations.length,
               visited: visited.contains(selected.id),
-              onOpen: () => openScenes(selected),
-              onDetails: () => openNarrative(selected),
+              onStart: () => startStation(selected),
             ),
           ),
         ),
@@ -315,7 +305,7 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
           child: Padding(
             padding: const EdgeInsetsDirectional.fromSTEB(20, 0, 20, 28),
             child: Text(
-              'الشواهد منقولة بنصها من أمهات كتب السيرة والحديث، وصياغة المشاهد مقتصرة عليها وتنتظر المراجعة العلمية. '
+              'الشواهد منقولة بنصها من أمهات كتب السيرة والحديث، وصياغة المحطات مقتصرة عليها. '
               'اليابسة على الخريطة من Natural Earth (ملكية عامة)، والمواضع تقريبية.',
               style: text.labelSmall?.copyWith(color: palette.inkSoft, height: 1.7),
             ),
@@ -331,15 +321,13 @@ class _SelectedStationCard extends StatelessWidget {
     required this.station,
     required this.total,
     required this.visited,
-    required this.onOpen,
-    required this.onDetails,
+    required this.onStart,
   });
 
   final SeerahStationModel station;
   final int total;
   final bool visited;
-  final VoidCallback onOpen;
-  final VoidCallback onDetails;
+  final VoidCallback onStart;
 
   @override
   Widget build(BuildContext context) {
@@ -368,7 +356,7 @@ class _SelectedStationCard extends StatelessWidget {
               if (station.timeLabel != null) SoftChip(label: station.timeLabel!, icon: Icons.schedule_rounded),
               if (visited)
                 SoftChip(
-                  label: 'أتممتَ مشاهدها',
+                  label: 'أتممتَ المحطة',
                   icon: Icons.verified_rounded,
                   background: palette.emeraldSoft,
                   foreground: palette.emeraldText,
@@ -384,18 +372,10 @@ class _SelectedStationCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           WideActionButton(
-            label: visited ? 'أعد مشاهدة المشاهد الثلاثة' : 'ادخل المشاهد الثلاثة',
-            subtitle: 'المشهد الزماني ← المأزق ← القرار النبوي ونتيجته',
-            icon: Icons.theaters_rounded,
-            onPressed: onOpen,
-          ),
-          const SizedBox(height: 8),
-          WideActionButton(
-            label: 'الرواية الكاملة وتفاصيل الحدث',
-            subtitle: 'مطالعة موسعة بخط تراثي يتبع حجم الخط في الإعدادات',
-            icon: Icons.auto_stories_rounded,
-            tone: WideActionTone.secondary,
-            onPressed: onDetails,
+            key: const ValueKey<String>('station-start'),
+            label: 'ابدأ المحطة',
+            icon: Icons.play_arrow_rounded,
+            onPressed: onStart,
           ),
         ],
       ),

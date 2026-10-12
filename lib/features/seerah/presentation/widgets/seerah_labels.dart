@@ -28,18 +28,6 @@ String sceneTitle(SeerahScene scene) {
   }
 }
 
-/// ترتيب المشهد.
-String sceneOrdinal(SeerahScene scene) {
-  switch (scene) {
-    case SeerahScene.setting:
-      return 'المشهد الأول';
-    case SeerahScene.challenge:
-      return 'المشهد الثاني';
-    case SeerahScene.decision:
-      return 'المشهد الثالث';
-  }
-}
-
 /// أيقونة المشهد.
 IconData sceneIcon(SeerahScene scene) {
   switch (scene) {

@@ -136,7 +136,7 @@ class WirdSheet extends ConsumerWidget {
       case WirdNodeStatus.today:
         final WideActionButton touch = WideActionButton(
           label: 'بدء وِرد التثبيت اللمسي',
-          subtitle: 'السياق، والمتن والغريب، والترصيع والتلاشي، والإسقاط السلوكي',
+          subtitle: 'السياق، والمتن والغريب، والترصيع والتلاشي، وأثر الحديث في حياتك',
           icon: Icons.touch_app_rounded,
           tone: preferred == ReceptionMode.touch ? WideActionTone.primary : WideActionTone.secondary,
           onPressed: () => Navigator.of(context).pop(StartTouchSession(hadithId!)),

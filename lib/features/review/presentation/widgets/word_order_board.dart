@@ -1,6 +1,7 @@
-// تحدي ترتيب كلمات المتن المشكولة بالسحب والإفلات: تُسحب الكلمة من البلاطات
-// المبعثرة إلى الموضع التالي في السطر، فتثبت إن طابقته رسماً وضبطاً، وإلا
-// اهتزت بلطف وعادت. ويغني اللمس عن السحب لمن يشق عليه السحب.
+// تحدي ترتيب كلمات المتن المشكولة: تُلمس الكلمة (أو تُسحب) من البلاطات المبعثرة
+// إلى الموضع التالي في السطر العلوي، فتثبت إن طابقته رسماً وضبطاً، وإلا اهتزت
+// بلطف وعادت. فإن أخطأ ثلاث مرات متتالية في المقطع أومضت الكلمة الصحيحة التالية
+// بكهرماني هادئ؛ والقفل على حاله حتى يكتمل المقطع.
 // الكلمات معروضة بضبطها كما في ملف الحديث حرفاً بحرف.
 
 import 'dart:math' as math;
@@ -15,6 +16,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/completion_flash.dart';
 import '../../../../core/ui/gated_next_button.dart';
+import '../../../../core/ui/hint_glow.dart';
 import '../../../hadith/domain/practice_engine.dart';
 import '../../application/review_controllers.dart';
 import '../../domain/review_deck.dart';
@@ -36,7 +38,7 @@ class WordOrderBoard extends ConsumerWidget {
     final OrderBoard? board = state.board;
     if (board == null || deck.orderChallenges.isEmpty) {
       return Text(
-        'لا مقاطع للترتيب في الأوراد المكتملة بعد.',
+        'لا مقاطع للترتيب في بطاقات اليوم.',
         textAlign: TextAlign.center,
         style: text.bodyMedium?.copyWith(color: palette.inkSoft),
       );
@@ -76,7 +78,7 @@ class WordOrderBoard extends ConsumerWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'اسحب كل كلمة إلى الموضع التالي في السطر، أو المسها. الكلمة غير المطابقة تعود بلطف.',
+          'المس الكلمة لتنتقل إلى السطر العلوي بالترتيب، أو اسحبها. الكلمة غير المطابقة تعود بلطف.',
           style: text.bodySmall?.copyWith(color: palette.inkSoft),
         ),
         const SizedBox(height: 12),
@@ -95,7 +97,7 @@ class WordOrderBoard extends ConsumerWidget {
             style: text.labelMedium?.copyWith(color: palette.inkSoft),
           ),
           const SizedBox(height: 8),
-          _Pool(board: board, onTapTile: attempt),
+          _Pool(board: board, hintTile: board.hintTileId, onTapTile: attempt),
           const SizedBox(height: 10),
           Wrap(
             alignment: WrapAlignment.spaceBetween,
@@ -332,9 +334,12 @@ class _Line extends StatelessWidget {
 }
 
 class _Pool extends StatelessWidget {
-  const _Pool({required this.board, required this.onTapTile});
+  const _Pool({required this.board, required this.hintTile, required this.onTapTile});
 
   final OrderBoard board;
+
+  /// الكلمة التي تومض بتلميح كهرماني بعد ثلاث محاولات خاطئة متتالية.
+  final int? hintTile;
   final ValueChanged<int> onTapTile;
 
   @override
@@ -348,7 +353,11 @@ class _Pool extends StatelessWidget {
             _ShakingTile(
               key: ValueKey<String>('tile-${tile.id}'),
               shakeTick: board.lastMismatchTile == tile.id ? board.mismatchTick : 0,
-              child: _DraggableTile(tile: tile, onTap: () => onTapTile(tile.id)),
+              child: _DraggableTile(
+                tile: tile,
+                hinted: tile.id == hintTile,
+                onTap: () => onTapTile(tile.id),
+              ),
             ),
       ],
     );
@@ -356,9 +365,10 @@ class _Pool extends StatelessWidget {
 }
 
 class _DraggableTile extends StatelessWidget {
-  const _DraggableTile({required this.tile, required this.onTap});
+  const _DraggableTile({required this.tile, required this.hinted, required this.onTap});
 
   final PracticeTile tile;
+  final bool hinted;
   final VoidCallback onTap;
 
   @override
@@ -367,7 +377,9 @@ class _DraggableTile extends StatelessWidget {
     final Widget face = _TileFace(label: tile.token.core, palette: palette);
     return Semantics(
       button: true,
-      label: 'الكلمة ${tile.token.core}. المسها لوضعها في الموضع التالي',
+      label: hinted
+          ? 'الكلمة ${tile.token.core}. تلميح: هذه الكلمة التالية. المسها لوضعها'
+          : 'الكلمة ${tile.token.core}. المسها لوضعها في الموضع التالي',
       child: ExcludeSemantics(
         child: Draggable<int>(
           data: tile.id,
@@ -376,7 +388,10 @@ class _DraggableTile extends StatelessWidget {
             child: Transform.scale(scale: 1.08, child: face),
           ),
           childWhenDragging: Opacity(opacity: 0.35, child: face),
-          child: GestureDetector(onTap: onTap, child: face),
+          child: GestureDetector(
+            onTap: onTap,
+            child: HintGlow(active: hinted, radius: AppShapes.radiusSmall, child: face),
+          ),
         ),
       ),
     );

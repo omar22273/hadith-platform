@@ -1,4 +1,4 @@
-// محرك التثبيت الحركي (حساب صرف):
+// محرك رتّب ألفاظ الحديث (حساب صرف):
 // - ترصيع المتن: بعثرة كلمات كل مقطع حفظ ببذرة ثابتة للمستخدم في اليوم.
 // - التلاشي التدريجي: ترتيب إخفاء ثابت يبدأ بالكلمات المفتاحية، فما يُخفى
 //   عند ٢٥٪ يبقى مخفياً عند ٥٠٪ و٨٠٪.
@@ -10,6 +10,10 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/text/stable_hash.dart';
 import '../data/models/models.dart';
+
+/// عدد المحاولات الخاطئة المتتالية في المقطع الواحد الذي يظهر بعده التلميح
+/// البصري على الكلمة الصحيحة التالية. التلميح لا يضع الكلمة ولا يفك القفل.
+const int hintAfterMistakes = 3;
 
 /// بلاطة في تمرين الترصيع.
 @immutable
@@ -46,6 +50,24 @@ class ChunkDrill {
       return false;
     }
     return tiles[tileId].token.core == tokens[position].core;
+  }
+
+  /// البلاطة الصحيحة للموضع التالي بعد [placed]، أو null إن اكتمل المقطع.
+  int? nextTileAfter(List<int> placed) {
+    if (placed.length >= tokens.length) {
+      return null;
+    }
+    for (final PracticeTile tile in tiles) {
+      if (!placed.contains(tile.id) && fits(tile.id, placed.length)) {
+        return tile.id;
+      }
+    }
+    return null;
+  }
+
+  /// بلاطة التلميح: الصحيحة التالية متى بلغت الأخطاء المتتالية الحد، وإلا null.
+  int? hintTile(List<int> placed, int consecutiveMistakes) {
+    return consecutiveMistakes >= hintAfterMistakes ? nextTileAfter(placed) : null;
   }
 }
 

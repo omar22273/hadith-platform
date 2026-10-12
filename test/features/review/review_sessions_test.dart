@@ -61,6 +61,53 @@ void main() {
     });
   });
 
+  group('word order hint', () {
+    test('three consecutive mismatches point at the next correct word; a correct word, undo or reset clears it', () {
+      final ChunkDrill drill = deck.orderChallenges.first.drill;
+      OrderBoard board = OrderBoard.start(drill);
+      int wrongFor(OrderBoard b) =>
+          drill.tiles.firstWhere((PracticeTile t) => !b.isUsed(t.id) && !drill.fits(t.id, b.nextPosition)).id;
+      int rightFor(OrderBoard b) =>
+          drill.tiles.firstWhere((PracticeTile t) => !b.isUsed(t.id) && drill.fits(t.id, b.nextPosition)).id;
+
+      for (int i = 1; i <= hintAfterMistakes; i++) {
+        expect(board.hintTileId, isNull, reason: 'before mistake $i');
+        board = board.place(wrongFor(board)).$1;
+        expect(board.streak, i);
+      }
+      expect(board.hintTileId, rightFor(board));
+      expect(board.placedTiles, isEmpty, reason: 'a hint places nothing');
+      expect(board.completed, isFalse);
+
+      // كلمة صحيحة تُصفّر العدّاد، فلا تلميح حتى ثلاث أخطاء متتالية جديدة.
+      board = board.place(rightFor(board)).$1;
+      expect(board.streak, 0);
+      expect(board.hintTileId, isNull);
+      board = board.place(wrongFor(board)).$1;
+      board = board.place(wrongFor(board)).$1;
+      expect(board.hintTileId, isNull, reason: 'two in a row after a correct word');
+
+      // التراجع يُصفّر العدّاد كذلك.
+      board = board.place(wrongFor(board)).$1;
+      expect(board.hintTileId, isNotNull);
+      board = board.undo();
+      expect(board.streak, 0);
+      expect(board.hintTileId, isNull);
+
+      // مقطع جديد لا يحمل عدّاد غيره.
+      expect(OrderBoard.start(drill).streak, 0);
+    });
+
+    test('a completed segment never shows a hint', () {
+      final ChunkDrill drill = deck.orderChallenges.first.drill;
+      OrderBoard board = OrderBoard.start(drill);
+      while (!board.completed) {
+        board = board.place(drill.tiles.firstWhere((PracticeTile t) => !board.isUsed(t.id) && drill.fits(t.id, board.nextPosition)).id).$1;
+      }
+      expect(board.hintTileId, isNull);
+    });
+  });
+
   group('word order', () {
     test('the right word is placed, a wrong one shakes back, and the chunk completes', () {
       final OrderChallenge challenge = deck.orderChallenges.first;

@@ -37,6 +37,9 @@ abstract final class StorageKeys {
   /// إعدادات تذكير الورد اليومي: التفعيل والوقت.
   static const String reminder = 'settings.reminder.v1';
 
+  /// سجل المراجعة المحلي: حصة اليوم وآخر ظهور لكل بطاقة. لا يدخل النسخة الاحتياطية.
+  static const String reviewLedger = 'review.ledger.v1';
+
   /// كل المفاتيح.
   static const Set<String> all = <String>{
     journeyProgress,
@@ -49,6 +52,7 @@ abstract final class StorageKeys {
     pacing,
     seerahVisited,
     reminder,
+    reviewLedger,
   };
 }
 

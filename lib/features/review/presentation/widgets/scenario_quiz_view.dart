@@ -1,4 +1,4 @@
-// اختبارات السيناريوهات التثبيتية: مواقف الإسقاط السلوكي من الأوراد المكتملة
+// اختبارات السيناريوهات التثبيتية: مواقف أثر الحديث في حياتك من الأوراد المكتملة
 // بخياراتها وتغذيتها الراجعة كما في ملفات الأحاديث، بلا درجات ولا توبيخ؛
 // ويجوز تغيير الاختيار لقراءة تغذية الخيارات الأخرى.
 
@@ -36,7 +36,7 @@ class ScenarioQuizView extends ConsumerWidget {
     final ScenarioQuizController controller = ref.read(scenarioQuizProvider.notifier);
     if (deck.scenarios.isEmpty) {
       return Text(
-        'لا مواقف في الأوراد المكتملة بعد.',
+        'لا مواقف في بطاقات اليوم.',
         textAlign: TextAlign.center,
         style: text.bodyMedium?.copyWith(color: palette.inkSoft),
       );

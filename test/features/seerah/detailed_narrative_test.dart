@@ -1,21 +1,26 @@
 // اختبارات طبقة الرواية المفصلة في السيرة: حقل detailed_narrative اختياري لا
-// يكسر الملفات القائمة ولا يغيّر تحويلها ذهاباً وإياباً، وشاشة «الرواية الكاملة
-// وتفاصيل الحدث» تعرضه فقرات بخط تراثي يتبع حجم الخط في الإعدادات، وتعود إلى
-// المشاهد الموثقة حين يغيب.
+// يكسر الملفات القائمة ولا يغيّر تحويلها ذهاباً وإياباً، وقسم «الرواية التاريخية
+// وتفاصيل الأحداث» القابل للطي في شاشة المحطة يعرضه فقرات بخط تراثي يتبع حجم
+// الخط في الإعدادات، ويعود إلى المشاهد الموثقة حين يغيب.
 
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hadith_platform/core/content/asset_json_source.dart';
 import 'package:hadith_platform/core/content/models/content_models.dart';
 import 'package:hadith_platform/core/json/json_reader.dart';
 import 'package:hadith_platform/core/preferences/reading_preferences.dart';
 import 'package:hadith_platform/core/storage/key_value_store.dart';
+import 'package:hadith_platform/core/theme/app_theme.dart';
+import 'package:hadith_platform/features/seerah/application/seerah_providers.dart';
 import 'package:hadith_platform/features/seerah/data/models/seerah_station.dart';
 import 'package:hadith_platform/features/seerah/domain/seerah_integrity.dart';
-import 'package:hadith_platform/features/seerah/presentation/seerah_narrative_screen.dart';
+import 'package:hadith_platform/features/seerah/presentation/seerah_station_screen.dart';
+import 'package:hadith_platform/features/seerah/presentation/widgets/seerah_narrative_section.dart';
 
 import '../../support/app_harness.dart';
 
@@ -81,33 +86,75 @@ void main() {
     });
   });
 
-  group('the full-narrative screen', () {
+  group('the collapsible narrative section', () {
+    /// يفتح شاشة المحطة وحدها، ومعها ملف سيرة تحلّ فيه [station] محل أصلها.
     Future<ProviderContainer> openScreen(
       WidgetTester tester, {
       required SeerahStationModel station,
       Map<String, String>? stored,
       Size size = const Size(412, 1800),
     }) async {
-      final ProviderContainer container = await pumpApp(tester, size: size, stored: stored);
-      final NavigatorState navigator = tester.state<NavigatorState>(find.byType(Navigator).first);
-      navigator.push<void>(
-        MaterialPageRoute<void>(builder: (BuildContext _) => SeerahNarrativeScreen(station: station)),
+      tester.view.physicalSize = size * 3;
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      final SeerahDataset custom = SeerahDataset(
+        schemaVersion: dataset.schemaVersion,
+        id: dataset.id,
+        title: dataset.title,
+        stations: <SeerahStationModel>[
+          station,
+          ...dataset.stations.where((SeerahStationModel s) => s.id != station.id),
+        ],
+      );
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            keyValueStoreProvider.overrideWithValue(InMemoryKeyValueStore(stored)),
+            assetJsonSourceProvider.overrideWithValue(AssetJsonSource(DiskBundle())),
+            seerahDatasetProvider.overrideWith((Ref ref) async => custom),
+          ],
+          // السمة تتبع إعدادات القراءة كما في HadithApp، فيتغير حجم خط الرواية بتغيرها.
+          child: Consumer(
+            builder: (BuildContext context, WidgetRef ref, Widget? _) {
+              return MaterialApp(
+                theme: AppTheme.light(reading: ref.watch(readingPreferencesProvider).readingTheme),
+                locale: const Locale('ar'),
+                supportedLocales: const <Locale>[Locale('ar')],
+                localizationsDelegates: GlobalMaterialLocalizations.delegates,
+                home: SeerahStationScreen(stationId: station.id),
+              );
+            },
+          ),
+        ),
       );
       await settle(tester);
-      return container;
+      return ProviderScope.containerOf(tester.element(find.byType(SeerahStationScreen)));
     }
 
     /// المحرك الرأسي للصفحة وحده (كل نص قابل للتحديد يحمل Scrollable داخلياً).
     Finder pageScrollable() {
       return find.descendant(
-        of: find.byKey(const ValueKey<String>('narrative-scroll')),
+        of: find.byKey(const ValueKey<String>('station-scroll')),
         matching: find.byType(Scrollable),
       ).first;
+    }
+
+    /// يفتح القسم القابل للطي بلمس رأسه.
+    Future<void> expandSection(WidgetTester tester) async {
+      final Finder tile = find.byKey(const ValueKey<String>('station-narrative'));
+      await tester.scrollUntilVisible(tile, 300, scrollable: pageScrollable());
+      await tester.tap(find.text(seerahNarrativeTitle));
+      await settle(tester);
     }
 
     /// القائمة كسولة: ما بعد الشاشة لا يُبنى، فيُمرَّر إليه أولاً.
     Future<void> scrollTo(WidgetTester tester, Finder target) async {
       await tester.scrollUntilVisible(target, 300, scrollable: pageScrollable());
+    }
+
+    /// داخل القسم القابل للطي وحده، فنص المشهد الموجز يتكرر خارجه.
+    Finder inSection(Finder inner) {
+      return find.descendant(of: find.byKey(const ValueKey<String>('station-narrative')), matching: inner);
     }
 
     double fontSizeOf(WidgetTester tester, String text) {
@@ -116,6 +163,24 @@ void main() {
       );
       return widget.style!.fontSize!;
     }
+
+    testWidgets('is collapsed at first, titled as asked, and shows nothing of the long reading', (WidgetTester tester) async {
+      await openScreen(tester, station: _withNarrative(base, '$_first\n\n$_second'));
+      await scrollTo(tester, find.byKey(const ValueKey<String>('station-narrative')));
+      expect(find.text('الرواية التاريخية وتفاصيل الأحداث'), findsOneWidget);
+      expect(find.byKey(const ValueKey<String>('narrative-body')), findsNothing);
+      expect(find.byKey(const ValueKey<String>('narrative-font-slider')), findsNothing);
+      expect(find.text(_first), findsNothing);
+
+      await tester.tap(find.text(seerahNarrativeTitle));
+      await settle(tester);
+      expect(find.byKey(const ValueKey<String>('narrative-body')), findsOneWidget);
+      expect(find.byKey(const ValueKey<String>('narrative-font-slider')), findsOneWidget);
+
+      await tester.tap(find.text(seerahNarrativeTitle));
+      await settle(tester);
+      expect(find.byKey(const ValueKey<String>('narrative-body')), findsNothing, reason: 'it folds again');
+    });
 
     testWidgets('shows the paragraphs in a heritage font tied to the settings font size', (WidgetTester tester) async {
       final ProviderContainer container = await openScreen(
@@ -129,6 +194,7 @@ void main() {
           }),
         },
       );
+      await expandSection(tester);
 
       expect(find.byKey(const ValueKey<String>('narrative-body')), findsOneWidget);
       expect(find.byKey(const ValueKey<String>('narrative-pending-note')), findsNothing);
@@ -157,7 +223,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('the slider on the screen moves the same preference the settings use, and saves it', (WidgetTester tester) async {
+    testWidgets('the slider moves the same preference the settings use, and saves it', (WidgetTester tester) async {
       final ProviderContainer container = await openScreen(
         tester,
         station: _withNarrative(base, _first),
@@ -170,6 +236,7 @@ void main() {
         },
       );
       expect(container.read(readingPreferencesProvider).matnFontSize, 30);
+      await expandSection(tester);
 
       await tester.drag(find.byKey(const ValueKey<String>('narrative-font-slider')), const Offset(120, 0));
       await settle(tester);
@@ -183,16 +250,15 @@ void main() {
 
     testWidgets('without a narrative the verified scenes stand alone, with a note', (WidgetTester tester) async {
       await openScreen(tester, station: base);
+      await expandSection(tester);
 
       expect(find.byKey(const ValueKey<String>('narrative-pending-note')), findsOneWidget);
       expect(find.byKey(const ValueKey<String>('narrative-body')), findsNothing);
-      expect(find.text('بانتظار المراجعة العلمية'), findsOneWidget);
-      await scrollTo(tester, find.text(base.sceneDescription));
-      expect(find.text(base.sceneDescription), findsOneWidget);
-      await scrollTo(tester, find.text(base.challenge));
-      expect(find.text(base.challenge), findsOneWidget);
-      await scrollTo(tester, find.text(base.propheticDecision));
-      expect(find.text(base.propheticDecision), findsOneWidget);
+      expect(find.textContaining('بانتظار المراجعة'), findsNothing);
+      for (final String text in <String>[base.sceneDescription, base.challenge, base.propheticDecision]) {
+        await scrollTo(tester, inSection(find.text(text)));
+        expect(inSection(find.text(text)), findsOneWidget);
+      }
     });
 
     testWidgets('a long narrative scrolls smoothly down to the last scene on a small phone', (WidgetTester tester) async {
@@ -202,6 +268,7 @@ void main() {
         size: const Size(360, 640),
         station: _withNarrative(base, longNarrative),
       );
+      await expandSection(tester);
 
       await tester.scrollUntilVisible(
         find.byKey(const ValueKey<String>('narrative-scene-decision')),

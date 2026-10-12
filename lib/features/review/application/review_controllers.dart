@@ -1,16 +1,22 @@
-// مزودات ميدان المراجعة: مادة المراجعة من الأوراد المكتملة، ومتحكمات
-// الجلسات الثلاث (البطاقات، والترتيب، والمواقف).
+// مزودات ميدان المراجعة: مادة المراجعة من الأوراد المكتملة مقصورة على حصة
+// اليوم (اثنتي عشرة بطاقة كحد أقصى)، ومتحكمات الجلسات الثلاث (البطاقات،
+// والترتيب، والمواقف).
+
+import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/content/asset_json_source.dart';
 import '../../../core/storage/install_salt.dart';
 import '../../../core/text/stable_hash.dart';
+import '../../../core/time/clock.dart';
 import '../../hadith/application/hadith_providers.dart';
 import '../../hadith/data/models/models.dart';
 import '../../hadith/domain/hadith_bundle.dart';
 import '../../journey/application/journey_progress_controller.dart';
 import '../../journey/domain/journey_progress.dart';
+import '../data/review_ledger_store.dart';
+import '../domain/daily_review.dart';
 import '../domain/review_deck.dart';
 import '../domain/review_sessions.dart';
 
@@ -31,11 +37,20 @@ enum ReviewMode {
   final String label;
 }
 
-/// مادة المراجعة من الأوراد المكتملة بترتيب المنهج.
+/// اليوم التقويمي المحلي للمراجعة. يتغير عند منتصف الليل فقط، فلا يعيد بناء
+/// المادة كلما عاد التطبيق من الخلفية.
+final Provider<int> reviewDayProvider = Provider<int>(
+  (Ref ref) => epochDayOf(ref.watch(nowProvider)),
+);
+
+/// مادة المراجعة من الأوراد المكتملة، مقصورة على حصة اليوم: لا أكثر من
+/// [dailyReviewCap] بطاقة مهما تراكم ما لم يُراجَع. وما زاد على الحصة يتقدم
+/// تلقائياً في حصة الأيام التالية دون أن يُعرض له رقم.
 final FutureProvider<ReviewDeck> reviewDeckProvider = FutureProvider<ReviewDeck>(
   (Ref ref) async {
     final JourneyProgress progress = await ref.watch(journeyProgressProvider.future);
     final CurriculumManifest curriculum = await ref.watch(curriculumProvider.future);
+    final int today = ref.watch(reviewDayProvider);
     final List<HadithBundle> bundles = <HadithBundle>[];
     for (final CurriculumItem item in curriculum.items) {
       if (progress.isCompleted(item.hadithId)) {
@@ -46,7 +61,14 @@ final FutureProvider<ReviewDeck> reviewDeckProvider = FutureProvider<ReviewDeck>
       return ReviewDeck.empty;
     }
     final int seed = stableHash('review|${ref.watch(installSaltProvider)}|${progress.completed.length}');
-    return buildReviewDeck(bundles, seed: seed);
+    final ReviewDeck full = buildReviewDeck(bundles, seed: seed);
+    final ReviewLedgerStore store = ref.read(reviewLedgerStoreProvider);
+    final ReviewLedger saved = store.read();
+    final ReviewLedger planned = planReviewDay(ledger: saved, orderedIds: full.cardIds, today: today);
+    if (planned != saved) {
+      unawaited(store.write(planned));
+    }
+    return full.limitedTo(planned.queue);
   },
   retry: contentNoRetry,
 );

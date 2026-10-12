@@ -92,7 +92,7 @@ class SessionController extends Notifier<SessionState> {
 
   PracticeEngine? get _engine => ref.read(practiceEngineProvider(hadithId));
 
-  /// هل يجوز تجاوز مرحلة التثبيت: لا يُفتح الإسقاط السلوكي قبل ترصيع كل المقاطع.
+  /// هل يجوز تجاوز مرحلة التثبيت: لا يُفتح أثر الحديث في حياتك قبل ترصيع كل المقاطع.
   bool get practiceCleared => isPracticeCleared(_engine, state.completedDrills);
 
   /// الانتقال إلى مرحلة. القفز إلى ما بعد التثبيت مرفوض قبل إتمام الترصيع،
@@ -214,7 +214,11 @@ class SessionController extends Notifier<SessionState> {
       return PlacementResult.ignored;
     }
     if (!drill.fits(tileId, placed.length)) {
-      state = state.copyWith(mistakeTileId: tileId, mistakeTick: state.mistakeTick + 1);
+      state = state.copyWith(
+        mistakeTileId: tileId,
+        mistakeTick: state.mistakeTick + 1,
+        mistakeStreak: state.mistakeStreak + 1,
+      );
       return PlacementResult.mismatch;
     }
     final List<int> updated = List<int>.unmodifiable(<int>[...placed, tileId]);

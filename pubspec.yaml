@@ -1,7 +1,7 @@
 name: hadith_platform
 description: منصة الحديث النبوي والتاريخ الإسلامي التفاعلية - الأربعون النووية ورحلة السيرة وميدان المراجعة.
 publish_to: none
-version: 2.2.1+6
+version: 2.3.0+7
 
 environment:
   sdk: '>=3.3.0 <4.0.0'

@@ -181,3 +181,11 @@ List<String> readStringList(JsonMap json, String key) {
   }
   return List<String>.unmodifiable(result);
 }
+
+/// قائمة نصوص اختيارية؛ الغياب وnull سواء، وإن وُجدت فعناصرها نصوص غير فارغة.
+List<String>? readStringListOrNull(JsonMap json, String key) {
+  if (json[key] == null) {
+    return null;
+  }
+  return readStringList(json, key);
+}

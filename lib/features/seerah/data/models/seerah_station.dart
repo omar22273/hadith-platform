@@ -161,6 +161,7 @@ class SeerahStationModel {
     required this.challenge,
     required this.propheticDecision,
     this.detailedNarrative,
+    this.dilemmaOptions,
     required this.evidence,
     required this.review,
   });
@@ -179,6 +180,7 @@ class SeerahStationModel {
       challenge: readString(json, 'challenge'),
       propheticDecision: readString(json, 'propheticDecision'),
       detailedNarrative: readStringOrNull(json, 'detailed_narrative'),
+      dilemmaOptions: readStringListOrNull(json, 'dilemma_options'),
       evidence: readModelList(json, 'evidence', SeerahEvidence.fromJson),
       review: readModel(json, 'review', ReviewInfo.fromJson),
     );
@@ -216,6 +218,9 @@ class SeerahStationModel {
 
   /// الرواية الكاملة وتفاصيل الحدث، اختيارية: فقرات تفصل بينها سطور فارغة، تُنقل من المصادر الموثقة في evidence وحدها وتخضع لمراجعة review. غيابها يعرض نصوص المشاهد الموثقة كاملة.
   final String? detailedNarrative;
+
+  /// الخيارات المطروحة في مأزق المحطة، اختيارية: كل خيار عبارة منقولة حرفياً من نص أحد شواهد مشهد المأزق، لا صياغة محرر. غيابها يعرض المأزق بنصه ثم زر كشف القرار.
+  final List<String>? dilemmaOptions;
 
   /// النصوص المصدرية الموثقة منقولة بنصها.
   final List<SeerahEvidence> evidence;
@@ -262,6 +267,7 @@ class SeerahStationModel {
       'challenge': challenge,
       'propheticDecision': propheticDecision,
       if (detailedNarrative != null) 'detailed_narrative': detailedNarrative,
+      if (dilemmaOptions != null) 'dilemma_options': List<String>.of(dilemmaOptions!),
       'evidence': evidence.map((SeerahEvidence item) => item.toJson()).toList(),
       'review': review.toJson(),
     };
@@ -284,6 +290,7 @@ class SeerahStationModel {
         challenge == other.challenge &&
         propheticDecision == other.propheticDecision &&
         detailedNarrative == other.detailedNarrative &&
+        listEquals(dilemmaOptions, other.dilemmaOptions) &&
         listEquals(evidence, other.evidence) &&
         review == other.review;
   }
@@ -302,6 +309,7 @@ class SeerahStationModel {
       challenge,
       propheticDecision,
       detailedNarrative,
+      Object.hashAll(dilemmaOptions ?? const <Object?>[]),
       Object.hashAll(evidence),
       review,
     ]);

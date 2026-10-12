@@ -83,7 +83,7 @@ class HadithDailyModel {
   /// المرحلة الثالثة: التثبيت والحفظ التراكمي.
   final PracticeConfig practice;
 
-  /// المرحلة الرابعة: الإسقاط السلوكي.
+  /// المرحلة الرابعة: أثر الحديث في حياتك.
   final Reflection reflection;
 
   /// طبقة طالب العلم: الإسناد ومقارنة الروايات.

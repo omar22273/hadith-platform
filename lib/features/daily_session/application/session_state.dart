@@ -10,11 +10,11 @@ enum SessionStage {
   /// المتن الشريف والبيان اللغوي اللمسي.
   matn('المتن', 'المتن والغريب'),
 
-  /// التثبيت الحركي والحفظ التراكمي.
-  practice('التثبيت', 'التثبيت الحركي'),
+  /// رتّب ألفاظ الحديث والحفظ التراكمي.
+  practice('التثبيت', 'رتّب ألفاظ الحديث'),
 
-  /// الإسقاط السلوكي.
-  reflection('الإسقاط', 'الإسقاط السلوكي');
+  /// أثر الحديث في حياتك.
+  reflection('الإسقاط', 'أثر الحديث في حياتك');
 
   const SessionStage(this.shortLabel, this.title);
 
@@ -47,6 +47,7 @@ class SessionState {
     required this.placedTiles,
     required this.mistakeTileId,
     required this.mistakeTick,
+    required this.mistakeStreak,
     required this.completedDrills,
     required this.vanishingLevel,
     required this.revealed,
@@ -65,6 +66,7 @@ class SessionState {
     placedTiles: <int>[],
     mistakeTileId: null,
     mistakeTick: 0,
+    mistakeStreak: 0,
     completedDrills: <int>{},
     vanishingLevel: 0,
     revealed: <int>{},
@@ -99,6 +101,10 @@ class SessionState {
   /// عداد يتغير مع كل محاولة غير موافقة لإعادة الاهتزاز.
   final int mistakeTick;
 
+  /// المحاولات الخاطئة المتتالية في المقطع الحالي؛ تُصفَّر بكلمة صحيحة أو
+  /// بالتراجع أو البدء من جديد أو تغيير المقطع. ببلوغها الحد يومض التلميح.
+  final int mistakeStreak;
+
   /// المقاطع التي اكتمل ترصيعها.
   final Set<int> completedDrills;
 
@@ -127,6 +133,7 @@ class SessionState {
     int? mistakeTileId,
     bool clearMistake = false,
     int? mistakeTick,
+    int? mistakeStreak,
     Set<int>? completedDrills,
     int? vanishingLevel,
     Set<int>? revealed,
@@ -143,6 +150,7 @@ class SessionState {
       placedTiles: placedTiles ?? this.placedTiles,
       mistakeTileId: clearMistake ? null : (mistakeTileId ?? this.mistakeTileId),
       mistakeTick: mistakeTick ?? this.mistakeTick,
+      mistakeStreak: clearMistake ? 0 : (mistakeStreak ?? this.mistakeStreak),
       completedDrills: completedDrills ?? this.completedDrills,
       vanishingLevel: vanishingLevel ?? this.vanishingLevel,
       revealed: revealed ?? this.revealed,
