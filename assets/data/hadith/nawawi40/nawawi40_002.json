@@ -350,46 +350,88 @@
         "id": "c2",
         "segmentId": "s4",
         "startToken": 12,
-        "endToken": 23,
-        "label": "الإسلام: الصلاة والزكاة والصوم والحج"
+        "endToken": 13,
+        "label": "إقامة الصلاة"
       },
       {
         "id": "c3",
-        "segmentId": "s10",
-        "startToken": 0,
-        "endToken": 11,
-        "label": "الإيمان"
+        "segmentId": "s4",
+        "startToken": 14,
+        "endToken": 15,
+        "label": "إيتاء الزكاة"
       },
       {
         "id": "c4",
-        "segmentId": "s16",
-        "startToken": 0,
-        "endToken": 10,
-        "label": "الإحسان"
+        "segmentId": "s4",
+        "startToken": 16,
+        "endToken": 17,
+        "label": "صوم رمضان"
       },
       {
         "id": "c5",
-        "segmentId": "s20",
-        "startToken": 0,
-        "endToken": 5,
-        "label": "الساعة"
+        "segmentId": "s4",
+        "startToken": 18,
+        "endToken": 23,
+        "label": "حج البيت"
       },
       {
         "id": "c6",
+        "segmentId": "s10",
+        "startToken": 0,
+        "endToken": 7,
+        "label": "الإيمان: أركانه الخمسة"
+      },
+      {
+        "id": "c7",
+        "segmentId": "s10",
+        "startToken": 8,
+        "endToken": 11,
+        "label": "الإيمان بالقدر"
+      },
+      {
+        "id": "c8",
+        "segmentId": "s16",
+        "startToken": 0,
+        "endToken": 4,
+        "label": "الإحسان: المشاهدة"
+      },
+      {
+        "id": "c9",
+        "segmentId": "s16",
+        "startToken": 5,
+        "endToken": 10,
+        "label": "الإحسان: المراقبة"
+      },
+      {
+        "id": "c10",
+        "segmentId": "s20",
+        "startToken": 0,
+        "endToken": 5,
+        "label": "علم الساعة"
+      },
+      {
+        "id": "c11",
         "segmentId": "s24",
         "startToken": 0,
         "endToken": 3,
         "label": "الأمارة الأولى"
       },
       {
-        "id": "c7",
+        "id": "c12",
         "segmentId": "s24",
         "startToken": 4,
         "endToken": 13,
         "label": "الأمارة الثانية"
       },
       {
-        "id": "c8",
+        "id": "c13",
+        "segmentId": "s26",
+        "startToken": 0,
+        "endToken": 4,
+        "label": "سؤال النبي لعمر"
+      },
+      {
+        "id": "c14",
         "segmentId": "s28",
         "startToken": 0,
         "endToken": 4,
@@ -405,7 +447,13 @@
         "c5",
         "c6",
         "c7",
-        "c8"
+        "c8",
+        "c9",
+        "c10",
+        "c11",
+        "c12",
+        "c13",
+        "c14"
       ],
       "shuffleStrategy": "per_user_per_day"
     },

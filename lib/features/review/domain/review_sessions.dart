@@ -1,6 +1,6 @@
 // حالات جلسات المراجعة الثلاث، صرفة وقابلة للاختبار:
 // - البطاقات: طابور يعود فيه ما يحتاج إعادة إلى آخره، بلا عقاب.
-// - الترتيب: تُقبل الكلمة في الموضع التالي إن طابقت رسماً وضبطاً، والخطأ
+// - الترتيب: تُقبل العبارة في الموضع التالي إن طابقت رسماً وضبطاً، والخطأ
 //   يهتز بلطف ويعود.
 // - المواقف: تغذية راجعة لحظية عند الاختيار، ويجوز تغيير الاختيار لقراءة
 //   تغذية الخيارات الأخرى.
@@ -80,12 +80,12 @@ class FlashcardSession {
   }
 }
 
-/// نتيجة وضع كلمة.
+/// نتيجة وضع عبارة.
 enum PlacementOutcome {
   /// وُضعت في موضعها.
   placed,
 
-  /// ليست كلمة الموضع التالي؛ تعود بلطف.
+  /// ليست عبارة الموضع التالي؛ تعود بلطف.
   mismatch,
 
   /// اكتمل المقطع بهذه الكلمة.
@@ -106,7 +106,7 @@ int openChallengeLimit(Set<int> completed, int total) {
   return total <= 0 ? 0 : total - 1;
 }
 
-/// حالة لوحة الترتيب لمقطع واحد.
+/// حالة لوحة الترتيب لتمرين واحد.
 @immutable
 class OrderBoard {
   const OrderBoard({
@@ -129,7 +129,20 @@ class OrderBoard {
     );
   }
 
-  /// المقطع.
+  /// لوحة مرتبة كاملةً بالترتيب الصحيح (لزر «تجاوز للاختبار»).
+  factory OrderBoard.solved(ChunkDrill drill) {
+    OrderBoard board = OrderBoard.start(drill);
+    for (int position = 0; position < drill.tokens.length; position++) {
+      final int? tile = drill.nextTileAfter(board.placedTiles);
+      if (tile == null) {
+        break;
+      }
+      board = board.place(tile).$1;
+    }
+    return board;
+  }
+
+  /// التمرين.
   final ChunkDrill drill;
 
   /// البلاطات الموضوعة بترتيب المواضع.
@@ -189,7 +202,7 @@ class OrderBoard {
     return (next, next.completed ? PlacementOutcome.completed : PlacementOutcome.placed);
   }
 
-  /// يتراجع عن آخر كلمة.
+  /// يتراجع عن آخر عبارة.
   OrderBoard undo() {
     if (placedTiles.isEmpty) {
       return this;

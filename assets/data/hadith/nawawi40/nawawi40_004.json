@@ -170,28 +170,70 @@
         "segmentId": "s2",
         "startToken": 0,
         "endToken": 9,
-        "label": "بدء الخلق: النطفة"
+        "label": "الأربعون الأولى: النطفة"
       },
       {
         "id": "c2",
         "segmentId": "s2",
         "startToken": 10,
-        "endToken": 19,
-        "label": "العلقة والمضغة"
+        "endToken": 14,
+        "label": "العلقة"
       },
       {
         "id": "c3",
         "segmentId": "s2",
-        "startToken": 20,
-        "endToken": 29,
-        "label": "نفخ الروح"
+        "startToken": 15,
+        "endToken": 19,
+        "label": "المضغة"
       },
       {
         "id": "c4",
         "segmentId": "s2",
-        "startToken": 30,
+        "startToken": 20,
+        "endToken": 26,
+        "label": "إرسال الملك ونفخ الروح"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s2",
+        "startToken": 27,
         "endToken": 36,
         "label": "الكلمات الأربع"
+      },
+      {
+        "id": "c6",
+        "segmentId": "s2",
+        "startToken": 37,
+        "endToken": 41,
+        "label": "القسم بالله"
+      },
+      {
+        "id": "c7",
+        "segmentId": "s2",
+        "startToken": 42,
+        "endToken": 54,
+        "label": "عمل أهل الجنة حتى ذراع"
+      },
+      {
+        "id": "c8",
+        "segmentId": "s2",
+        "startToken": 55,
+        "endToken": 62,
+        "label": "سبق الكتاب فدخول النار"
+      },
+      {
+        "id": "c9",
+        "segmentId": "s2",
+        "startToken": 63,
+        "endToken": 75,
+        "label": "عمل أهل النار حتى ذراع"
+      },
+      {
+        "id": "c10",
+        "segmentId": "s2",
+        "startToken": 76,
+        "endToken": 83,
+        "label": "سبق الكتاب فدخول الجنة"
       }
     ],
     "reconstruction": {
@@ -199,7 +241,13 @@
         "c1",
         "c2",
         "c3",
-        "c4"
+        "c4",
+        "c5",
+        "c6",
+        "c7",
+        "c8",
+        "c9",
+        "c10"
       ],
       "shuffleStrategy": "per_user_per_day"
     },

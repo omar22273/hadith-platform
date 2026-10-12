@@ -1,9 +1,11 @@
 // المرحلة الثالثة: رتّب ألفاظ الحديث والحفظ التراكمي.
-// - ترصيع المتن: مصفوفة كلمات مشكولة مبعثرة تُلمس لتستقر في حوض المتن بالترتيب.
-//   الكلمة الموافقة ترتكز بارتكاز ناعم، وغير الموافقة تهتز بلطف وتعود بلا توبيخ.
-//   والتقدم محكوم بالإنجاز: زر «التالي ←» معطّل رمادي حتى تطابق المقطع المتنَ
-//   المشكول تماماً، فيومض الحوض بالأخضر الهادئ ويهتز الجهاز اهتزازة خفيفة ويتفعّل
-//   الزر بارزاً؛ والمقاطع اللاحقة مقفلة حتى إتمام ما قبلها.
+// - ترتيب العبارات: عبارات تامة المعنى من المتن المشكول، مبعثرة، تُلمس لتستقر
+//   في حوض المتن بالترتيب (لمسة واحدة تضع العبارة). العبارة الموافقة ترتكز
+//   بارتكاز ناعم، وغير الموافقة تهتز بلطف وتعود بلا توبيخ. والتقدم محكوم
+//   بالإنجاز: زر «التالي ←» معطّل رمادي حتى يطابق التمرينُ المتنَ المشكول
+//   تماماً، فيومض الحوض بالأخضر الهادئ ويهتز الجهاز اهتزازة خفيفة ويتفعّل الزر
+//   بارزاً؛ والتمارين اللاحقة مقفلة حتى إتمام ما قبلها. وفي وضع التجربة يظهر
+//   زر «تجاوز للاختبار ⚡» الذي يرتّب كل العبارات فوراً.
 // - التلاشي التدريجي: إخفاء ٢٥٪ ثم ٥٠٪ ثم ٨٠٪ من الكلمات واستحضارها ذهنياً.
 
 import 'dart:math' as math;
@@ -20,7 +22,9 @@ import '../../../../core/ui/completion_flash.dart';
 import '../../../../core/ui/gated_next_button.dart';
 import '../../../../core/ui/hint_glow.dart';
 import '../../../../core/ui/smooth_surface.dart';
+import '../../../../core/ui/testing_skip_button.dart';
 import '../../../hadith/domain/practice_engine.dart';
+import '../../../journey/application/pacing_notifier.dart';
 import '../../application/session_controller.dart';
 import '../../application/session_state.dart';
 
@@ -51,6 +55,10 @@ class PracticeStage extends ConsumerWidget {
           total: engine.drills.length,
         ),
         const SizedBox(height: 14),
+        if (state.practiceMode == PracticeMode.reconstruction && ref.watch(testingSkipEnabledProvider)) ...<Widget>[
+          TestingSkipButton(onPressed: () => controller.skipPracticeForTesting()),
+          const SizedBox(height: 12),
+        ],
         if (state.practiceMode == PracticeMode.reconstruction)
           _ReconstructionBoard(engine: engine, state: state, controller: controller)
         else
@@ -73,7 +81,7 @@ class _GateNote extends StatelessWidget {
     final AppPalette palette = AppPalette.of(context);
     final String message = cleared
         ? 'اكتمل ترصيع المتن كله، وانفتحت الخطوة التالية.'
-        : 'أتمّ ترصيع مقاطع المتن لتُفتح الخطوة التالية · ${arabicDigits(done)} من ${arabicDigits(total)}';
+        : 'أتمّ ترتيب عبارات المتن لتُفتح الخطوة التالية · ${arabicDigits(done)} من ${arabicDigits(total)}';
     return Semantics(
       liveRegion: true,
       container: true,
@@ -155,7 +163,7 @@ class _ModeSwitch extends StatelessWidget {
 
     return Row(
       children: <Widget>[
-        tile(PracticeMode.reconstruction, Icons.view_module_rounded, 'ترصيع المتن', 'رتّب الكلمات في الحوض'),
+        tile(PracticeMode.reconstruction, Icons.view_module_rounded, 'ترتيب العبارات', 'رتّب عبارات المتن في الحوض'),
         const SizedBox(width: 10),
         tile(PracticeMode.vanishing, Icons.blur_on_rounded, 'التلاشي التدريجي', 'استحضر ما خُفي'),
       ],
@@ -194,19 +202,19 @@ class _ReconstructionBoard extends StatelessWidget {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
     if (engine.drills.isEmpty) {
-      return Text('لا مقاطع ترصيع لهذا الحديث.', style: text.bodyMedium);
+      return Text('لا عبارات للترتيب في هذا الحديث.', style: text.bodyMedium);
     }
     final int index = state.drillIndex.clamp(0, engine.drills.length - 1).toInt();
     final ChunkDrill drill = engine.drills[index];
     final Set<int> placed = state.placedTiles.toSet();
-    // مطابقة تامة: كل كلمات المقطع موضوعة، وكلٌّ في موضعها الصحيح (لا تُقبل
+    // مطابقة تامة: كل عبارات التمرين موضوعة، وكلٌّ في موضعها الصحيح (لا تُقبل
     // البلاطة في المتحكم إلا إن وافقت موضعها).
     final bool complete = state.placedTiles.length == drill.tokens.length;
     final bool hasNext = index + 1 < engine.drills.length;
     final int limit = openDrillLimit(engine.drills.length, state.completedDrills);
-    final TextStyle wordStyle = AppTypography.matnOf(context, color: palette.ink, fontSize: 23, fontWeight: FontWeight.w700);
-    // بعد ثلاث محاولات خاطئة متتالية في المقطع تومض الكلمة الصحيحة التالية
-    // بكهرماني هادئ؛ القفل كما هو: لا تُوضع الكلمة عنه ولا يتفعّل «التالي».
+    final TextStyle wordStyle = AppTypography.matnOf(context, color: palette.ink, fontSize: 22, fontWeight: FontWeight.w700);
+    // بعد ثلاث محاولات خاطئة متتالية في التمرين تومض العبارة الصحيحة التالية
+    // بكهرماني هادئ؛ القفل كما هو: لا تُوضع العبارة عنه ولا يتفعّل «التالي».
     final int? hintTile = drill.hintTile(state.placedTiles, state.mistakeStreak);
 
     return Column(
@@ -228,8 +236,8 @@ class _ReconstructionBoard extends StatelessWidget {
               return Semantics(
                 enabled: !locked,
                 label: locked
-                    ? 'المقطع ${arabicDigits(i + 1)} مقفل حتى إتمام ما قبله'
-                    : 'المقطع ${arabicDigits(i + 1)}${done ? '، مكتمل' : ''}',
+                    ? 'التمرين ${arabicDigits(i + 1)} مقفل حتى إتمام ما قبله'
+                    : 'التمرين ${arabicDigits(i + 1)}${done ? '، مكتمل' : ''}',
                 child: ExcludeSemantics(
                   child: ChoiceChip(
                     selected: current && !locked,
@@ -264,7 +272,7 @@ class _ReconstructionBoard extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          drill.chunk.label,
+          drill.label,
           style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 8),
@@ -278,28 +286,34 @@ class _ReconstructionBoard extends StatelessWidget {
           idleBorderWidth: 1.4,
           child: SizedBox(
             width: double.infinity,
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 2,
-              crossAxisAlignment: WrapCrossAlignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 for (int position = 0; position < state.placedTiles.length; position++)
-                  TweenAnimationBuilder<double>(
-                    key: ValueKey<String>('placed-$index-$position'),
-                    tween: Tween<double>(begin: 0.6, end: 1),
-                    duration: const Duration(milliseconds: 320),
-                    curve: Curves.easeOutBack,
-                    builder: (BuildContext context, double scale, Widget? child) =>
-                        Transform.scale(scale: scale, child: child),
-                    child: Text(drill.tokens[position].raw, style: wordStyle),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: TweenAnimationBuilder<double>(
+                      key: ValueKey<String>('placed-$index-$position'),
+                      tween: Tween<double>(begin: 0.9, end: 1),
+                      duration: const Duration(milliseconds: 320),
+                      curve: Curves.easeOutBack,
+                      builder: (BuildContext context, double scale, Widget? child) =>
+                          Transform.scale(scale: scale, alignment: AlignmentDirectional.centerStart, child: child),
+                      child: Text(drill.tokens[position].raw, style: wordStyle.copyWith(height: 1.8)),
+                    ),
                   ),
                 if (!complete)
                   Container(
-                    width: 52,
-                    height: 26,
+                    height: 34,
+                    alignment: AlignmentDirectional.centerStart,
+                    padding: const EdgeInsetsDirectional.only(start: 12),
                     decoration: ShapeDecoration(
                       color: palette.amberSoft,
                       shape: AppShapes.rounded(AppShapes.radiusSmall),
+                    ),
+                    child: Text(
+                      'العبارة ${arabicDigits(state.placedTiles.length + 1)}',
+                      style: AppTypography.ui(color: palette.amberText, fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ),
               ],
@@ -321,7 +335,7 @@ class _ReconstructionBoard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'استقر المقطع في موضعه.',
+                      'استقرت العبارات في مواضعها.',
                       style: text.bodyMedium?.copyWith(color: palette.emeraldText, fontWeight: FontWeight.w600),
                     ),
                   ),
@@ -330,20 +344,21 @@ class _ReconstructionBoard extends StatelessWidget {
             ),
           )
         else
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            alignment: WrapAlignment.center,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               for (final PracticeTile tile in drill.tiles)
                 if (!placed.contains(tile.id))
-                  _Tile(
-                    key: ValueKey<String>('tile-$index-${tile.id}'),
-                    label: tile.token.core,
-                    style: wordStyle,
-                    shakeTick: tile.id == state.mistakeTileId ? state.mistakeTick : 0,
-                    hinted: tile.id == hintTile,
-                    onTap: () => _attempt(tile.id),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _Tile(
+                      key: ValueKey<String>('tile-$index-${tile.id}'),
+                      label: tile.token.core,
+                      style: wordStyle,
+                      shakeTick: tile.id == state.mistakeTileId ? state.mistakeTick : 0,
+                      hinted: tile.id == hintTile,
+                      onTap: () => _attempt(tile.id),
+                    ),
                   ),
             ],
           ),
@@ -394,7 +409,7 @@ class _Tile extends StatelessWidget {
   final TextStyle style;
   final int shakeTick;
 
-  /// هل هي الكلمة الصحيحة التالية بعد ثلاث محاولات خاطئة متتالية.
+  /// هل هي العبارة الصحيحة التالية بعد ثلاث محاولات خاطئة متتالية.
   final bool hinted;
   final VoidCallback onTap;
 
@@ -416,10 +431,10 @@ class _Tile extends StatelessWidget {
           borderColor: palette.line,
           radius: AppShapes.radiusMedium,
           elevated: true,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           onTap: onTap,
-          semanticLabel: hinted ? '$label، تلميح: هذه الكلمة التالية' : label,
-          child: Text(label, style: style.copyWith(height: 1.9)),
+          semanticLabel: hinted ? '$label، تلميح: هذه العبارة التالية' : label,
+          child: Text(label, textAlign: TextAlign.start, style: style.copyWith(height: 1.8)),
         ),
       ),
     );

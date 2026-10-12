@@ -161,17 +161,59 @@
       },
       {
         "id": "c3",
+        "segmentId": "s2",
+        "startToken": 15,
+        "endToken": 24,
+        "label": "آية الرسل"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 25,
+        "endToken": 35,
+        "label": "آية المؤمنين"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s3",
+        "startToken": 0,
+        "endToken": 6,
+        "label": "الرجل المسافر الأشعث"
+      },
+      {
+        "id": "c6",
+        "segmentId": "s3",
+        "startToken": 7,
+        "endToken": 10,
+        "label": "يمد يديه إلى السماء"
+      },
+      {
+        "id": "c7",
+        "segmentId": "s4",
+        "startToken": 0,
+        "endToken": 3,
+        "label": "يا رب يا رب"
+      },
+      {
+        "id": "c8",
         "segmentId": "s4",
         "startToken": 4,
         "endToken": 9,
         "label": "حرام المطعم والمشرب والملبس"
       },
       {
-        "id": "c4",
+        "id": "c9",
         "segmentId": "s4",
         "startToken": 10,
+        "endToken": 11,
+        "label": "غذي بالحرام"
+      },
+      {
+        "id": "c10",
+        "segmentId": "s4",
+        "startToken": 12,
         "endToken": 14,
-        "label": "تعجّب من الاستجابة"
+        "label": "فأنى يستجاب له"
       }
     ],
     "reconstruction": {
@@ -179,7 +221,13 @@
         "c1",
         "c2",
         "c3",
-        "c4"
+        "c4",
+        "c5",
+        "c6",
+        "c7",
+        "c8",
+        "c9",
+        "c10"
       ],
       "shuffleStrategy": "per_user_per_day"
     },

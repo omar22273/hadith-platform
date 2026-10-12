@@ -45,7 +45,7 @@ class GharibCard {
   final String citation;
 }
 
-/// تحدي ترتيب كلمات مقطع من المتن المشكول.
+/// تحدي ترتيب عبارات متجاورة من المتن المشكول.
 @immutable
 class OrderChallenge {
   const OrderChallenge({
@@ -60,14 +60,14 @@ class OrderChallenge {
   /// عنوان الحديث.
   final String hadithTitle;
 
-  /// المقطع وبلاطاته المبعثرة.
+  /// العبارات وبلاطاتها المبعثرة.
   final ChunkDrill drill;
 
   /// معرّف البطاقة الثابت.
-  String get id => 'o|$hadithId|${drill.chunk.id}';
+  String get id => 'o|$hadithId|${drill.id}';
 
-  /// عنوان المقطع.
-  String get label => drill.chunk.label;
+  /// عنوان التمرين.
+  String get label => drill.label;
 }
 
 /// موقف تثبيتي.

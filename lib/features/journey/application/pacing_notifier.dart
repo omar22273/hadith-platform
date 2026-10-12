@@ -100,3 +100,9 @@ class PacingNotifier extends AsyncNotifier<PacingState> {
 /// حالة الوتيرة.
 final AsyncNotifierProvider<PacingNotifier, PacingState> pacingProvider =
     AsyncNotifierProvider<PacingNotifier, PacingState>(PacingNotifier.new);
+
+/// هل وضع التجربة مفعّل («تخطي قفل الفجر دائماً» في الإعدادات)؟ يظهر معه زر
+/// «تجاوز للاختبار» في شاشتي ترتيب المتن.
+final Provider<bool> testingSkipEnabledProvider = Provider<bool>(
+  (Ref ref) => ref.watch(pacingProvider).value?.settings.alwaysBypassLock ?? false,
+);

@@ -150,29 +150,37 @@
         "id": "c1",
         "segmentId": "s2",
         "startToken": 0,
-        "endToken": 4,
+        "endToken": 7,
         "label": "إحداث ما ليس من الدين"
       },
       {
         "id": "c2",
         "segmentId": "s2",
-        "startToken": 5,
+        "startToken": 8,
         "endToken": 9,
-        "label": "النتيجة: فهو رد"
+        "label": "الحكم: فهو رد"
       },
       {
         "id": "c3",
         "segmentId": "s4",
         "startToken": 0,
+        "endToken": 5,
+        "label": "رواية مسلم: عمل مخالف"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s4",
+        "startToken": 6,
         "endToken": 7,
-        "label": "رواية مسلم"
+        "label": "الحكم: فهو رد"
       }
     ],
     "reconstruction": {
       "chunkIds": [
         "c1",
         "c2",
-        "c3"
+        "c3",
+        "c4"
       ],
       "shuffleStrategy": "per_user_per_day"
     },

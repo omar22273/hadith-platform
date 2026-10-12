@@ -148,29 +148,50 @@
         "id": "c1",
         "segmentId": "s2",
         "startToken": 0,
-        "endToken": 5,
+        "endToken": 3,
         "label": "الأمر بقتال الناس"
       },
       {
         "id": "c2",
         "segmentId": "s2",
-        "startToken": 6,
+        "startToken": 4,
         "endToken": 14,
-        "label": "الشهادتان"
+        "label": "الغاية: الشهادتان"
       },
       {
         "id": "c3",
         "segmentId": "s2",
         "startToken": 15,
-        "endToken": 18,
-        "label": "الصلاة والزكاة"
+        "endToken": 16,
+        "label": "إقامة الصلاة"
       },
       {
         "id": "c4",
         "segmentId": "s2",
+        "startToken": 17,
+        "endToken": 18,
+        "label": "إيتاء الزكاة"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s2",
         "startToken": 19,
-        "endToken": 28,
+        "endToken": 25,
         "label": "عصمة الدم والمال"
+      },
+      {
+        "id": "c6",
+        "segmentId": "s2",
+        "startToken": 26,
+        "endToken": 28,
+        "label": "إلا بحق الإسلام"
+      },
+      {
+        "id": "c7",
+        "segmentId": "s2",
+        "startToken": 29,
+        "endToken": 32,
+        "label": "الحساب على الله"
       }
     ],
     "reconstruction": {
@@ -178,7 +199,10 @@
         "c1",
         "c2",
         "c3",
-        "c4"
+        "c4",
+        "c5",
+        "c6",
+        "c7"
       ],
       "shuffleStrategy": "per_user_per_day"
     },

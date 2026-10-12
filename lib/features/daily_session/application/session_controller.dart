@@ -11,6 +11,7 @@ import '../../hadith/application/hadith_providers.dart';
 import '../../hadith/data/models/models.dart';
 import '../../hadith/domain/practice_engine.dart';
 import '../../journey/application/journey_controller.dart';
+import '../../journey/application/pacing_notifier.dart';
 import 'session_state.dart';
 
 /// نتيجة وضع بلاطة.
@@ -164,6 +165,24 @@ class SessionController extends Notifier<SessionState> {
     final List<int> restored =
         state.completedDrills.contains(index) ? _solvedPlacement(engine.drills[index]) : const <int>[];
     state = state.copyWith(drillIndex: index, placedTiles: restored, clearMistake: true);
+  }
+
+  /// زر «تجاوز للاختبار ⚡»: يرتّب عبارات كل التمارين ترتيباً صحيحاً ويعرض
+  /// آخرها مكتملاً، فيُفتح «التالي» وما بعد التثبيت فوراً. لا يعمل إلا إذا كان
+  /// وضع التجربة مفعّلاً في الإعدادات. يعيد true إن نُفّذ.
+  bool skipPracticeForTesting() {
+    final PracticeEngine? engine = _engine;
+    if (engine == null || engine.drills.isEmpty || !ref.read(testingSkipEnabledProvider)) {
+      return false;
+    }
+    final int last = engine.drills.length - 1;
+    state = state.copyWith(
+      drillIndex: last,
+      placedTiles: _solvedPlacement(engine.drills[last]),
+      completedDrills: <int>{for (int i = 0; i <= last; i++) i},
+      clearMistake: true,
+    );
+    return true;
   }
 
   /// ترتيب البلاطات الذي يطابق المقطع تماماً (لعرض مقطع مكتمل سابقاً).

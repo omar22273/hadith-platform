@@ -188,28 +188,42 @@
         "segmentId": "s2",
         "startToken": 0,
         "endToken": 2,
-        "label": "المقطع الأول: ميزان الأعمال"
+        "label": "ميزان الأعمال"
       },
       {
         "id": "c2",
         "segmentId": "s2",
         "startToken": 3,
         "endToken": 7,
-        "label": "المقطع الثاني: حظ كل عامل"
+        "label": "حظ كل عامل"
       },
       {
         "id": "c3",
         "segmentId": "s2",
         "startToken": 8,
-        "endToken": 17,
-        "label": "المقطع الثالث: الهجرة إلى الله ورسوله"
+        "endToken": 13,
+        "label": "هجرة إلى الله ورسوله"
       },
       {
         "id": "c4",
         "segmentId": "s2",
+        "startToken": 14,
+        "endToken": 17,
+        "label": "جزاء هذه الهجرة"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s2",
         "startToken": 18,
+        "endToken": 25,
+        "label": "هجرة لدنيا أو امرأة"
+      },
+      {
+        "id": "c6",
+        "segmentId": "s2",
+        "startToken": 26,
         "endToken": 30,
-        "label": "المقطع الرابع: الهجرة لغير ذلك"
+        "label": "جزاء هذه الهجرة"
       }
     ],
     "reconstruction": {
@@ -217,7 +231,9 @@
         "c1",
         "c2",
         "c3",
-        "c4"
+        "c4",
+        "c5",
+        "c6"
       ],
       "shuffleStrategy": "per_user_per_day"
     },
