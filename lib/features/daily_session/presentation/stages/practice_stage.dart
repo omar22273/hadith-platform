@@ -1,6 +1,9 @@
 // المرحلة الثالثة: التثبيت الحركي والحفظ التراكمي.
 // - ترصيع المتن: مصفوفة كلمات مشكولة مبعثرة تُلمس لتستقر في حوض المتن بالترتيب.
 //   الكلمة الموافقة ترتكز بارتكاز ناعم، وغير الموافقة تهتز بلطف وتعود بلا توبيخ.
+//   والتقدم محكوم بالإنجاز: زر «التالي ←» معطّل رمادي حتى تطابق المقطع المتنَ
+//   المشكول تماماً، فيومض الحوض بالأخضر الهادئ ويهتز الجهاز اهتزازة خفيفة ويتفعّل
+//   الزر بارزاً؛ والمقاطع اللاحقة مقفلة حتى إتمام ما قبلها.
 // - التلاشي التدريجي: إخفاء ٢٥٪ ثم ٥٠٪ ثم ٨٠٪ من الكلمات واستحضارها ذهنياً.
 
 import 'dart:math' as math;
@@ -13,6 +16,8 @@ import '../../../../core/text/arabic_digits.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/ui/app_shapes.dart';
+import '../../../../core/ui/completion_flash.dart';
+import '../../../../core/ui/gated_next_button.dart';
 import '../../../../core/ui/smooth_surface.dart';
 import '../../../hadith/domain/practice_engine.dart';
 import '../../application/session_controller.dart';
@@ -30,6 +35,7 @@ class PracticeStage extends ConsumerWidget {
     final PracticeEngine? engine = ref.watch(practiceEngineProvider(hadithId));
     final SessionState state = ref.watch(sessionControllerProvider(hadithId));
     final SessionController controller = ref.read(sessionControllerProvider(hadithId).notifier);
+    final bool cleared = ref.watch(practiceClearedProvider(hadithId));
     if (engine == null) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -37,12 +43,72 @@ class PracticeStage extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       children: <Widget>[
         _ModeSwitch(mode: state.practiceMode, onChanged: controller.setPracticeMode),
+        const SizedBox(height: 10),
+        _GateNote(
+          cleared: cleared,
+          done: state.completedDrills.where((int i) => i >= 0 && i < engine.drills.length).length,
+          total: engine.drills.length,
+        ),
         const SizedBox(height: 14),
         if (state.practiceMode == PracticeMode.reconstruction)
           _ReconstructionBoard(engine: engine, state: state, controller: controller)
         else
           _VanishingBoard(engine: engine, state: state, controller: controller),
       ],
+    );
+  }
+}
+
+/// يبيّن سبب قفل الخطوة التالية وتقدّم الترصيع، ثم يتحول إلى تأكيد هادئ.
+class _GateNote extends StatelessWidget {
+  const _GateNote({required this.cleared, required this.done, required this.total});
+
+  final bool cleared;
+  final int done;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+    final String message = cleared
+        ? 'اكتمل ترصيع المتن كله، وانفتحت الخطوة التالية.'
+        : 'أتمّ ترصيع مقاطع المتن لتُفتح الخطوة التالية · ${arabicDigits(done)} من ${arabicDigits(total)}';
+    return Semantics(
+      liveRegion: true,
+      container: true,
+      child: DecoratedBox(
+        key: const ValueKey<String>('practice-gate-note'),
+        decoration: ShapeDecoration(
+          color: cleared ? palette.emeraldSoft : palette.lockedSoft,
+          shape: AppShapes.rounded(
+            AppShapes.radiusSmall,
+            side: BorderSide(color: cleared ? palette.emerald.withValues(alpha: 0.5) : palette.line),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            children: <Widget>[
+              Icon(
+                cleared ? Icons.lock_open_rounded : Icons.lock_outline_rounded,
+                size: 20,
+                color: cleared ? palette.emeraldText : palette.locked,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  message,
+                  style: AppTypography.ui(
+                    color: cleared ? palette.emeraldText : palette.inkSoft,
+                    fontSize: 13,
+                    height: 1.6,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -107,6 +173,21 @@ class _ReconstructionBoard extends StatelessWidget {
   final SessionState state;
   final SessionController controller;
 
+  void _attempt(int tileId) {
+    final PlacementResult result = controller.placeTile(tileId);
+    switch (result) {
+      case PlacementResult.placed:
+        HapticFeedback.selectionClick();
+      case PlacementResult.completedDrill:
+        // آخر كلمة في موضعها: اهتزازة خفيفة تواكب وميض النجاح الهادئ.
+        HapticFeedback.lightImpact();
+      case PlacementResult.mismatch:
+        HapticFeedback.selectionClick();
+      case PlacementResult.ignored:
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
@@ -117,14 +198,18 @@ class _ReconstructionBoard extends StatelessWidget {
     final int index = state.drillIndex.clamp(0, engine.drills.length - 1).toInt();
     final ChunkDrill drill = engine.drills[index];
     final Set<int> placed = state.placedTiles.toSet();
+    // مطابقة تامة: كل كلمات المقطع موضوعة، وكلٌّ في موضعها الصحيح (لا تُقبل
+    // البلاطة في المتحكم إلا إن وافقت موضعها).
     final bool complete = state.placedTiles.length == drill.tokens.length;
+    final bool hasNext = index + 1 < engine.drills.length;
+    final int limit = openDrillLimit(engine.drills.length, state.completedDrills);
     final TextStyle wordStyle = AppTypography.matnOf(context, color: palette.ink, fontSize: 23, fontWeight: FontWeight.w700);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         SizedBox(
-          height: 44,
+          height: 48,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: engine.drills.length,
@@ -132,16 +217,43 @@ class _ReconstructionBoard extends StatelessWidget {
             itemBuilder: (BuildContext context, int i) {
               final bool current = i == index;
               final bool done = state.completedDrills.contains(i);
-              return ChoiceChip(
-                selected: current,
-                onSelected: (bool _) => controller.selectDrill(i),
-                avatar: done ? Icon(Icons.check_rounded, size: 16, color: palette.emeraldText) : null,
-                label: Text(arabicDigits(i + 1)),
-                shape: AppShapes.rounded(AppShapes.radiusSmall),
-                selectedColor: palette.amberSoft,
-                backgroundColor: palette.surface,
-                side: BorderSide(color: current ? palette.amber : palette.line),
-                showCheckmark: false,
+              final bool locked = i > limit;
+              final Color foreground = locked
+                  ? palette.locked
+                  : (done ? palette.emeraldText : (current ? palette.amberText : palette.inkSoft));
+              return Semantics(
+                enabled: !locked,
+                label: locked
+                    ? 'المقطع ${arabicDigits(i + 1)} مقفل حتى إتمام ما قبله'
+                    : 'المقطع ${arabicDigits(i + 1)}${done ? '، مكتمل' : ''}',
+                child: ExcludeSemantics(
+                  child: ChoiceChip(
+                    selected: current && !locked,
+                    // null يعطّل الرقاقة فلا تُنقر وتظهر رمادية.
+                    onSelected: locked ? null : (bool _) => controller.selectDrill(i),
+                    avatar: Icon(
+                      locked ? Icons.lock_rounded : (done ? Icons.check_circle_rounded : Icons.edit_note_rounded),
+                      size: 18,
+                      color: foreground,
+                    ),
+                    label: Text(arabicDigits(i + 1)),
+                    shape: AppShapes.rounded(AppShapes.radiusSmall),
+                    selectedColor: palette.amberSoft,
+                    backgroundColor: locked ? palette.lockedSoft : (done ? palette.emeraldSoft : palette.surface),
+                    disabledColor: palette.lockedSoft,
+                    side: BorderSide(
+                      color: locked
+                          ? palette.line
+                          : (current ? palette.amber : (done ? palette.emerald : palette.line)),
+                    ),
+                    showCheckmark: false,
+                    labelStyle: AppTypography.ui(
+                      color: foreground,
+                      fontSize: 13,
+                      fontWeight: current ? FontWeight.w700 : FontWeight.w400,
+                    ),
+                  ),
+                ),
               );
             },
           ),
@@ -152,66 +264,65 @@ class _ReconstructionBoard extends StatelessWidget {
           style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 8),
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 260),
-          constraints: const BoxConstraints(minHeight: 96),
-          decoration: ShapeDecoration(
-            color: complete ? palette.emeraldSoft : palette.surfaceMuted,
-            shape: AppShapes.rounded(
-              AppShapes.radiusLarge,
-              side: BorderSide(
-                color: complete ? palette.emerald : palette.amber.withValues(alpha: 0.5),
-                width: 1.4,
-              ),
-            ),
-          ),
+        CompletionFlash(
+          key: ValueKey<String>('practice-flash-$index'),
+          completed: complete,
+          minHeight: 68,
           padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 2,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: <Widget>[
-              for (int position = 0; position < state.placedTiles.length; position++)
-                TweenAnimationBuilder<double>(
-                  key: ValueKey<String>('placed-$index-$position'),
-                  tween: Tween<double>(begin: 0.6, end: 1),
-                  duration: const Duration(milliseconds: 320),
-                  curve: Curves.easeOutBack,
-                  builder: (BuildContext context, double scale, Widget? child) =>
-                      Transform.scale(scale: scale, child: child),
-                  child: Text(drill.tokens[position].raw, style: wordStyle),
-                ),
-              if (!complete)
-                Container(
-                  width: 52,
-                  height: 26,
-                  decoration: ShapeDecoration(
-                    color: palette.amberSoft,
-                    shape: AppShapes.rounded(AppShapes.radiusSmall),
+          idleColor: palette.surfaceMuted,
+          idleBorderColor: palette.amber.withValues(alpha: 0.5),
+          idleBorderWidth: 1.4,
+          child: SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 2,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: <Widget>[
+                for (int position = 0; position < state.placedTiles.length; position++)
+                  TweenAnimationBuilder<double>(
+                    key: ValueKey<String>('placed-$index-$position'),
+                    tween: Tween<double>(begin: 0.6, end: 1),
+                    duration: const Duration(milliseconds: 320),
+                    curve: Curves.easeOutBack,
+                    builder: (BuildContext context, double scale, Widget? child) =>
+                        Transform.scale(scale: scale, child: child),
+                    child: Text(drill.tokens[position].raw, style: wordStyle),
                   ),
-                ),
-            ],
+                if (!complete)
+                  Container(
+                    width: 52,
+                    height: 26,
+                    decoration: ShapeDecoration(
+                      color: palette.amberSoft,
+                      shape: AppShapes.rounded(AppShapes.radiusSmall),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 12),
         if (complete)
-          SmoothSurface(
-            color: palette.emeraldSoft,
-            radius: AppShapes.radiusMedium,
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.verified_outlined, color: palette.emeraldText),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'استقر المقطع في موضعه.',
-                    style: text.bodyMedium?.copyWith(color: palette.emeraldText, fontWeight: FontWeight.w600),
+          Semantics(
+            liveRegion: true,
+            container: true,
+            child: SmoothSurface(
+              color: palette.emeraldSoft,
+              radius: AppShapes.radiusMedium,
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.verified_outlined, color: palette.emeraldText),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'استقر المقطع في موضعه.',
+                      style: text.bodyMedium?.copyWith(color: palette.emeraldText, fontWeight: FontWeight.w600),
+                    ),
                   ),
-                ),
-                if (index + 1 < engine.drills.length)
-                  TextButton(onPressed: controller.nextDrill, child: const Text('المقطع التالي')),
-              ],
+                ],
+              ),
             ),
           )
         else
@@ -227,19 +338,7 @@ class _ReconstructionBoard extends StatelessWidget {
                     label: tile.token.core,
                     style: wordStyle,
                     shakeTick: tile.id == state.mistakeTileId ? state.mistakeTick : 0,
-                    onTap: () {
-                      final PlacementResult result = controller.placeTile(tile.id);
-                      switch (result) {
-                        case PlacementResult.placed:
-                          HapticFeedback.selectionClick();
-                        case PlacementResult.completedDrill:
-                          HapticFeedback.mediumImpact();
-                        case PlacementResult.mismatch:
-                          HapticFeedback.lightImpact();
-                        case PlacementResult.ignored:
-                          break;
-                      }
-                    },
+                    onTap: () => _attempt(tile.id),
                   ),
             ],
           ),
@@ -259,6 +358,17 @@ class _ReconstructionBoard extends StatelessWidget {
               label: const Text('من البداية'),
             ),
           ],
+        ),
+        const SizedBox(height: 8),
+        // معطّل رمادي ما لم يطابق المقطع المتن تماماً، ثم عريض بارز. والمتحكم
+        // يعيد التحقق من المطابقة قبل أن ينقل.
+        GatedNextButton(
+          buttonKey: const ValueKey<String>('practice-next'),
+          label: hasNext ? 'المقطع التالي' : 'إتمام التثبيت والمتابعة',
+          enabled: complete,
+          onPressed: () {
+            controller.advanceFromDrill();
+          },
         ),
       ],
     );
