@@ -27,8 +27,12 @@ jobs:
           find android -type f -not -path '*/build/*' -not -path '*/.gradle/*' | sort
           cat android/.gitignore
           cat android/gradle.properties
-      - run: tar czf android-scaffold.tgz android --exclude=android/.gradle --exclude=android/build --exclude=android/app/build
       - uses: actions/upload-artifact@v4
         with:
           name: android-scaffold
-          path: android-scaffold.tgz
+          include-hidden-files: true
+          path: |
+            android
+            !android/.gradle
+            !android/build
+            !android/app/build
