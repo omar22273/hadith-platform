@@ -89,6 +89,7 @@ class DhikrItem {
     required this.title,
     required this.text,
     required this.count,
+    this.virtue,
     required this.evidence,
     required this.review,
   });
@@ -101,6 +102,7 @@ class DhikrItem {
       title: readString(json, 'title'),
       text: readString(json, 'text'),
       count: readInt(json, 'count'),
+      virtue: readStringOrNull(json, 'virtue'),
       evidence: readModelList(json, 'evidence', SourceRef.fromJson),
       review: readModel(json, 'review', ReviewInfo.fromJson),
     );
@@ -121,6 +123,9 @@ class DhikrItem {
   /// العدد المسنون الثابت في الحديث؛ بلوغه يقفل الذكر.
   final int count;
 
+  /// الفضل النبوي: عبارة منقولة حرفياً، وهي جزء من نص أحد الشواهد؛ تُعرض في ورقة معلومات الذكر وتغيب إن لم يكن للذكر فضل منصوص في شواهده.
+  final String? virtue;
+
   /// الشواهد: نص الحديث حرفياً من المصدر المعتمد مع موضعه.
   final List<SourceRef> evidence;
 
@@ -135,6 +140,7 @@ class DhikrItem {
       'title': title,
       'text': text,
       'count': count,
+      if (virtue != null) 'virtue': virtue,
       'evidence': evidence.map((SourceRef item) => item.toJson()).toList(),
       'review': review.toJson(),
     };
@@ -151,6 +157,7 @@ class DhikrItem {
         title == other.title &&
         text == other.text &&
         count == other.count &&
+        virtue == other.virtue &&
         listEquals(evidence, other.evidence) &&
         review == other.review;
   }
@@ -163,6 +170,7 @@ class DhikrItem {
       title,
       text,
       count,
+      virtue,
       Object.hashAll(evidence),
       review,
     ]);

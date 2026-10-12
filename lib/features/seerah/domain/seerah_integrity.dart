@@ -1,6 +1,7 @@
 // فحص سلامة محطات السيرة قبل عرضها: معرّفات وترتيب فريدان، ونصوص مشاهد
 // غير فارغة، وشاهد منقول بنصه لكل مشهد من المشاهد الثلاثة، ومصادر معروفة،
-// والرواية المفصلة (detailed_narrative) إن وُجدت ليست بياضاً.
+// والرواية المفصلة (detailed_narrative) إن وُجدت ليست بياضاً، وخيارات المأزق
+// (dilemma_options) إن وُجدت متمايزة وكل منها جزء حرفي من شاهد مشهد المأزق.
 
 import '../../../core/content/models/source_catalog.dart';
 import '../../../core/content/models/source_ref.dart';
@@ -34,6 +35,23 @@ List<String> checkSeerahDataset(SeerahDataset dataset, {SourceCatalog? sources})
     final String? narrative = station.detailedNarrative;
     if (narrative != null && narrative.trim().isEmpty) {
       issues.add('$path.detailed_narrative: must not be blank when present.');
+    }
+    final List<String>? options = station.dilemmaOptions;
+    if (options != null) {
+      final List<String> challengeQuotes = <String>[
+        for (final SeerahEvidence item in station.evidenceFor(SeerahScene.challenge)) item.source.quote ?? '',
+      ];
+      if (options.length < 2 || options.toSet().length != options.length) {
+        issues.add('$path.dilemma_options: needs at least two distinct options.');
+      }
+      for (int o = 0; o < options.length; o++) {
+        final String option = options[o].trim();
+        if (option.isEmpty || !challengeQuotes.any((String quote) => quote.contains(option))) {
+          issues.add(
+            '$path.dilemma_options[$o]: The option must be a verbatim part of a challenge-scene quote.',
+          );
+        }
+      }
     }
     for (final SeerahScene scene in SeerahScene.values) {
       if (station.evidenceFor(scene).isEmpty) {

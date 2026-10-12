@@ -1,7 +1,8 @@
-// اختبارات وِرد الأذكار: سلامة بيانات البذرة وأن نصها جزء حرفي من شواهدها،
-// ومتحكم العدّ والقفل النهائي والانتقال التلقائي، وبطاقة السبحة: ضغطة بأي
-// موضع باهتزاز خفيف، واهتزاز مزدوج وهالة خضراء وقفل عند بلوغ العدد المسنون،
-// ثم شارة إتمام الوِرد.
+// اختبارات وِرد الأذكار: سلامة بيانات البذرة وأن نصها وفضلها جزء حرفي من
+// شواهدها، ومتحكم العدّ والقفل النهائي والانتقال التلقائي، والشاشة الهادئة:
+// رأس بلا شرائح وشريط تقدم رفيع، وسحب أفقي بين الأذكار، ونصف سفلي يحتسب أي
+// نقرة باهتزاز خفيف، واهتزاز مزدوج وهالة خضراء وقفل وانتقال تلقائي عند بلوغ
+// العدد المسنون، وورقة التخريج والفضل والمصدر، ثم شارة إتمام الوِرد.
 
 import 'dart:convert';
 import 'dart:io';
@@ -42,10 +43,32 @@ Finder _navLabel(String label) {
   return find.descendant(of: find.byType(AppBottomBar), matching: find.text(label));
 }
 
-/// سطر التقدم تحت العنوان.
+/// موضع الذكر في الرأس، مثل «١ / ٢».
 String _progress(WidgetTester tester) {
   return tester.widget<Text>(find.byKey(const ValueKey<String>('adhkar-progress'))).data!;
 }
+
+/// عنوان الذكر الحالي في الرأس.
+String _title(WidgetTester tester) {
+  return tester.widget<Text>(find.byKey(const ValueKey<String>('adhkar-title'))).data!;
+}
+
+/// متحكم صفحات الأذكار.
+PageController _pages(WidgetTester tester) {
+  return tester.widget<PageView>(find.byKey(const ValueKey<String>('adhkar-pages'))).controller;
+}
+
+/// يسحب الصفحة أفقياً. الواجهة من اليمين إلى اليسار: صفحة الذكر التالي عن
+/// يسار الحالية، فيكون السحب إليها بإصبع يتحرك نحو اليمين.
+Future<void> _swipe(WidgetTester tester, {required bool toNext}) async {
+  await tester.drag(find.byKey(const ValueKey<String>('adhkar-pages')), Offset(toNext ? 320 : -320, 0));
+  await settle(tester);
+}
+
+const String _firstId = 'sayyid_al_istighfar';
+const String _secondId = 'tasbih_dubur_al_salah';
+
+Finder _zone(String id) => find.byKey(ValueKey<String>('dhikr-tap-zone-$id'));
 
 /// يفتح تبويب الأذكار ويعيد الحاوية.
 Future<ProviderContainer> _openAdhkar(WidgetTester tester, {Size size = const Size(412, 2200)}) async {
@@ -55,16 +78,6 @@ Future<ProviderContainer> _openAdhkar(WidgetTester tester, {Size size = const Si
   await container.read(adhkarCatalogProvider.future);
   await settle(tester);
   return container;
-}
-
-/// يختار الذكر ذا الترتيب [index] من الرقائق، فيُظهر الرقاقة أولاً إن كانت
-/// خلف الحافة (الخطوط الاختبارية أعرض من الحقيقية).
-Future<void> _selectDhikr(WidgetTester tester, int index) async {
-  final Finder pill = find.byKey(ValueKey<String>('adhkar-pill-$index'));
-  await tester.ensureVisible(pill);
-  await tester.pump();
-  await tester.tap(pill);
-  await settle(tester);
 }
 
 void main() {
@@ -97,6 +110,30 @@ void main() {
         // نص كامل التشكيل: لا كلمة عربية بلا حركة سوى الحروف المفردة.
         expect(RegExp('[ً-ْ]').hasMatch(item.text), isTrue, reason: item.id);
       }
+    });
+
+    test('every dhikr carries a virtue that is a verbatim part of one of its evidence quotes', () {
+      for (final DhikrItem item in catalog.items) {
+        final String? virtue = item.virtue;
+        expect(virtue, isNotNull, reason: item.id);
+        expect(virtue!.trim(), isNotEmpty, reason: item.id);
+        expect(item.evidence.any((SourceRef r) => (r.quote ?? '').contains(virtue)), isTrue, reason: item.id);
+        expect(RegExp('[ً-ْ]').hasMatch(virtue), isTrue, reason: 'vocalized: ${item.id}');
+      }
+    });
+
+    test('a virtue that is blank or not in the quotes is rejected', () {
+      final DhikrItem first = catalog.items.first;
+      AdhkarCatalog withVirtue(String virtue) => AdhkarCatalog(
+            schemaVersion: catalog.schemaVersion,
+            id: catalog.id,
+            title: catalog.title,
+            items: <DhikrItem>[
+              DhikrItem.fromJson(<String, dynamic>{...first.toJson(), 'virtue': virtue}),
+            ],
+          );
+      expect(checkAdhkarCatalog(withVirtue('فضل لا أصل له في الشاهد'), sources: sources), contains(contains('virtue')));
+      expect(checkAdhkarCatalog(withVirtue('   '), sources: sources), contains(contains('virtue')));
     });
 
     test('a dhikr whose text is not in its quotes, or a duplicate id, or a bad count, is rejected', () {
@@ -186,24 +223,73 @@ void main() {
     });
   });
 
-  group('the dhikr card', () {
-    testWidgets('a tap anywhere counts one with a light haptic, and the counter rises', (WidgetTester tester) async {
+  group('the adhkar screen', () {
+    final List<DhikrItem> items = catalog.itemsInOrder;
+
+    testWidgets('the header is only the current title with a thin position bar, and no chips', (WidgetTester tester) async {
+      await _openAdhkar(tester);
+      expect(find.byType(ChoiceChip), findsNothing);
+      expect(find.byType(FilterChip), findsNothing);
+      expect(find.byType(ActionChip), findsNothing);
+      expect(find.byKey(const ValueKey<String>('adhkar-pill-0')), findsNothing);
+
+      expect(_title(tester), items.first.title);
+      expect(_progress(tester), '١ / ٢');
+      final LinearProgressIndicator bar =
+          tester.widget<LinearProgressIndicator>(find.byKey(const ValueKey<String>('adhkar-progress-bar')));
+      expect(bar.value, 0.5);
+      expect(bar.minHeight, lessThanOrEqualTo(4), reason: 'a very thin bar');
+      expect(find.byIcon(Icons.info_outline), findsOneWidget);
+      // لا تخريج ولا مصدر على الشاشة: كلها في ورقة المعلومات.
+      expect(find.textContaining(items.first.evidence.first.quote!), findsNothing);
+      expect(find.text('التخريج'), findsNothing);
+      expect(find.text('المصدر'), findsNothing);
+    });
+
+    testWidgets('the dhikr text is large, vocalized and centered', (WidgetTester tester) async {
+      await _openAdhkar(tester);
+      final Finder text = find.byKey(const ValueKey<String>('dhikr-text-$_firstId'));
+      expect(tester.widget<Text>(text).data, items.first.text);
+      expect(tester.widget<Text>(text).style!.fontSize, greaterThanOrEqualTo(30));
+      expect(tester.widget<Text>(text).textAlign, TextAlign.center);
+      expect(find.byKey(const ValueKey<String>('dhikr-text-scroll-$_firstId')), findsOneWidget);
+      final Rect page = tester.getRect(find.byKey(const ValueKey<String>('adhkar-pages')));
+      expect(tester.getCenter(text).dx, closeTo(page.center.dx, 1));
+    });
+
+    testWidgets('swiping the whole page moves between adhkar and updates the header', (WidgetTester tester) async {
+      final ProviderContainer container = await _openAdhkar(tester);
+      await _swipe(tester, toNext: true);
+      expect(container.read(adhkarWirdProvider).index, 1);
+      expect(_title(tester), items[1].title);
+      expect(_progress(tester), '٢ / ٢');
+      expect(tester.widget<LinearProgressIndicator>(find.byKey(const ValueKey<String>('adhkar-progress-bar'))).value, 1.0);
+
+      await _swipe(tester, toNext: false);
+      expect(container.read(adhkarWirdProvider).index, 0);
+      expect(_title(tester), items.first.title);
+      expect(_progress(tester), '١ / ٢');
+    });
+
+    testWidgets('the lower half is one tap zone: a tap anywhere in it counts with a light haptic', (WidgetTester tester) async {
       final List<String> haptics = _recordHaptics(tester);
       final ProviderContainer container = await _openAdhkar(tester);
-      // انتقل إلى الذكر ذي الثلاث والثلاثين.
-      await _selectDhikr(tester, 1);
+      await _swipe(tester, toNext: true);
       expect(container.read(adhkarWirdProvider).index, 1);
 
-      final Finder card = find.byKey(const ValueKey<String>('dhikr-card-tap'));
-      expect(find.byKey(const ValueKey<String>('dhikr-counter')), findsOneWidget);
-      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('dhikr-counter'))).data, '٠');
+      final Rect pages = tester.getRect(find.byKey(const ValueKey<String>('adhkar-pages')));
+      final Rect zone = tester.getRect(_zone(_secondId));
+      expect(zone.top, greaterThanOrEqualTo(pages.center.dy - 0.5), reason: 'it starts at the middle of the page');
+      expect(zone.bottom, lessThanOrEqualTo(pages.bottom + 0.5));
+      expect(zone.width, greaterThan(pages.width - 40), reason: 'it spans the page width');
+      expect(zone.height, greaterThan(pages.height / 2 - 30), reason: 'it fills the lower half');
 
-      // لمس في الزاوية العلوية ثم في الوسط ثم في الأسفل: كلها داخل البطاقة وكلها تُحتسب.
-      final Rect rect = tester.getRect(card);
+      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('dhikr-remaining-$_secondId'))).data, 'باقٍ ٣٣');
+
       for (final Offset point in <Offset>[
-        rect.topLeft + const Offset(24, 24),
-        rect.center,
-        rect.bottomRight - const Offset(24, 24),
+        zone.topLeft + const Offset(24, 24),
+        zone.center,
+        zone.bottomRight - const Offset(24, 24),
       ]) {
         await tester.tapAt(point);
         await tester.pump(const Duration(milliseconds: 60));
@@ -211,35 +297,43 @@ void main() {
       await settle(tester);
 
       expect(container.read(adhkarWirdProvider).countOf(1), 3);
-      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('dhikr-counter'))).data, '٣');
-      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('dhikr-remaining'))).data, endsWith('٣٠'));
+      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('dhikr-remaining-$_secondId'))).data, 'باقٍ ٣٠');
       expect(haptics.where((String h) => h == 'HapticFeedbackType.selectionClick'), hasLength(3));
       expect(haptics.where((String h) => h == 'HapticFeedbackType.mediumImpact'), isEmpty);
+
+      // لمسة على نص الذكر في النصف العلوي لا تُحتسب.
+      haptics.clear();
+      await tester.tapAt(tester.getCenter(find.byKey(const ValueKey<String>('dhikr-text-$_secondId'))));
+      await tester.pump(const Duration(milliseconds: 60));
+      expect(container.read(adhkarWirdProvider).countOf(1), 3);
+      expect(haptics, isEmpty);
     });
 
     testWidgets('reaching the number gives a double medium haptic, a green halo and a permanent lock', (WidgetTester tester) async {
       final List<String> haptics = _recordHaptics(tester);
       final ProviderContainer container = await _openAdhkar(tester);
-      await _selectDhikr(tester, 1);
+      await _swipe(tester, toNext: true);
 
-      final Finder card = find.byKey(const ValueKey<String>('dhikr-card-tap'));
+      final Finder zone = _zone(_secondId);
       AnimatedContainer surface() =>
-          tester.widget<AnimatedContainer>(find.byKey(const ValueKey<String>('dhikr-card-surface')));
+          tester.widget<AnimatedContainer>(find.byKey(const ValueKey<String>('dhikr-zone-surface-$_secondId')));
       List<BoxShadow> shadows() => (surface().decoration! as ShapeDecoration).shadows!.cast<BoxShadow>();
-      final FeedbackColors feedback = FeedbackColors.of(tester.element(find.byKey(const ValueKey<String>('dhikr-card-surface'))));
+      final FeedbackColors feedback =
+          FeedbackColors.of(tester.element(find.byKey(const ValueKey<String>('dhikr-zone-surface-$_secondId'))));
 
       // قبل الإتمام: ظل هادئ لا هالة خضراء.
       expect(shadows().any((BoxShadow s) => s.color == feedback.rightBorder.withValues(alpha: 0.5)), isFalse);
 
       for (int i = 0; i < 32; i++) {
-        await tester.tap(card);
+        await tester.tap(zone);
         await tester.pump(const Duration(milliseconds: 20));
       }
       expect(haptics.where((String h) => h == 'HapticFeedbackType.mediumImpact'), isEmpty, reason: 'not yet');
       expect(container.read(adhkarWirdProvider).countOf(1), 32);
+      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('dhikr-remaining-$_secondId'))).data, 'باقٍ ١');
 
       haptics.clear();
-      await tester.tap(card);
+      await tester.tap(zone);
       await tester.pump();
       // الاهتزاز الأول فوراً والثاني بعد فاصل قصير: مزدوج، ولا نقرة خفيفة معه.
       expect(haptics, <String>['HapticFeedbackType.mediumImpact']);
@@ -247,19 +341,19 @@ void main() {
       expect(haptics, <String>['HapticFeedbackType.mediumImpact', 'HapticFeedbackType.mediumImpact']);
       await tester.pump(const Duration(milliseconds: 600));
 
-      // الهالة الخضراء والحد الأخضر وعبارة الإتمام.
+      // الهالة الخضراء والحد الأخضر وعبارة الإتمام بدل «باقٍ».
       expect(container.read(adhkarWirdProvider).countOf(1), 33);
       expect(shadows().any((BoxShadow s) => s.color == feedback.rightBorder.withValues(alpha: 0.5)), isTrue);
       final SmoothRectangleBorder border = (surface().decoration! as ShapeDecoration).shape as SmoothRectangleBorder;
       expect(border.side.color, feedback.rightBorder);
-      expect(find.text('اكتمل العدد المسنون'), findsOneWidget);
-      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('dhikr-counter'))).data, '٣٣');
+      expect(find.byKey(const ValueKey<String>('dhikr-complete-$_secondId')), findsOneWidget);
+      expect(find.byKey(const ValueKey<String>('dhikr-remaining-$_secondId')), findsNothing);
 
-      // القفل نهائي: لا عدّ ولا اهتزاز ولو كثرت اللمسات، والبطاقة نفسها بلا تفاعل.
+      // القفل نهائي: لا عدّ ولا اهتزاز ولو كثرت اللمسات، والمنطقة نفسها بلا استجابة.
       haptics.clear();
-      expect(tester.widget<InkWell>(card).onTap, isNull);
+      expect(tester.widget<GestureDetector>(zone).onTap, isNull);
       for (int i = 0; i < 5; i++) {
-        await tester.tap(card, warnIfMissed: false);
+        await tester.tap(zone, warnIfMissed: false);
         await tester.pump(const Duration(milliseconds: 30));
       }
       expect(container.read(adhkarWirdProvider).countOf(1), 33);
@@ -267,72 +361,148 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('finishing both adhkar shows the wird-complete badge, and a new wird clears it', (WidgetTester tester) async {
+    testWidgets('completing a dhikr locks it and slides to the next page on its own', (WidgetTester tester) async {
+      final List<String> haptics = _recordHaptics(tester);
+      final ProviderContainer container = await _openAdhkar(tester);
+      expect(_pages(tester).page, 0);
+
+      // الذكر الأول عدده واحد: لمسة واحدة تكمله بالاهتزاز المزدوج لا الخفيف.
+      await tester.tap(_zone(_firstId));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(haptics, <String>['HapticFeedbackType.mediumImpact', 'HapticFeedbackType.mediumImpact']);
+      expect(container.read(adhkarWirdProvider).countOf(0), 1);
+      expect(find.byKey(const ValueKey<String>('dhikr-complete-$_firstId')), findsOneWidget);
+
+      // يبقى على الذكر المكتمل لحظة تُرى فيها الهالة، ثم تنزلق الصفحة وحدها.
+      expect(_pages(tester).page, 0);
+      expect(_title(tester), items.first.title);
+      await tester.pump(const Duration(milliseconds: 1400));
+      await settle(tester);
+      expect(container.read(adhkarWirdProvider).index, 1);
+      expect(_pages(tester).page, closeTo(1, 0.001));
+      expect(_title(tester), items[1].title);
+      expect(_progress(tester), '٢ / ٢');
+
+      // الذكر الأول بقي مقفلاً خلفنا، والثاني مفتوح للعدّ.
+      expect(container.read(adhkarWirdProvider).isDone(items, 0), isTrue);
+      expect(container.read(adhkarWirdProvider).countOf(1), 0);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the info button opens the sheet with takhrij, the prophetic virtue and the source', (WidgetTester tester) async {
+      await _openAdhkar(tester);
+      final DhikrItem first = items.first;
+      await tester.tap(find.byKey(const ValueKey<String>('adhkar-info')));
+      await settle(tester);
+
+      final Finder sheet = find.byKey(const ValueKey<String>('dhikr-info-sheet'));
+      expect(sheet, findsOneWidget);
+      for (final String heading in <String>['التخريج', 'الفضل النبوي', 'المصدر']) {
+        expect(find.descendant(of: sheet, matching: find.text(heading)), findsOneWidget, reason: heading);
+      }
+      // الإحالة مرة واحدة في التخريج ولو حمل الحديث شاهدين، ونصاهما كلاهما في المصدر.
+      expect(find.descendant(of: sheet, matching: find.textContaining('رقم ٦٣٠٦')), findsWidgets);
+      for (final SourceRef reference in first.evidence) {
+        expect(find.descendant(of: sheet, matching: find.textContaining(reference.quote!)), findsWidgets);
+      }
+      final Finder virtue = find.descendant(of: find.byKey(const ValueKey<String>('dhikr-info-virtue')), matching: find.textContaining(first.virtue!));
+      expect(virtue, findsOneWidget);
+
+      // لا عبارة مراجعة علمية ولا علامة استفهام مسودة في الورقة ولا خلفها.
+      expect(find.textContaining('بانتظار المراجعة'), findsNothing);
+      expect(find.textContaining('[?]'), findsNothing);
+
+      // لمس ما حول الورقة يغلقها فتعود الشاشة هادئة.
+      await tester.tapAt(const Offset(200, 40));
+      await settle(tester);
+      expect(sheet, findsNothing);
+    });
+
+    testWidgets('the sheet follows the current dhikr: two sources and its own virtue for the second', (WidgetTester tester) async {
+      await _openAdhkar(tester);
+      await _swipe(tester, toNext: true);
+      final DhikrItem second = items[1];
+      await tester.tap(find.byKey(const ValueKey<String>('adhkar-info')));
+      await settle(tester);
+
+      final Finder sheet = find.byKey(const ValueKey<String>('dhikr-info-sheet'));
+      expect(find.descendant(of: sheet, matching: find.text(second.title)), findsOneWidget);
+      expect(find.descendant(of: sheet, matching: find.text('المصادر')), findsOneWidget);
+      expect(find.descendant(of: sheet, matching: find.textContaining(second.virtue!)), findsWidgets);
+      expect(find.descendant(of: sheet, matching: find.textContaining('رقم ٥٩٦')), findsWidgets);
+      expect(find.descendant(of: sheet, matching: find.textContaining('رقم ٨٤٣')), findsWidgets);
+    });
+
+    testWidgets('finishing both adhkar shows the wird-complete banner, and a new wird returns to the first page', (WidgetTester tester) async {
       _recordHaptics(tester);
       final ProviderContainer container = await _openAdhkar(tester);
       expect(find.byKey(const ValueKey<String>('adhkar-wird-complete')), findsNothing);
-      expect(_progress(tester), endsWith('٠ من ٢'));
 
-      // الذكر الأول: لمسة واحدة، ثم انتقال تلقائي إلى الثاني.
-      await tester.tap(find.byKey(const ValueKey<String>('dhikr-card-tap')));
-      await tester.pump(const Duration(milliseconds: 300));
-      expect(_progress(tester), endsWith('١ من ٢'));
+      await tester.tap(_zone(_firstId));
       await tester.pump(const Duration(milliseconds: 1500));
       await settle(tester);
       expect(container.read(adhkarWirdProvider).index, 1);
-      expect(find.byKey(const ValueKey<String>('dhikr-tasbih_dubur_al_salah')), findsOneWidget);
 
       for (int i = 0; i < 33; i++) {
-        await tester.tap(find.byKey(const ValueKey<String>('dhikr-card-tap')), warnIfMissed: false);
+        await tester.tap(_zone(_secondId), warnIfMissed: false);
         await tester.pump(const Duration(milliseconds: 20));
       }
       await settle(tester);
 
       expect(container.read(adhkarWirdProvider).isComplete(container.read(adhkarItemsProvider)), isTrue);
       expect(find.byKey(const ValueKey<String>('adhkar-wird-complete')), findsOneWidget);
-      expect(_progress(tester), endsWith('٢ من ٢'));
+      expect(_progress(tester), '٢ / ٢');
+      expect(container.read(adhkarWirdProvider).index, 1, reason: 'nowhere left to advance to');
 
       await tester.tap(find.byKey(const ValueKey<String>('adhkar-restart')));
       await settle(tester);
       expect(find.byKey(const ValueKey<String>('adhkar-wird-complete')), findsNothing);
       expect(container.read(adhkarWirdProvider).counts, <int>[0, 0]);
+      expect(_pages(tester).page, closeTo(0, 0.001));
+      expect(_title(tester), items.first.title);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('the pill row brings the current dhikr fully into view when the wird advances on its own', (WidgetTester tester) async {
-      _recordHaptics(tester);
-      final ProviderContainer container = await _openAdhkar(tester, size: const Size(360, 1400));
-      await tester.tap(find.byKey(const ValueKey<String>('dhikr-card-tap')));
-      await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump(const Duration(milliseconds: 1500));
+    testWidgets('a quick back-and-forth of the current dhikr leaves the page on the chosen one', (WidgetTester tester) async {
+      final ProviderContainer container = await _openAdhkar(tester);
+      final AdhkarWirdController wird = container.read(adhkarWirdProvider.notifier);
+      wird.select(1);
+      await tester.pump(const Duration(milliseconds: 40));
+      wird.select(0);
       await settle(tester);
-
-      expect(container.read(adhkarWirdProvider).index, 1);
-      final Rect pill = tester.getRect(find.byKey(const ValueKey<String>('adhkar-pill-1')));
-      expect(pill.left, greaterThanOrEqualTo(-0.5), reason: 'not hidden behind the left edge');
-      expect(pill.right, lessThanOrEqualTo(360.5), reason: 'not hidden behind the right edge');
+      expect(container.read(adhkarWirdProvider).index, 0);
+      expect(_pages(tester).page, closeTo(0, 0.001));
+      expect(_title(tester), items.first.title);
     });
 
-    testWidgets('the sources sit under the card with their verbatim quote and locator', (WidgetTester tester) async {
-      await _openAdhkar(tester);
-      final DhikrItem first = catalog.itemsInOrder.first;
-      expect(find.textContaining(first.evidence.first.quote!), findsOneWidget);
-      expect(find.textContaining('صحيح البخاري'), findsWidgets);
-      expect(find.text('بانتظار المراجعة العلمية'), findsOneWidget);
-    });
-
-    testWidgets('the screen survives a narrow phone with the largest fonts', (WidgetTester tester) async {
+    testWidgets('the screen survives a narrow phone with the largest fonts, and a long text scrolls inside', (WidgetTester tester) async {
       await pumpApp(tester, size: const Size(360, 740), systemTextScale: 1.3);
       await tester.tap(_navLabel('وِرد الأذكار'));
       await settle(tester);
       expect(find.byType(AdhkarScreen), findsOneWidget);
-      await _selectDhikr(tester, 1);
       expect(tester.takeException(), isNull);
-      await tester.scrollUntilVisible(
-        find.byKey(const ValueKey<String>('dhikr-remaining')),
-        200,
-        scrollable: find.descendant(of: find.byKey(const ValueKey<String>('adhkar-scroll')), matching: find.byType(Scrollable)).first,
+
+      // نص سيد الاستغفار طويل: يتمرر داخل منطقته ولا يدفع العدّاد خارج الشاشة.
+      final Finder scroll = find.descendant(
+        of: find.byKey(const ValueKey<String>('dhikr-text-scroll-$_firstId')),
+        matching: find.byType(Scrollable),
       );
+      final ScrollableState scrollable = tester.state<ScrollableState>(scroll);
+      expect(scrollable.position.maxScrollExtent, greaterThan(0));
+      await tester.drag(scroll, const Offset(0, -200));
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(scrollable.position.pixels, greaterThan(0));
+
+      await _swipe(tester, toNext: true);
+      expect(tester.takeException(), isNull);
+      final Rect ring = tester.getRect(find.byKey(const ValueKey<String>('dhikr-remaining-$_secondId')));
+      expect(ring.bottom, lessThanOrEqualTo(740));
+      expect(ring.left, greaterThanOrEqualTo(0));
+      expect(ring.right, lessThanOrEqualTo(360));
+
+      await tester.tap(find.byKey(const ValueKey<String>('adhkar-info')));
+      await settle(tester);
+      expect(find.byKey(const ValueKey<String>('dhikr-info-sheet')), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

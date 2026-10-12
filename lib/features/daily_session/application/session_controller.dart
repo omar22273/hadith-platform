@@ -92,7 +92,7 @@ class SessionController extends Notifier<SessionState> {
 
   PracticeEngine? get _engine => ref.read(practiceEngineProvider(hadithId));
 
-  /// هل يجوز تجاوز مرحلة التثبيت: لا يُفتح الإسقاط السلوكي قبل ترصيع كل المقاطع.
+  /// هل يجوز تجاوز مرحلة التثبيت: لا يُفتح أثر الحديث في حياتك قبل ترصيع كل المقاطع.
   bool get practiceCleared => isPracticeCleared(_engine, state.completedDrills);
 
   /// الانتقال إلى مرحلة. القفز إلى ما بعد التثبيت مرفوض قبل إتمام الترصيع،

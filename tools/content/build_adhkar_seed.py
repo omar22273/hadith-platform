@@ -61,6 +61,17 @@ def after_word(span, stripped_marker):
     raise AssertionError(f"marker {stripped_marker!r} not found")
 
 
+def slice_words(span, first_plain, last_plain):
+    """The exact run of words from the first word whose unvocalized form equals
+    first_plain through the next word equal to last_plain (both included)."""
+    words = span.split(" ")
+    start = next((i for i, w in enumerate(words) if plain(w) == first_plain), None)
+    assert start is not None, f"marker {first_plain!r} not found"
+    end = next((i for i in range(start, len(words)) if plain(words[i]) == last_plain), None)
+    assert end is not None, f"marker {last_plain!r} not found after {first_plain!r}"
+    return " ".join(words[start:end + 1])
+
+
 def review(notes):
     return {"status": "pending_scholarly_review", "reviewer": None, "reviewedAt": None, "notes": notes}
 
@@ -76,6 +87,9 @@ def main():
     sayyid_quote = quoted_span(b6306, 0)
     sayyid_text = after_word(sayyid_quote, "تقول")
     assert sayyid_text and sayyid_text in sayyid_quote
+    # فضله: العبارة النبوية الثانية في الحديث نفسه كاملةً (من قالها موقناً ...).
+    sayyid_virtue_quote = quoted_span(b6306, 1)
+    assert sayyid_virtue_quote != sayyid_quote
 
     # التسبيح دبر الصلاة المكتوبة: العدد من مسلم 596 (حديث كعب بن عجرة)،
     # واللفظ من البخاري 843 (العبارة النبوية الثانية: «تقول ...»).
@@ -85,6 +99,9 @@ def main():
     bukhari_quote = quoted_span(b843, 1)
     tasbih_text = after_word(bukhari_quote, "تقول").split("،")[0].strip()
     assert tasbih_text and tasbih_text in bukhari_quote
+    # فضله: مطلع شاهد مسلم من «معقبات» إلى «مكتوبة»، مقتطع بكلماته كما هي.
+    tasbih_virtue = slice_words(muslim_quote, "معقبات", "مكتوبة")
+    assert tasbih_virtue in muslim_quote
 
     provenance = (
         "النص والإحالة منقولان حرفياً بالاقتطاع الآلي من إصدار fawazahmed0/hadith-api المعتمد في "
@@ -102,10 +119,15 @@ def main():
                 "title": "سيّد الاستغفار",
                 "text": sayyid_text,
                 "count": 1,
-                "evidence": [{"sourceId": "sahih_bukhari", "locator": "6306", "quote": sayyid_quote}],
+                "virtue": sayyid_virtue_quote,
+                "evidence": [
+                    {"sourceId": "sahih_bukhari", "locator": "6306", "quote": sayyid_quote},
+                    {"sourceId": "sahih_bukhari", "locator": "6306", "quote": sayyid_virtue_quote},
+                ],
                 "review": review([
                     provenance,
                     "الحديث لا يذكر عدداً؛ العدد (١) حدده مالك المنتج لبذرة الاختبار، ويتحقق المراجع من تقييد العدد في الروايات الأخرى.",
+                    "الفضل: العبارة النبوية الثانية في الحديث نفسه منقولة كاملة، وهي شاهد ثانٍ بالموضع نفسه.",
                     "الضبط كما في الإصدار الرقمي دون تعديل؛ يراجعه مصحح قبل النشر.",
                 ]),
             },
@@ -115,6 +137,7 @@ def main():
                 "title": "تسبيح دبر الصلاة المكتوبة",
                 "text": tasbih_text,
                 "count": 33,
+                "virtue": tasbih_virtue,
                 "evidence": [
                     {"sourceId": "sahih_muslim", "locator": "596", "quote": muslim_quote},
                     {"sourceId": "sahih_bukhari", "locator": "843", "quote": bukhari_quote},
@@ -123,6 +146,7 @@ def main():
                     provenance,
                     "العدد ثلاث وثلاثون في نص الشاهدين؛ واللفظ المعدود مأخوذ من رواية البخاري. رقم مسلم بترقيم فؤاد عبد الباقي (الإصدار الرقمي: 596.01).",
                     "أُرجئ التحميد والتكبير والتهليل إلى حزمة المحتوى النهائية، وإن ذُكرت في نص الشاهد المنقول.",
+                    "الفضل: مقتطع بكلماته من مطلع شاهد مسلم (من «معقبات» إلى «مكتوبة») دون تغيير.",
                     "الضبط كما في الإصدار الرقمي دون تعديل؛ يراجعه مصحح قبل النشر.",
                 ]),
             },

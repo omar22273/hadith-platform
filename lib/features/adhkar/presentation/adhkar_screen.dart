@@ -1,11 +1,17 @@
-// التبويب الثالث: وِرد الأذكار والسبحة النبوية الذكية.
+// التبويب الثالث: وِرد الأذكار والسبحة النبوية الذكية، بلا زحام.
 //
-// بطاقة الذكر الحالي تُلمس في أي موضع منها لاحتساب ضغطة (اهتزاز لمسي خفيف)،
-// فإذا بلغ العدد المسنون: اهتزاز مزدوج وهالة خضراء وقفل نهائي، ثم ينتقل الوِرد
-// تلقائياً إلى الذكر التالي، أو تظهر شارة إتمام الوِرد.
+// ثلاثة عناصر بصرية لا غير:
+// 1. الرأس: عنوان الذكر الحالي، وشريط تقدم رفيع بموضعه («٢ / ١٢»)، وزر معلومات.
+// 2. المتن: نص الذكر المشكول كبيراً في المنتصف.
+// 3. النصف السفلي: منطقة لمس واحدة تحتسب أي نقرة، وفيها عدّاد «باقٍ N».
 //
-// الخط الأحمر: نصوص الأذكار وشواهدها تأتي من ملف البيانات وحده، وتحت كل ذكر
-// شاهده بنصه الحرفي وموضعه.
+// الانتقال بين الأذكار بسحب الصفحة أفقياً (PageView). التخريج والفضل النبوي
+// والمصدر كلها في ورقة تُفتح من زر المعلومات، لا على الشاشة.
+//
+// عند بلوغ العدد المسنون: اهتزاز مزدوج، وقفل العدّاد، ثم ينتقل الوِرد إلى الذكر
+// التالي بـ PageView.nextPage، أو تظهر شارة إتمام الوِرد.
+//
+// الخط الأحمر: نصوص الأذكار وشواهدها وفضلها تأتي من ملف البيانات وحده.
 
 import 'dart:async';
 
@@ -14,10 +20,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/content/models/source_catalog.dart';
-import '../../../core/content/models/source_ref.dart';
-import '../../../core/content/review_labels.dart';
 import '../../../core/content/source_catalog_provider.dart';
-import '../../../core/content/widgets/source_quote_tile.dart';
 import '../../../core/json/json_reader.dart';
 import '../../../core/text/arabic_digits.dart';
 import '../../../core/theme/app_palette.dart';
@@ -28,7 +31,11 @@ import '../application/adhkar_providers.dart';
 import '../application/adhkar_wird_controller.dart';
 import '../data/models/adhkar.dart';
 import '../domain/adhkar_repository.dart';
-import 'widgets/dhikr_card.dart';
+import 'widgets/dhikr_info_sheet.dart';
+import 'widgets/dhikr_page.dart';
+
+/// مدة انزلاق الصفحة عند الانتقال التلقائي.
+const Duration _pageSlide = Duration(milliseconds: 380);
 
 /// شاشة وِرد الأذكار.
 class AdhkarScreen extends ConsumerWidget {
@@ -60,11 +67,27 @@ class _AdhkarBody extends ConsumerStatefulWidget {
 }
 
 class _AdhkarBodyState extends ConsumerState<_AdhkarBody> {
+  late final PageController _pages;
   Timer? _secondPulse;
+
+  /// صحيح وقت انزلاق الصفحات برمجياً؛ تمرّ الصفحات الوسيطة فلا تُعامل اختياراً.
+  bool _sliding = false;
+
+  /// رقم آخر انزلاق برمجي: انزلاق أحدث يُبطل خاتمة ما قبله.
+  int _slideToken = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final int total = ref.read(adhkarItemsProvider).length;
+    final int start = ref.read(adhkarWirdProvider).index;
+    _pages = PageController(initialPage: total == 0 ? 0 : start.clamp(0, total - 1).toInt());
+  }
 
   @override
   void dispose() {
     _secondPulse?.cancel();
+    _pages.dispose();
     super.dispose();
   }
 
@@ -77,7 +100,7 @@ class _AdhkarBodyState extends ConsumerState<_AdhkarBody> {
     });
   }
 
-  void _onCardTap() {
+  void _onTap() {
     final DhikrTapResult result = ref.read(adhkarWirdProvider.notifier).tap();
     switch (result) {
       case DhikrTapResult.counted:
@@ -90,10 +113,52 @@ class _AdhkarBodyState extends ConsumerState<_AdhkarBody> {
     }
   }
 
+  /// استقرت صفحة بسحب المستخدم: الذكر المختار هو الذكر الحالي.
+  void _onPageChanged(int page) {
+    if (_sliding) {
+      return;
+    }
+    ref.read(adhkarWirdProvider.notifier).select(page);
+  }
+
+  /// تغيّر الذكر الحالي من المتحكم (انتقال تلقائي أو وِرد جديد): تتبعه الصفحة.
+  void _followIndex(int? previous, int next) {
+    if (!_pages.hasClients) {
+      return;
+    }
+    final int shown = _pages.page?.round() ?? _pages.initialPage;
+    if (shown == next && !_sliding) {
+      return;
+    }
+    final bool still = MediaQuery.disableAnimationsOf(context);
+    if (still) {
+      _slideToken++;
+      _sliding = false;
+      _pages.jumpToPage(next);
+      return;
+    }
+    final bool adjacent = !_sliding && next == shown + 1;
+    final int token = ++_slideToken;
+    _sliding = true;
+    final Future<void> slide = adjacent
+        ? _pages.nextPage(duration: _pageSlide, curve: Curves.easeInOutCubic)
+        : _pages.animateToPage(next, duration: _pageSlide, curve: Curves.easeInOutCubic);
+    unawaited(
+      slide.whenComplete(() {
+        if (token == _slideToken) {
+          _sliding = false;
+        }
+      }),
+    );
+  }
+
+  void _showInfo(DhikrItem item, SourceCatalog? sources) {
+    unawaited(showDhikrInfoSheet(context: context, item: item, sources: sources));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    final TextTheme text = Theme.of(context).textTheme;
+    ref.listen<int>(adhkarWirdProvider.select((AdhkarWirdState s) => s.index), _followIndex);
     final List<DhikrItem> items = ref.watch(adhkarItemsProvider);
     final AdhkarWirdState wird = ref.watch(adhkarWirdProvider);
     final SourceCatalog? sources = ref.watch(sourceCatalogProvider).value;
@@ -103,166 +168,132 @@ class _AdhkarBodyState extends ConsumerState<_AdhkarBody> {
     final int index = wird.index.clamp(0, items.length - 1).toInt();
     final DhikrItem item = items[index];
     final bool complete = wird.isComplete(items);
-    return ListView(
-      key: const ValueKey<String>('adhkar-scroll'),
-      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+    return Column(
       children: <Widget>[
-        Text(
-          'وِرد الأذكار',
-          style: AppTypography.heritageTitle(color: palette.ink, fontSize: 32),
-        ),
-        Text(
-          'أتممتَ ${arabicDigits(wird.doneCount(items))} من ${arabicDigits(items.length)}',
-          key: const ValueKey<String>('adhkar-progress'),
-          style: text.bodyMedium?.copyWith(color: palette.inkSoft),
-        ),
-        const SizedBox(height: 12),
-        _ItemPills(items: items, wird: wird, onSelect: ref.read(adhkarWirdProvider.notifier).select),
-        const SizedBox(height: 14),
-        if (complete) ...<Widget>[
-          _WirdCompleteBadge(
-            total: items.length,
-            onRestart: ref.read(adhkarWirdProvider.notifier).restart,
-          ),
-          const SizedBox(height: 14),
-        ],
-        DhikrCard(
-          key: ValueKey<String>('dhikr-${item.id}'),
+        _Header(
           item: item,
           position: index + 1,
           total: items.length,
-          count: wird.countOf(index),
-          onTap: _onCardTap,
+          onInfo: () => _showInfo(item, sources),
         ),
-        const SizedBox(height: 18),
-        _EvidenceSection(item: item, sources: sources),
-        const SizedBox(height: 14),
-        Text(
-          'نصوص الأذكار وأعدادها منقولة من ملف البيانات حرفياً بشواهدها، ولا يُضاف إليها شيء من خارجه. '
-          'ما عدا ذلك من الأذكار يصل مع حزمة المحتوى النهائية.',
-          style: text.labelSmall?.copyWith(color: palette.inkSoft, height: 1.7),
+        if (complete)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+            child: _WirdCompleteBadge(
+              total: items.length,
+              onRestart: ref.read(adhkarWirdProvider.notifier).restart,
+            ),
+          ),
+        Expanded(
+          child: PageView.builder(
+            key: const ValueKey<String>('adhkar-pages'),
+            controller: _pages,
+            itemCount: items.length,
+            onPageChanged: _onPageChanged,
+            itemBuilder: (BuildContext context, int i) {
+              return DhikrPage(
+                key: ValueKey<String>('dhikr-page-${items[i].id}'),
+                item: items[i],
+                count: wird.countOf(i),
+                onTap: _onTap,
+              );
+            },
+          ),
         ),
       ],
     );
   }
 }
 
-/// أذكار الوِرد رقائق أفقية: الحالي مظلل، والمكتمل بعلامة. يتوسط الذكر الحالي
-/// الشريط كلما تغير (باللمس أو بالانتقال التلقائي) فلا يختفي خلف الحافة.
-class _ItemPills extends StatefulWidget {
-  const _ItemPills({required this.items, required this.wird, required this.onSelect});
+/// الرأس: عنوان الذكر الحالي وزر المعلومات، وتحتهما شريط التقدم الرفيع بموضع الذكر.
+class _Header extends StatelessWidget {
+  const _Header({
+    required this.item,
+    required this.position,
+    required this.total,
+    required this.onInfo,
+  });
 
-  final List<DhikrItem> items;
-  final AdhkarWirdState wird;
-  final ValueChanged<int> onSelect;
+  final DhikrItem item;
 
-  @override
-  State<_ItemPills> createState() => _ItemPillsState();
-}
-
-class _ItemPillsState extends State<_ItemPills> {
-  final ScrollController _controller = ScrollController();
-  final Map<int, GlobalKey> _anchors = <int, GlobalKey>{};
-
-  @override
-  void initState() {
-    super.initState();
-    _revealCurrent();
-  }
-
-  @override
-  void didUpdateWidget(_ItemPills oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.wird.index != widget.wird.index) {
-      _revealCurrent();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  GlobalKey _anchorOf(int index) => _anchors.putIfAbsent(index, () => GlobalKey());
-
-  /// يحرك شريط الرقائق وحده (لا الصفحة) ليتوسط الذكر الحالي.
-  void _revealCurrent() {
-    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
-      if (!mounted || !_controller.hasClients) {
-        return;
-      }
-      final RenderObject? target = _anchorOf(widget.wird.index).currentContext?.findRenderObject();
-      if (target == null) {
-        return;
-      }
-      final bool still = MediaQuery.disableAnimationsOf(context);
-      unawaited(
-        _controller.position.ensureVisible(
-          target,
-          alignment: 0.5,
-          duration: still ? Duration.zero : const Duration(milliseconds: 260),
-          curve: Curves.easeInOutCubic,
-        ),
-      );
-    });
-  }
+  /// رقم الذكر الحالي من ١.
+  final int position;
+  final int total;
+  final VoidCallback onInfo;
 
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
-    final List<DhikrItem> items = widget.items;
-    final AdhkarWirdState wird = widget.wird;
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return SizedBox(
-          height: 48,
-          child: ListView.separated(
-            controller: _controller,
-            scrollDirection: Axis.horizontal,
-            itemCount: items.length,
-            separatorBuilder: (BuildContext context, int _) => const SizedBox(width: 8),
-            itemBuilder: (BuildContext context, int i) {
-              final bool current = i == wird.index;
-              final bool done = wird.isDone(items, i);
-              final Color foreground = done ? palette.emeraldText : (current ? palette.amberText : palette.inkSoft);
-              return KeyedSubtree(
-                key: _anchorOf(i),
-                child: Semantics(
-                  label: 'الذكر ${arabicDigits(i + 1)}: ${items[i].title}${done ? '، مكتمل' : ''}',
-                  child: ExcludeSemantics(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: constraints.maxWidth),
-                      child: ChoiceChip(
-                        key: ValueKey<String>('adhkar-pill-$i'),
-                        selected: current,
-                        onSelected: (bool _) => widget.onSelect(i),
-                        avatar: Icon(
-                          done ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                          size: 18,
-                          color: foreground,
-                        ),
-                        label: Text(items[i].title, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        selectedColor: palette.amberSoft,
-                        backgroundColor: done ? palette.emeraldSoft : palette.surface,
-                        side: BorderSide(color: done ? palette.emerald : (current ? palette.amber : palette.line)),
-                        shape: AppShapes.rounded(AppShapes.radiusSmall),
-                        showCheckmark: false,
-                        labelStyle: AppTypography.ui(
-                          color: foreground,
-                          fontSize: 13,
-                          fontWeight: current ? FontWeight.w700 : FontWeight.w400,
-                        ),
+    final TextTheme text = Theme.of(context).textTheme;
+    final String where = '${arabicDigits(position)} / ${arabicDigits(total)}';
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  item.title,
+                  key: const ValueKey<String>('adhkar-title'),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.heritageTitle(color: palette.ink, fontSize: 26),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton.outlined(
+                key: const ValueKey<String>('adhkar-info'),
+                tooltip: 'التخريج والفضل والمصدر',
+                onPressed: onInfo,
+                visualDensity: VisualDensity.compact,
+                iconSize: 22,
+                color: palette.inkSoft,
+                style: IconButton.styleFrom(
+                  side: BorderSide(color: palette.line),
+                  shape: const CircleBorder(),
+                ),
+                icon: const Icon(Icons.info_outline),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Semantics(
+            label: 'الذكر ${arabicDigits(position)} من ${arabicDigits(total)}',
+            child: ExcludeSemantics(
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(2),
+                      child: LinearProgressIndicator(
+                        key: const ValueKey<String>('adhkar-progress-bar'),
+                        value: position / total,
+                        minHeight: 3,
+                        backgroundColor: palette.line,
+                        color: palette.amber,
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                  const SizedBox(width: 10),
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: Text(
+                      where,
+                      key: const ValueKey<String>('adhkar-progress'),
+                      style: text.labelMedium?.copyWith(
+                        color: palette.inkSoft,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }
@@ -283,18 +314,18 @@ class _WirdCompleteBadge extends StatelessWidget {
       color: palette.emeraldSoft,
       borderColor: palette.emerald.withValues(alpha: 0.5),
       radius: AppShapes.radiusMedium,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: <Widget>[
-          Icon(Icons.workspace_premium_rounded, size: 34, color: palette.emeraldText),
-          const SizedBox(width: 12),
+          Icon(Icons.workspace_premium_rounded, size: 28, color: palette.emeraldText),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
                   'أتممتَ وِرد الأذكار',
-                  style: text.titleMedium?.copyWith(color: palette.emeraldText, fontWeight: FontWeight.w700),
+                  style: text.titleSmall?.copyWith(color: palette.emeraldText, fontWeight: FontWeight.w700),
                 ),
                 Text(
                   'بلغتَ العدد المسنون في ${arabicDigits(total)} من ${arabicDigits(total)}.',
@@ -310,43 +341,6 @@ class _WirdCompleteBadge extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// شواهد الذكر الحالي بنصها الحرفي وموضعها، وحالة مراجعتها.
-class _EvidenceSection extends StatelessWidget {
-  const _EvidenceSection({required this.item, required this.sources});
-
-  final DhikrItem item;
-  final SourceCatalog? sources;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    final TextTheme text = Theme.of(context).textTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        // Wrap لا Row: على الهاتف الضيق مع الخط الكبير تنزل الشارة إلى سطر ثانٍ بدل أن تتجاوز.
-        Wrap(
-          spacing: 12,
-          runSpacing: 6,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: <Widget>[
-            Text(
-              item.evidence.length == 1 ? 'المصدر' : 'المصادر (${arabicDigits(item.evidence.length)})',
-              style: text.labelLarge?.copyWith(color: palette.inkSoft, fontWeight: FontWeight.w700),
-            ),
-            SoftChip(label: reviewStatusLabel(item.review.status), icon: Icons.fact_check_outlined),
-          ],
-        ),
-        const SizedBox(height: 8),
-        for (final SourceRef reference in item.evidence) ...<Widget>[
-          SourceQuoteTile(reference: reference, source: sources?.byId(reference.sourceId)),
-          const SizedBox(height: 8),
-        ],
-      ],
     );
   }
 }

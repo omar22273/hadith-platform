@@ -1,6 +1,6 @@
 // فحص سلامة ملف الأذكار قبل عرضه: معرّفات وترتيب فريدان، وعنوان ونص غير
 // فارغين، وعدد مسنون موجب، وشاهد لكل ذكر بموضعه ونصه الحرفي ومصدره المعروف،
-// ونص الذكر نفسه جزء من نص أحد شواهده فلا يُعرض لفظ بلا أصل منقول.
+// ونص الذكر نفسه (وفضله إن وُجد) جزء من نص أحد شواهده فلا يُعرض لفظ بلا أصل منقول.
 
 import '../../../core/content/models/source_catalog.dart';
 import '../../../core/content/models/source_ref.dart';
@@ -48,6 +48,14 @@ List<String> checkAdhkarCatalog(AdhkarCatalog catalog, {SourceCatalog? sources})
     }
     if (!grounded) {
       issues.add('$path.text: The dhikr text must be a verbatim part of one of its evidence quotes.');
+    }
+    final String? virtue = item.virtue;
+    if (virtue != null) {
+      if (virtue.trim().isEmpty) {
+        issues.add('$path.virtue: must not be blank when present.');
+      } else if (!item.evidence.any((SourceRef r) => (r.quote ?? '').contains(virtue.trim()))) {
+        issues.add('$path.virtue: The virtue must be a verbatim part of one of its evidence quotes.');
+      }
     }
   }
   return issues;
