@@ -25,12 +25,23 @@ it on every run. This script then adds what the app needs at runtime:
    Android Gradle Plugin is older than the plugin's minimum it is raised, with
    the Gradle wrapper raised to the version that AGP needs.
 
+8. The launcher activity is forced to android:exported="true" (Android 12+
+   refuses to install or start a launcher activity without it).
+9. The release build type is signed with the debug signing config, so the APK
+   that CI uploads is always signed and installable directly on a device.
+10. The patched manifest is parsed as XML and its structure checked
+   (validate_manifest): permissions and <queries> directly under <manifest>,
+   components only under <application>, exported set where required. The script
+   exits non-zero with the reasons if anything is wrong, so a malformed
+   manifest fails the build instead of producing an APK that cannot install.
+
 The script is idempotent: running it twice leaves everything unchanged.
 """
 
 import os
 import re
 import sys
+import xml.etree.ElementTree as ET
 
 LABEL = 'منصة الحديث النبوي'
 NETWORK_CONFIG = """<?xml version="1.0" encoding="utf-8"?>
@@ -45,6 +56,10 @@ NETWORK_CONFIG = """<?xml version="1.0" encoding="utf-8"?>
 DESUGAR_LIB = 'com.android.tools:desugar_jdk_libs:2.1.4'
 MIN_AGP = (8, 11, 1)
 MIN_GRADLE = (8, 14)
+
+ANDROID_NS = 'http://schemas.android.com/apk/res/android'
+SIGNING_KTS = 'signingConfig = signingConfigs.getByName("debug")'
+SIGNING_GROOVY = 'signingConfig signingConfigs.debug'
 
 PERMISSIONS = (
     'android.permission.POST_NOTIFICATIONS',
@@ -122,7 +137,79 @@ def patch(manifest: str) -> str:
                 '    <queries>\n' + TTS_INTENT + '    </queries>\n</manifest>',
                 1,
             )
-    return manifest
+    return ensure_launcher_exported(manifest)
+
+
+def ensure_launcher_exported(manifest: str) -> str:
+    """Give every activity that handles MAIN android:exported="true".
+
+    Android 12 (targetSdk 31+) rejects a component with an intent filter and no
+    explicit android:exported, and a launcher activity that is not exported can
+    never be opened from the home screen.
+    """
+    result = manifest
+    for match in reversed(list(re.finditer(r'<activity\b[^>]*>', manifest))):
+        tag = match.group(0)
+        if tag.endswith('/>'):
+            continue
+        close = manifest.find('</activity>', match.end())
+        if close < 0 or 'android.intent.action.MAIN' not in manifest[match.end():close]:
+            continue
+        if re.search(r'android:exported\s*=\s*"true"', tag):
+            continue
+        if re.search(r'android:exported\s*=', tag):
+            fixed = re.sub(r'android:exported\s*=\s*"[^"]*"', 'android:exported="true"', tag, count=1)
+        else:
+            fixed = tag.replace('<activity', '<activity\n            android:exported="true"', 1)
+        result = result[: match.start()] + fixed + result[match.end():]
+    return result
+
+
+def _attr(element: ET.Element, name: str):
+    return element.get('{%s}%s' % (ANDROID_NS, name))
+
+
+def validate_manifest(manifest: str) -> list:
+    """Return the structural problems of a manifest (empty means it is sound)."""
+    try:
+        root = ET.fromstring(manifest.encode('utf-8'))
+    except ET.ParseError as error:
+        return ['AndroidManifest.xml is not well-formed XML: %s' % error]
+    problems = []
+    if root.tag != 'manifest':
+        return ['The root element is <%s>, expected <manifest>.' % root.tag]
+    parents = {child: parent for parent in root.iter() for child in parent}
+    top_level = ('uses-permission', 'uses-permission-sdk-23', 'uses-feature', 'uses-sdk', 'queries', 'permission')
+    for element in root.iter():
+        if element.tag in top_level and parents.get(element) is not root:
+            problems.append('<%s> must be a direct child of <manifest>.' % element.tag)
+        if element.tag in ('activity', 'activity-alias', 'service', 'receiver', 'provider') and (
+            parents.get(element) is None or parents[element].tag != 'application'
+        ):
+            problems.append('<%s> must be inside <application>.' % element.tag)
+        if element.tag in ('activity', 'service', 'receiver') and element.find('intent-filter') is not None:
+            if _attr(element, 'exported') is None:
+                problems.append(
+                    '<%s %s> has an intent-filter but no android:exported.' % (element.tag, _attr(element, 'name'))
+                )
+    applications = [child for child in root if child.tag == 'application']
+    if len(applications) != 1:
+        problems.append('Expected exactly one <application> under <manifest>, found %d.' % len(applications))
+    names = [_attr(child, 'name') for child in root if child.tag == 'uses-permission']
+    for name in sorted({n for n in names if names.count(n) > 1}):
+        problems.append('Duplicate <uses-permission> for %s.' % name)
+    launchers = []
+    for activity in root.iter('activity'):
+        for action in activity.iter('action'):
+            if _attr(action, 'name') == 'android.intent.action.MAIN':
+                launchers.append(activity)
+                break
+    if not launchers:
+        problems.append('No activity handles android.intent.action.MAIN.')
+    for activity in launchers:
+        if _attr(activity, 'exported') != 'true':
+            problems.append('Launcher activity %s must have android:exported="true".' % _attr(activity, 'name'))
+    return problems
 
 
 def _insert_after_block_open(text: str, block: str, line: str, indent: str) -> str:
@@ -133,8 +220,89 @@ def _insert_after_block_open(text: str, block: str, line: str, indent: str) -> s
     return text[: match.end()] + indent + line + '\n' + text[match.end():]
 
 
+def _match_brace(text: str, open_index: int) -> int:
+    """Index of the `}` closing the `{` at open_index, skipping comments and strings; -1 if none."""
+    depth = 0
+    i = open_index
+    size = len(text)
+    while i < size:
+        char = text[i]
+        if text.startswith('//', i):
+            end = text.find('\n', i)
+            i = size if end < 0 else end
+            continue
+        if text.startswith('/*', i):
+            end = text.find('*/', i + 2)
+            i = size if end < 0 else end + 2
+            continue
+        if char in '"\'':
+            j = i + 1
+            while j < size and text[j] != char:
+                j += 2 if text[j] == '\\' else 1
+            i = j + 1
+            continue
+        if char == '{':
+            depth += 1
+        elif char == '}':
+            depth -= 1
+            if depth == 0:
+                return i
+        i += 1
+    return -1
+
+
+def _find_block(text: str, name: str, start: int = 0, end: int = -1):
+    """(open, close) indexes of the first `name { ... }` block in text[start:end], or None."""
+    limit = len(text) if end < 0 else end
+    pattern = re.compile(r'(?<![\w.])%s\s*\{' % re.escape(name))
+    index = start
+    while True:
+        match = pattern.search(text, index, limit)
+        if match is None:
+            return None
+        before = text.rfind('\n', 0, match.start()) + 1
+        if text[before:match.start()].lstrip().startswith(('//', '*', '/*')):
+            index = match.end()
+            continue
+        open_index = match.end() - 1
+        close_index = _match_brace(text, open_index)
+        if close_index < 0:
+            return None
+        return open_index, close_index
+
+
+def ensure_release_signing(text: str, kotlin_dsl: bool) -> str:
+    """Make the release build type use the debug signing config (idempotent).
+
+    `flutter create` already does this, but the script does not rely on the
+    template: an unsigned release APK cannot be installed on a device.
+    """
+    line = SIGNING_KTS if kotlin_dsl else SIGNING_GROOVY
+    build_types = _find_block(text, 'buildTypes')
+    if build_types is None:
+        android = _find_block(text, 'android')
+        if android is None:
+            return text
+        block = '\n    buildTypes {\n        release {\n            %s\n        }\n    }\n' % line
+        return text[: android[1]].rstrip(' \t') + block + text[android[1]:]
+    release = _find_block(text, 'release', build_types[0] + 1, build_types[1])
+    if release is None:
+        block = '\n        release {\n            %s\n        }' % line
+        return text[: build_types[0] + 1] + block + text[build_types[0] + 1:]
+    body = text[release[0] + 1: release[1]]
+    existing = re.search(r'^[ \t]*signingConfig\b[^\n]*$', body, flags=re.MULTILINE)
+    if existing is None:
+        return text[: release[0] + 1] + '\n            ' + line + text[release[0] + 1:]
+    if re.search(r'signingConfigs\s*(\.\s*debug\b|\.\s*getByName\(\s*["\']debug["\']\s*\))', existing.group(0)):
+        return text
+    start = release[0] + 1 + existing.start()
+    end = release[0] + 1 + existing.end()
+    indent = re.match(r'[ \t]*', existing.group(0)).group(0)
+    return text[:start] + indent + line + text[end:]
+
+
 def patch_gradle(text: str, kotlin_dsl: bool) -> str:
-    """Enable core library desugaring for the app module (idempotent)."""
+    """Enable core library desugaring and debug-signed release builds (idempotent)."""
     enabled = 'isCoreLibraryDesugaringEnabled = true' if kotlin_dsl else 'coreLibraryDesugaringEnabled true'
     multidex = 'multiDexEnabled = true' if kotlin_dsl else 'multiDexEnabled true'
     dependency = (
@@ -160,7 +328,7 @@ def patch_gradle(text: str, kotlin_dsl: bool) -> str:
             )
         else:
             text = text.rstrip('\n') + '\n\ndependencies {\n    ' + dependency + '\n}\n'
-    return text
+    return ensure_release_signing(text, kotlin_dsl)
 
 
 def _version_tuple(value: str) -> tuple:
@@ -236,6 +404,9 @@ def main(argv: list) -> int:
     with open(path, encoding='utf-8') as handle:
         original = handle.read()
     patched = patch(original)
+    problems = validate_manifest(patched)
+    if problems:
+        raise SystemExit('The patched AndroidManifest.xml is invalid:\n  - ' + '\n  - '.join(problems))
     if patched != original:
         with open(path, 'w', encoding='utf-8') as handle:
             handle.write(patched)

@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Unit-test the Android patch and verification scripts
+        run: python3 -m unittest discover -s tools/android -p 'test_*.py' -v
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -26,15 +29,19 @@ jobs:
       - name: Generate Android Scaffolding
         run: flutter create --platforms=android --org app.hadithplatform --project-name hadith_platform .
 
-      - name: Configure Android manifest (internet, local audio cache proxy, TTS)
+      - name: Configure Android manifest, signing and Gradle
         run: python3 tools/android/patch_manifest.py android
 
       - name: Show the effective Android configuration
         run: |
-          echo "--- app/build.gradle(.kts)"; cat android/app/build.gradle* || true
-          echo "--- settings.gradle(.kts)"; cat android/settings.gradle* || true
-          echo "--- gradle-wrapper.properties"; cat android/gradle/wrapper/gradle-wrapper.properties || true
-          echo "--- AndroidManifest.xml"; cat android/app/src/main/AndroidManifest.xml
+          {
+            echo "--- app/build.gradle(.kts)"; cat android/app/build.gradle* || true
+            echo "--- settings.gradle(.kts)"; cat android/settings.gradle* || true
+            echo "--- gradle-wrapper.properties"; cat android/gradle/wrapper/gradle-wrapper.properties || true
+            echo "--- AndroidManifest.xml"; cat android/app/src/main/AndroidManifest.xml
+          } > android-config.txt
+          cat android-config.txt
+          python3 tools/ci/annotate.py notice "Android configuration" --file android-config.txt
 
       - name: Remove dummy widget test
         run: rm -f test/widget_test.dart
@@ -45,11 +52,60 @@ jobs:
       - name: Run Integrity Tests
         run: flutter test || true
 
+      # One universal APK (arm64, arm32 and x86_64 inside) instead of three
+      # per-ABI files: there is no wrong file to pick on a phone.
       - name: Build APK
-        run: flutter build apk --split-per-abi
+        run: flutter build apk --release
+
+      # Fails the build, and so blocks the upload, if the APK cannot be
+      # installed: malformed manifest structure, unsigned, or a broken archive.
+      - name: Verify the APK (manifest structure and signature)
+        if: ${{ !cancelled() }}
+        run: |
+          python3 tools/android/verify_apk.py build/app/outputs/flutter-apk > apk-report.txt 2>&1 && status=0 || status=$?
+          cat apk-report.txt
+          python3 tools/ci/annotate.py $([ $status -eq 0 ] && echo notice || echo error) "APK verification" --file apk-report.txt
+          exit $status
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: build/app/outputs/flutter-apk/*.apk
+
+  # Installs the finished APK on an emulator the way a phone would and launches
+  # it. Informational: it never blocks the APK, which is already uploaded.
+  install-test:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the APK built above
+        uses: actions/download-artifact@v4
+        with:
+          name: app-release
+          path: apk
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Install and launch on an Android 14 emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: bash tools/android/emulator_install_check.sh apk/app-release.apk
+
+      - name: Publish the install report
+        if: ${{ always() }}
+        run: |
+          test -f install-report.txt || echo "no report: the emulator did not start" > install-report.txt
+          python3 tools/ci/annotate.py $(grep -q "RESULT: INSTALLED AND RUNNING" install-report.txt && echo notice || echo error) "Emulator install test" --file install-report.txt
