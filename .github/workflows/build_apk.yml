@@ -72,3 +72,40 @@ jobs:
         with:
           name: app-release
           path: build/app/outputs/flutter-apk/*.apk
+
+  # Installs the finished APK on an emulator the way a phone would and launches
+  # it. Informational: it never blocks the APK, which is already uploaded.
+  install-test:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download the APK built above
+        uses: actions/download-artifact@v4
+        with:
+          name: app-release
+          path: apk
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Install and launch on an Android 14 emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: bash tools/android/emulator_install_check.sh apk/app-release.apk
+
+      - name: Publish the install report
+        if: ${{ always() }}
+        run: |
+          test -f install-report.txt || echo "no report: the emulator did not start" > install-report.txt
+          python3 tools/ci/annotate.py $(grep -q "RESULT: INSTALLED AND RUNNING" install-report.txt && echo notice || echo error) "Emulator install test" --file install-report.txt

@@ -39,7 +39,20 @@ GOOD_TREE = """N: android=http://schemas.android.com/apk/res/android (line=2)
 """
 
 
+URI = 'http://schemas.android.com/apk/res/android:'
+# aapt2 prints namespaced attribute names with the namespace URI, not the prefix.
+GOOD_TREE_URI = GOOD_TREE.replace('A: android:', 'A: ' + URI)
+
+
 class XmlTreeTest(unittest.TestCase):
+    def test_namespace_uri_attributes_are_read_as_android_prefixed(self) -> None:
+        root = va.parse_xmltree(GOOD_TREE_URI)
+        self.assertEqual(va.manifest_problems(root), [])
+        self.assertEqual(va.permissions_of(root), ['android.permission.INTERNET', 'android.permission.VIBRATE'])
+        self.assertEqual(root.find_all('activity')[0].attrs['android:exported'], 'true')
+        broken = GOOD_TREE_URI.replace('=(type 0x12)0xffffffff', '=(type 0x12)0x0')
+        self.assertTrue(any('not exported' in p for p in va.manifest_problems(va.parse_xmltree(broken))))
+
     def test_values_are_normalised(self) -> None:
         self.assertEqual(va.parse_attribute_value('(type 0x12)0xffffffff'), 'true')
         self.assertEqual(va.parse_attribute_value('true'), 'true')
@@ -123,14 +136,19 @@ class ZipTest(unittest.TestCase):
                 handle.write(b'this is not a zip')
             self.assertTrue(any('Not a valid zip' in p for p in va.zip_problems(path)))
 
-    def test_alignment_helper(self) -> None:
-        class Info:
-            filename = 'resources.arsc'
-            extra = b''
-            header_offset = 0
-
-        self.assertEqual(va.data_offset(Info()), 30 + len('resources.arsc'))
-        self.assertEqual(va.data_offset(Info()) % 4, 0)
+    def test_data_offset_points_at_the_entry_data_in_the_local_header(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            path = self._apk(
+                folder,
+                {
+                    'AndroidManifest.xml': (b'm', zipfile.ZIP_STORED),
+                    'resources.arsc': (b'ARSC-DATA', zipfile.ZIP_STORED),
+                },
+            )
+            with open(path, 'rb') as raw, zipfile.ZipFile(raw) as archive:
+                offset = va.data_offset(raw, archive.getinfo('resources.arsc'))
+                raw.seek(offset)
+                self.assertEqual(raw.read(9), b'ARSC-DATA')
 
     def test_collect_and_main_without_apks(self) -> None:
         with tempfile.TemporaryDirectory() as folder:

@@ -23,6 +23,7 @@ import hashlib
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import zipfile
@@ -49,6 +50,7 @@ class Node:
 
 
 _ATTRIBUTE = re.compile(r'^A:\s+([^\s(=]+)(?:\(0x[0-9a-fA-F]+\))?=(.*)$')
+_ANDROID_URI = 'http://schemas.android.com/apk/res/android:'
 _RAW = re.compile(r'\(Raw:\s*"(.*)"\)\s*$')
 
 
@@ -88,7 +90,11 @@ def parse_xmltree(text: str):
         elif body.startswith('A: ') and stack:
             match = _ATTRIBUTE.match(body)
             if match is not None:
-                stack[-1][1].attrs[match.group(1)] = parse_attribute_value(match.group(2))
+                # aapt2 prints the namespace as its URI; compare by the usual prefix.
+                key = match.group(1)
+                if key.startswith(_ANDROID_URI):
+                    key = 'android:' + key[len(_ANDROID_URI):]
+                stack[-1][1].attrs[key] = parse_attribute_value(match.group(2))
     return root
 
 
@@ -136,15 +142,24 @@ def permissions_of(root) -> list:
     )
 
 
-def data_offset(info) -> int:
-    """Offset of an entry's data in the archive (after the local header)."""
-    return info.header_offset + 30 + len(info.filename.encode('utf-8')) + len(info.extra or b'')
+def data_offset(handle, info) -> int:
+    """Offset of an entry's data in the archive, read from its local header.
+
+    The central directory copy of the extra field can differ from the local one
+    (zipalign pads the local header), so the local header is the authority.
+    """
+    handle.seek(info.header_offset)
+    header = handle.read(30)
+    if len(header) < 30 or header[:4] != b'PK\x03\x04':
+        raise zipfile.BadZipFile('Bad local header for %s' % info.filename)
+    name_length, extra_length = struct.unpack('<HH', header[26:30])
+    return info.header_offset + 30 + name_length + extra_length
 
 
 def zip_problems(path: str) -> list:
     problems = []
     try:
-        with zipfile.ZipFile(path) as archive:
+        with open(path, 'rb') as raw, zipfile.ZipFile(raw) as archive:
             broken = archive.testzip()
             if broken is not None:
                 problems.append('Corrupt zip entry: %s' % broken)
@@ -156,7 +171,7 @@ def zip_problems(path: str) -> list:
                 info = archive.getinfo('resources.arsc')
                 if info.compress_type != zipfile.ZIP_STORED:
                     problems.append('resources.arsc is compressed; it must be stored uncompressed.')
-                elif data_offset(info) % 4 != 0:
+                elif data_offset(raw, info) % 4 != 0:
                     problems.append('resources.arsc is not 4-byte aligned.')
     except zipfile.BadZipFile as error:
         problems.append('Not a valid zip/APK: %s' % error)
@@ -213,6 +228,7 @@ def verify_apk(path: str, tools: dict) -> tuple:
     """(ok, report lines) for one APK."""
     lines = ['== %s' % os.path.basename(path)]
     failures = []
+    manifest_dump = ''
     digest = hashlib.sha256()
     with open(path, 'rb') as handle:
         for block in iter(lambda: handle.read(1 << 20), b''):
@@ -232,7 +248,7 @@ def verify_apk(path: str, tools: dict) -> tuple:
         if code != 0:
             failures.append('aapt2 could not parse the APK (exit %d): %s' % (code, badging.strip()[:300]))
         else:
-            for key in ('package:', 'sdkVersion:', 'targetSdkVersion:', 'native-code:', 'launchable-activity:'):
+            for key in ('package:', 'sdkVersion:', 'targetSdkVersion:', 'application-label', 'native-code:', 'launchable-activity:'):
                 for line in badging.splitlines():
                     if line.startswith(key):
                         lines.append(line.strip())
@@ -245,6 +261,7 @@ def verify_apk(path: str, tools: dict) -> tuple:
         else:
             root = parse_xmltree(tree)
             found = manifest_problems(root)
+            manifest_dump = tree
             failures.extend(found)
             lines.append('manifest: %s' % ('structure sound' if not found else 'PROBLEMS'))
             lines.append('permissions: %s' % ', '.join(p.replace('android.permission.', '') for p in permissions_of(root)))
@@ -261,6 +278,9 @@ def verify_apk(path: str, tools: dict) -> tuple:
     for failure in failures:
         lines.append('FAIL: %s' % failure)
     lines.append('RESULT: %s' % ('PASS' if not failures else 'FAIL'))
+    if manifest_dump:
+        lines.append('--- compiled AndroidManifest.xml (aapt2 dump xmltree)')
+        lines.append(manifest_dump.rstrip())
     return not failures, lines
 
 
