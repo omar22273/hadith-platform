@@ -237,7 +237,7 @@ class GradleSigningTest(unittest.TestCase):
     def test_the_template_signing_is_kept_and_desugaring_is_added(self) -> None:
         patched = pm.patch_gradle(TEMPLATE_KTS, True)
         self.assertIn(pm.SIGNING_KTS, _release_block(patched))
-        self.assertEqual(patched.count('signingConfig'), TEMPLATE_KTS.count('signingConfig'))
+        self.assertEqual(_release_block(patched).count('signingConfig'), _release_block(TEMPLATE_KTS).count('signingConfig'))
         self.assertIn('isCoreLibraryDesugaringEnabled = true', patched)
         self.assertIn('multiDexEnabled = true', patched)
         self.assertIn('coreLibraryDesugaring("%s")' % pm.DESUGAR_LIB, patched)
@@ -301,6 +301,38 @@ class GradleSigningTest(unittest.TestCase):
         self.assertIn(pm.SIGNING_KTS, _release_block(patched))
         self.assertEqual(patched.count(pm.SIGNING_KTS), 1)
         self.assertEqual(pm.patch_gradle(patched, True), patched)
+
+
+class StableKeyTest(unittest.TestCase):
+    def test_kotlin_template_gets_the_public_keystore_with_all_three_schemes(self) -> None:
+        patched = pm.patch_gradle(TEMPLATE_KTS, True)
+        self.assertIn('signingConfigs {\n        getByName("debug") {', patched)
+        self.assertIn('rootProject.file("../tools/android/hadith-stable.keystore")', patched)
+        for scheme in ('enableV1Signing = true', 'enableV2Signing = true', 'enableV3Signing = true'):
+            self.assertIn(scheme, patched)
+        self.assertEqual(patched.count(pm.STABLE_KEYSTORE), 1)
+        self.assertEqual(pm.patch_gradle(patched, True), patched)
+
+    def test_groovy_template_gets_the_public_keystore_with_all_three_schemes(self) -> None:
+        patched = pm.patch_gradle(TEMPLATE_GROOVY, False)
+        self.assertIn('signingConfigs {\n        debug {', patched)
+        for scheme in ('enableV1Signing true', 'enableV2Signing true', 'enableV3Signing true'):
+            self.assertIn(scheme, patched)
+        self.assertEqual(pm.patch_gradle(patched, False), patched)
+
+    def test_an_existing_signing_configs_block_receives_the_entry_inside_it(self) -> None:
+        with_block = TEMPLATE_KTS.replace('    buildTypes {', '    signingConfigs {\n    }\n\n    buildTypes {')
+        patched = pm.patch_gradle(with_block, True)
+        self.assertEqual(patched.count('signingConfigs {'), 1)
+        block_start = patched.index('signingConfigs {')
+        self.assertLess(block_start, patched.index(pm.STABLE_KEYSTORE))
+        self.assertLess(patched.index(pm.STABLE_KEYSTORE), patched.index('buildTypes {'))
+        self.assertEqual(pm.patch_gradle(patched, True), patched)
+
+    def test_the_committed_keystore_exists_next_to_the_scripts(self) -> None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), pm.STABLE_KEYSTORE)
+        self.assertTrue(os.path.isfile(path))
+        self.assertGreater(os.path.getsize(path), 1000)
 
 
 if __name__ == '__main__':
