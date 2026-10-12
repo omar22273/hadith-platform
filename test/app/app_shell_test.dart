@@ -1,4 +1,4 @@
-// اختبارات دخان لغلاف التطبيق: تُبنى التبويبات الأربعة من بيانات الأصول
+// اختبارات دخان لغلاف التطبيق: تُبنى التبويبات الخمسة من بيانات الأصول
 // الحقيقية دون أخطاء تخطيط، ويحفظ IndexedStack حالتها، وتفتح النقرات الخمس
 // على رقم الإصدار لوحة الإدخال المحلية، ويُفتح وِرد اليوم من المسار.
 
@@ -11,8 +11,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hadith_platform/app/app_shell_screen.dart';
 import 'package:hadith_platform/app/hadith_app.dart';
 import 'package:hadith_platform/core/content/asset_json_source.dart';
+import 'package:hadith_platform/core/navigation/app_tab.dart';
 import 'package:hadith_platform/core/storage/key_value_store.dart';
 import 'package:hadith_platform/core/time/clock.dart';
+import 'package:hadith_platform/features/adhkar/presentation/adhkar_screen.dart';
+import 'package:hadith_platform/features/adhkar/presentation/widgets/dhikr_card.dart';
 import 'package:hadith_platform/features/admin/presentation/admin_export_screen.dart';
 import 'package:hadith_platform/features/daily_session/presentation/daily_hadith_session_screen.dart';
 import 'package:hadith_platform/features/journey/presentation/widgets/caravan_trail_view.dart';
@@ -60,7 +63,7 @@ Future<void> _pumpApp(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('the shell builds all four tabs and opens the hidden admin gate', (WidgetTester tester) async {
+  testWidgets('the shell builds all five tabs in order and opens the hidden admin gate', (WidgetTester tester) async {
     await _pumpApp(tester);
 
     // الشريط السفلي لا يبتلع المساحة: جسم الغلاف يأخذ معظم ارتفاع الشاشة.
@@ -71,9 +74,30 @@ void main() {
     expect(find.text('الأعمال بالنيات'), findsWidgets);
     expect(find.text('قيد الإعداد'), findsWidgets);
 
+    // خمسة ألسنة متناسقة بالترتيب المطلوب، من اليمين إلى اليسار.
+    final List<String> labels = <String>[
+      'الأربعين النووية',
+      'رحلة السيرة',
+      'وِرد الأذكار',
+      'ميدان المراجعة',
+      'الإعدادات',
+    ];
+    expect(AppTab.values.map((AppTab t) => t.label).toList(), labels);
+    final List<double> lefts = <double>[
+      for (final String label in labels) tester.getTopLeft(_navLabel(label)).dx,
+    ];
+    for (int i = 1; i < lefts.length; i++) {
+      expect(lefts[i], lessThan(lefts[i - 1]), reason: '${labels[i]} sits left of ${labels[i - 1]} in RTL');
+    }
+
     await tester.tap(_navLabel('رحلة السيرة'));
     await _settle(tester);
     expect(find.text('المولد في عام الفيل'), findsWidgets);
+
+    await tester.tap(_navLabel('وِرد الأذكار'));
+    await _settle(tester);
+    expect(find.byType(AdhkarScreen), findsOneWidget);
+    expect(find.byType(DhikrCard), findsOneWidget);
 
     await tester.tap(_navLabel('ميدان المراجعة'));
     await _settle(tester);

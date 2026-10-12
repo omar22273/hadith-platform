@@ -124,6 +124,14 @@ EXTRAS = {
     return List<SeerahStationModel>.unmodifiable(result);
   }
 """,
+    "AdhkarCatalog": """
+  /// الأذكار مرتبة بحقل order كما تُعرض في الوِرد.
+  List<DhikrItem> get itemsInOrder {
+    final List<DhikrItem> result = List<DhikrItem>.of(items)
+      ..sort((DhikrItem a, DhikrItem b) => a.order.compareTo(b.order));
+    return List<DhikrItem>.unmodifiable(result);
+  }
+""",
     "SeerahStationModel": """
   /// شواهد مشهد واحد بترتيبها في الملف.
   List<SeerahEvidence> evidenceFor(SeerahScene scene) {

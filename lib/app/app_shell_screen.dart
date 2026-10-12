@@ -1,4 +1,4 @@
-// غلاف التطبيق (AppShellScreen): شريط تنقل سفلي بأربعة تبويبات، وIndexedStack
+// غلاف التطبيق (AppShellScreen): شريط تنقل سفلي بخمسة تبويبات، وIndexedStack
 // يحفظ حالة كل تبويب أثناء التنقل فلا تُعاد تهيئة الواجهات. يُبنى التبويب أول
 // مرة عند زيارته ثم يبقى حياً.
 //
@@ -16,6 +16,7 @@ import '../core/theme/app_palette.dart';
 import '../core/theme/app_typography.dart';
 import '../core/time/clock.dart';
 import '../core/ui/app_shapes.dart';
+import '../features/adhkar/presentation/adhkar_screen.dart';
 import '../features/journey/presentation/arbaeen_path_screen.dart';
 import '../features/reminders/application/reminder_controller.dart';
 import '../features/review/presentation/review_arena_screen.dart';
@@ -61,6 +62,8 @@ class _AppShellScreenState extends ConsumerState<AppShellScreen> {
         return const ArbaeenPathScreen();
       case AppTab.seerah:
         return const SeerahJourneyScreen();
+      case AppTab.adhkar:
+        return const AdhkarScreen();
       case AppTab.review:
         return const ReviewArenaScreen();
       case AppTab.settings:
@@ -185,7 +188,7 @@ class _NavItem extends StatelessWidget {
                     AnimatedContainer(
                       duration: duration,
                       curve: Curves.easeOutCubic,
-                      padding: EdgeInsets.symmetric(horizontal: selected ? 18 : 10, vertical: 4),
+                      padding: EdgeInsets.symmetric(horizontal: selected ? 14 : 8, vertical: 4),
                       decoration: ShapeDecoration(
                         color: selected ? palette.amberSoft : Colors.transparent,
                         shape: AppShapes.rounded(AppShapes.radiusSmall),

@@ -233,7 +233,7 @@ void main() {
     );
     expect(tester.takeException(), isNull);
 
-    for (final String tab in <String>['رحلة السيرة', 'ميدان المراجعة', 'الإعدادات', 'الأربعين النووية']) {
+    for (final String tab in <String>['رحلة السيرة', 'وِرد الأذكار', 'ميدان المراجعة', 'الإعدادات', 'الأربعين النووية']) {
       await tester.tap(_navLabel(tab));
       await settle(tester);
       expect(tester.takeException(), isNull, reason: tab);

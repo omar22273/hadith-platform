@@ -2,20 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/content/models/review_info.dart';
 import '../../data/models/seerah_station.dart';
-
-/// حالة المراجعة العلمية لنص المحطة.
-String reviewStatusLabel(ReviewStatus status) {
-  switch (status) {
-    case ReviewStatus.pendingScholarlyReview:
-      return 'بانتظار المراجعة العلمية';
-    case ReviewStatus.approved:
-      return 'مراجَعة علمياً';
-    case ReviewStatus.changesRequested:
-      return 'طُلبت تعديلات علمية';
-  }
-}
 
 /// اسم الحقبة.
 String epochLabel(SeerahEpoch epoch) {

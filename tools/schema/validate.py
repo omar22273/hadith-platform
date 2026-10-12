@@ -19,6 +19,7 @@ ok = all([
     check("assets/data/catalogs/narrators.json", "NarratorCatalog"),
     check("assets/data/catalogs/sources.json", "SourceCatalog"),
     check("assets/data/seerah_dataset.json", "SeerahDataset"),
+    check("assets/data/adhkar/adhkar_catalog.json", "AdhkarCatalog"),
     check("assets/data/curriculum/nawawi40_curriculum.json", "CurriculumManifest"),
     check("assets/data/catalogs/wisdom_bank.json", "WisdomCatalog"),
 ])

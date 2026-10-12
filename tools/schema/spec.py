@@ -467,6 +467,22 @@ MODELS = [
         F("scene", "E:SeerahScene", "المشهد الذي يشهد له النص."),
         F("source", "SourceRef", "المصدر والموضع ونص الشاهد حرفياً."),
     ]),
+    # ---------------------------------------------------------------- adhkar
+    Model("AdhkarCatalog", "adhkar.dart", "ملف الأذكار النبوية لوِرد الأذكار، مرتبة كما تُعرض.", [
+        F("schemaVersion", "String", "إصدار المخطط.", **SEMVER),
+        F("id", "String", "المعرّف.", **ID),
+        F("title", "String", "العنوان."),
+        F("items", "List<DhikrItem>", "الأذكار بترتيب عرضها في الوِرد.", minItems=1),
+    ]),
+    Model("DhikrItem", "adhkar.dart", "ذكر نبوي بعدده المسنون الثابت وشواهده الموثقة.", [
+        F("id", "String", "معرّف الذكر.", **ID),
+        F("order", "int", "الترتيب في الوِرد.", minimum=1),
+        F("title", "String", "عنوان الذكر."),
+        F("text", "String", "نص الذكر مشكولاً كما في الشاهد حرفياً، وهو جزء من نص أحد الشواهد."),
+        F("count", "int", "العدد المسنون الثابت في الحديث؛ بلوغه يقفل الذكر.", minimum=1, maximum=1000),
+        F("evidence", "List<SourceRef>", "الشواهد: نص الحديث حرفياً من المصدر المعتمد مع موضعه.", minItems=1),
+        F("review", "ReviewInfo", "حالة المراجعة العلمية."),
+    ]),
     # ---------------------------------------------------------------- admin intake
     Model("HadithDraft", "hadith_draft.dart", "مسودة حديث من لوحة الإدخال، تُحوَّل لاحقاً إلى HadithDailyModel بعد التوثيق.", [
         F("schemaVersion", "String", "إصدار المخطط.", **SEMVER),
@@ -489,6 +505,7 @@ FILE_DOCS = {
     "token_anchor.dart": "مراسي الكلمات في المتن.",
     "review_info.dart": "حالة المراجعة العلمية المشتركة بين الحديث والسيرة.",
     "seerah_station.dart": "محطات رحلة السيرة ومشاهدها الثلاثة.",
+    "adhkar.dart": "وِرد الأذكار النبوية: الأذكار بأعدادها المسنونة وشواهدها.",
     "hadith_draft.dart": "مسودات الإدخال المصدّرة من لوحة الإدارة.",
     "hadith_daily_model.dart": "النموذج الجذري للوِرد اليومي.",
     "historical_context.dart": "المرحلة الأولى: سياق الورود.",
@@ -514,5 +531,6 @@ FILE_DIRS = {
     "source_catalog.dart": "core/content/models",
     "review_info.dart": "core/content/models",
     "seerah_station.dart": "features/seerah/data/models",
+    "adhkar.dart": "features/adhkar/data/models",
     "hadith_draft.dart": "features/admin/data/models",
 }

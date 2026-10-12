@@ -82,7 +82,7 @@ def build_schema():
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "$id": "https://hadith-platform.app/schema/hadith_platform.schema.json",
         "title": "HadithDailyModel",
-        "description": "مخطط بيانات منصة الحديث النبوي. الجذر هو HadithDailyModel، والملفات الأخرى تُتحقق عبر $defs: SourceCatalog وNarratorCatalog وCurriculumManifest وWisdomCatalog وSeerahDataset، ومسودات لوحة الإدخال عبر HadithDraft.",
+        "description": "مخطط بيانات منصة الحديث النبوي. الجذر هو HadithDailyModel، والملفات الأخرى تُتحقق عبر $defs: SourceCatalog وNarratorCatalog وCurriculumManifest وWisdomCatalog وSeerahDataset وAdhkarCatalog، ومسودات لوحة الإدخال عبر HadithDraft.",
         "$ref": "#/$defs/HadithDailyModel",
         "$defs": defs,
     }
