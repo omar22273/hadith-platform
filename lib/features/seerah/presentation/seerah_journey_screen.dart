@@ -18,8 +18,8 @@ import '../application/seerah_providers.dart';
 import '../data/models/seerah_station.dart';
 import '../domain/seerah_map.dart';
 import '../domain/seerah_repository.dart';
+import 'seerah_narrative_screen.dart';
 import 'seerah_scene_screen.dart';
-import 'widgets/seerah_detail_sheet.dart';
 import 'widgets/seerah_labels.dart';
 import 'widgets/seerah_map_view.dart';
 import 'widgets/seerah_timeline.dart';
@@ -114,6 +114,14 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
       await Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
           builder: (BuildContext routeContext) => SeerahSceneScreen(stationId: station.id),
+        ),
+      );
+    }
+
+    Future<void> openNarrative(SeerahStationModel station) async {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (BuildContext routeContext) => SeerahNarrativeScreen(station: station),
         ),
       );
     }
@@ -299,7 +307,7 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
               total: stations.length,
               visited: visited.contains(selected.id),
               onOpen: () => openScenes(selected),
-              onDetails: () => showSeerahDetailSheet(context, selected),
+              onDetails: () => openNarrative(selected),
             ),
           ),
         ),
@@ -382,10 +390,12 @@ class _SelectedStationCard extends StatelessWidget {
             onPressed: onOpen,
           ),
           const SizedBox(height: 8),
-          OutlinedButton.icon(
+          WideActionButton(
+            label: 'الرواية الكاملة وتفاصيل الحدث',
+            subtitle: 'مطالعة موسعة بخط تراثي يتبع حجم الخط في الإعدادات',
+            icon: Icons.auto_stories_rounded,
+            tone: WideActionTone.secondary,
             onPressed: onDetails,
-            icon: const Icon(Icons.menu_book_rounded),
-            label: const Text('التفاصيل والرواية الكاملة'),
           ),
         ],
       ),

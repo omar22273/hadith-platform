@@ -1,5 +1,6 @@
 // فحص سلامة محطات السيرة قبل عرضها: معرّفات وترتيب فريدان، ونصوص مشاهد
-// غير فارغة، وشاهد منقول بنصه لكل مشهد من المشاهد الثلاثة، ومصادر معروفة.
+// غير فارغة، وشاهد منقول بنصه لكل مشهد من المشاهد الثلاثة، ومصادر معروفة،
+// والرواية المفصلة (detailed_narrative) إن وُجدت ليست بياضاً.
 
 import '../../../core/content/models/source_catalog.dart';
 import '../../../core/content/models/source_ref.dart';
@@ -30,6 +31,10 @@ List<String> checkSeerahDataset(SeerahDataset dataset, {SourceCatalog? sources})
         issues.add('$path.$field: must not be blank.');
       }
     });
+    final String? narrative = station.detailedNarrative;
+    if (narrative != null && narrative.trim().isEmpty) {
+      issues.add('$path.detailed_narrative: must not be blank when present.');
+    }
     for (final SeerahScene scene in SeerahScene.values) {
       if (station.evidenceFor(scene).isEmpty) {
         issues.add('$path: No evidence for scene "${scene.wire}".');

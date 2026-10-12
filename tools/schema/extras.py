@@ -131,5 +131,23 @@ EXTRAS = {
       evidence.where((SeerahEvidence item) => item.scene == scene),
     );
   }
+
+  /// فقرات الرواية المفصلة (تفصل بينها سطور فارغة)؛ فارغة إن غابت الرواية
+  /// أو كانت بياضاً، فيعود العرض إلى نصوص المشاهد الموثقة.
+  List<String> get narrativeParagraphs {
+    final String? text = detailedNarrative;
+    if (text == null) {
+      return const <String>[];
+    }
+    return List<String>.unmodifiable(
+      text
+          .split(RegExp(r'\\n\\s*\\n'))
+          .map((String paragraph) => paragraph.trim())
+          .where((String paragraph) => paragraph.isNotEmpty),
+    );
+  }
+
+  /// هل للمحطة رواية مفصلة جاهزة للعرض.
+  bool get hasDetailedNarrative => narrativeParagraphs.isNotEmpty;
 """,
 }

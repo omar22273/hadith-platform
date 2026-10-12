@@ -75,8 +75,8 @@ def build_schema():
             "type": "object",
             "description": m.doc,
             "additionalProperties": False,
-            "required": [f.name for f in m.fields],
-            "properties": {f.name: schema_for_field(f) for f in m.fields},
+            "required": [f.wire for f in m.fields if not f.optional],
+            "properties": {f.wire: schema_for_field(f) for f in m.fields},
         }
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -91,7 +91,7 @@ def build_schema():
 # ------------------------------------------------------------------ dart
 def from_json_expr(f):
     p = parse_type(f.type)
-    k = f"'{f.name}'"
+    k = f"'{f.wire}'"
     if p["kind"] == "prim":
         fn = {"String": "readString", "int": "readInt", "double": "readDouble", "bool": "readBool"}[p["name"]]
         if p["nullable"]:
@@ -162,7 +162,8 @@ def gen_model(m: Model):
     # constructor
     out += f"  const {m.name}({{\n"
     for f in m.fields:
-        out += f"    required this.{f.name},\n"
+        # الحقل الاختياري لا يُلزِم من يبني النموذج مباشرةً، فلا ينكسر ما قبله.
+        out += f"    {'' if f.optional else 'required '}this.{f.name},\n"
     out += "  });\n\n"
     # fromJson
     out += f"  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.\n"
@@ -185,7 +186,11 @@ def gen_model(m: Model):
     out += "  JsonMap toJson() {\n"
     out += "    return <String, dynamic>{\n"
     for f in m.fields:
-        out += f"      '{f.name}': {to_json_expr(f)},\n"
+        if f.optional:
+            # حقل اختياري: لا يُكتب إن كان null فتبقى الملفات القديمة كما هي.
+            out += f"      if ({f.name} != null) '{f.wire}': {to_json_expr(f)},\n"
+        else:
+            out += f"      '{f.wire}': {to_json_expr(f)},\n"
     out += "    };\n"
     out += "  }\n\n"
     # equality
