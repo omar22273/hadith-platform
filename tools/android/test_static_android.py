@@ -105,6 +105,9 @@ class SigningTest(unittest.TestCase):
         self.assertIsNotNone(release)
         self.assertIn('signingConfig = signingConfigs.getByName("debug")', release.group(1))
 
+    def test_min_sdk_is_pinned_to_the_flutter_floor(self) -> None:
+        self.assertRegex(self.gradle, r'minSdk\s*=\s*24\b')
+
     def test_no_todo_placeholders(self) -> None:
         self.assertNotIn('TODO', self.gradle)
 
@@ -119,10 +122,11 @@ class WorkflowTest(unittest.TestCase):
         self.assertNotIn('patch_manifest', self.workflow)
         self.assertFalse(os.path.exists(os.path.join(ROOT, 'tools', 'android', 'patch_manifest.py')))
 
-    def test_the_apk_is_inspected_and_signed_before_upload(self) -> None:
-        for needle in ('aapt dump badging', 'apksigner', 'verify_apk.py'):
+    def test_the_apk_is_split_inspected_and_signed_before_upload(self) -> None:
+        for needle in ('flutter build apk --release --split-per-abi', 'aapt dump badging', 'apksigner', 'verify_apk.py'):
             self.assertIn(needle, self.workflow)
         self.assertLess(self.workflow.index('verify_apk.py'), self.workflow.index('upload-artifact'))
+        self.assertLess(self.workflow.index('dump badging'), self.workflow.index('upload-artifact'))
 
 
 if __name__ == '__main__':

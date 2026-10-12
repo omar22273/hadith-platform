@@ -31,7 +31,8 @@ android {
     defaultConfig {
         multiDexEnabled = true
         applicationId = "app.hadithplatform.hadith_platform"
-        minSdk = flutter.minSdkVersion
+        // Flutter 3.35+ refuses to build below API 24 (Android 7.0), so 24 is the floor.
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         // versionCode and versionName come from pubspec.yaml.
         versionCode = flutter.versionCode

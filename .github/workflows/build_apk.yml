@@ -35,84 +35,111 @@ jobs:
       - name: Run Integrity Tests
         run: flutter test || true
 
-      # One universal APK (arm64, arm32 and x86_64 inside) instead of three
-      # per-ABI files: there is no wrong file to pick on a phone.
-      - name: Build APK
-        run: flutter build apk --release
+      # One APK per CPU architecture (arm64-v8a for every modern phone,
+      # armeabi-v7a for old 32-bit phones, x86_64 for emulators): each file is
+      # about a third of a universal APK.
+      - name: Build APKs
+        run: flutter build apk --release --split-per-abi
 
       # The android/ project is committed as plain files (manifest, Gradle, the
-      # stable debug keystore); nothing is generated or patched here. The APK
-      # is aligned and signed once more with apksigner so that v1, v2 and v3
-      # are all present, then inspected with aapt dump badging and checked
+      # stable debug keystore); nothing is generated or patched here. Every APK
+      # is read with aapt dump badging exactly as Gradle produced it, aligned,
+      # signed once more with apksigner (v1, v2 and v3 together) and checked
       # with apksigner verify. Any failure stops the job before the upload.
-      - name: Align, sign (v1+v2+v3) and inspect the APK (aapt dump badging, apksigner verify)
+      - name: Inspect (aapt dump badging), align, sign v1+v2+v3 and verify every APK
         run: |
           set -euo pipefail
-          BT="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)"
+          if [ -d "$ANDROID_HOME/build-tools/34.0.0" ]; then
+            BT="$ANDROID_HOME/build-tools/34.0.0"
+          else
+            BT="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)"
+          fi
           echo "build-tools: $BT"
           AAPT="$BT/aapt"
           if [ ! -x "$AAPT" ]; then AAPT="$BT/aapt2"; fi
           mkdir -p dist
-          SRC=build/app/outputs/flutter-apk/app-release.apk
-          "$BT/zipalign" -p -f 4 "$SRC" dist/aligned.apk
-          "$BT/apksigner" sign \
-            --ks tools/android/hadith-stable.keystore \
-            --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey \
-            --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
-            --out dist/app-release.apk dist/aligned.apk
-          rm -f dist/aligned.apk dist/*.idsig
-          "$BT/zipalign" -c -p 4 dist/app-release.apk
-          {
-            echo "== $AAPT dump badging"
-            "$AAPT" dump badging dist/app-release.apk | grep -E "^(package|sdkVersion|minSdkVersion|targetSdkVersion|application-label:|launchable-activity|native-code)" || true
-            echo "== apksigner verify (v1 required via --min-sdk-version 23)"
-            "$BT/apksigner" verify --verbose --print-certs --min-sdk-version 23 dist/app-release.apk
-          } 2>&1 | tee sign-report.txt
-          grep -q "Verified using v1 scheme (JAR signing): true" sign-report.txt
-          grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" sign-report.txt
+          shopt -s nullglob
+          APKS=(build/app/outputs/flutter-apk/*-release.apk)
+          if [ "${#APKS[@]}" -ne 3 ]; then
+            echo "expected 3 split APKs (armeabi-v7a, arm64-v8a, x86_64), found ${#APKS[@]}"; exit 1
+          fi
+          : > sign-report.txt
+          for SRC in "${APKS[@]}"; do
+            NAME="$(basename "$SRC")"
+            {
+              echo "######## $NAME"
+              echo "== $AAPT dump badging (as built)"
+              "$AAPT" dump badging "$SRC" > badging.txt
+              grep -qE "^package: name='app.hadithplatform.hadith_platform'" badging.txt
+              grep -q "^launchable-activity:" badging.txt
+              grep -E "^(package|sdkVersion|minSdkVersion|targetSdkVersion|application-label:|launchable-activity|native-code)" badging.txt
+              "$BT/zipalign" -p -f 4 "$SRC" dist/aligned.apk
+              "$BT/apksigner" sign \
+                --ks tools/android/hadith-stable.keystore \
+                --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey \
+                --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+                --out "dist/$NAME" dist/aligned.apk
+              rm -f dist/aligned.apk dist/*.idsig
+              "$BT/zipalign" -c -p 4 "dist/$NAME"
+              echo "== $AAPT dump badging (signed)"
+              "$AAPT" dump badging "dist/$NAME" | grep -E "^(package|native-code)"
+              echo "== apksigner verify (v1 required via --min-sdk-version 23)"
+              "$BT/apksigner" verify --verbose --print-certs --min-sdk-version 23 "dist/$NAME" 2>&1 | grep -v "^WARNING: META-INF"
+              "$BT/apksigner" verify --verbose --min-sdk-version 23 "dist/$NAME" 2>&1 | grep -q "Verified using v1 scheme (JAR signing): true"
+              "$BT/apksigner" verify --verbose --min-sdk-version 23 "dist/$NAME" 2>&1 | grep -q "Verified using v2 scheme (APK Signature Scheme v2): true"
+              echo "sha256: $(sha256sum "dist/$NAME" | cut -d' ' -f1)  size: $(stat -c %s "dist/$NAME")"
+            } 2>&1 | tee -a sign-report.txt
+          done
+          (cd dist && sha256sum *.apk > SHA256SUMS.txt && cat SHA256SUMS.txt)
           python3 tools/ci/annotate.py notice "APK signing and badging" --file sign-report.txt
 
-      # Fails the build, and so blocks the upload, if the APK cannot be
+      # Fails the build, and so blocks the upload, if an APK cannot be
       # installed: malformed manifest structure, unsigned, or a broken archive.
-      - name: Verify the APK (manifest structure and signature)
+      - name: Verify the APKs (manifest structure and signature)
         run: |
           python3 tools/android/verify_apk.py dist > apk-report.txt 2>&1 && status=0 || status=$?
           cat apk-report.txt
           python3 tools/ci/annotate.py $([ $status -eq 0 ] && echo notice || echo error) "APK verification" --file apk-report.txt
           exit $status
 
-      - name: Upload APK
+      - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: dist/app-release.apk
+          path: |
+            dist/*.apk
+            dist/SHA256SUMS.txt
 
-      # A public direct link to the plain .apk (no zip, no GitHub sign-in):
-      # https://github.com/<owner>/<repo>/releases/download/apk-latest/app-release.apk
-      - name: Publish the APK as the apk-latest release
+      # Public direct links to the plain .apk files (no zip, no GitHub sign-in):
+      # https://github.com/<owner>/<repo>/releases/download/apk-latest/app-arm64-v8a-release.apk
+      - name: Publish the APKs as the apk-latest release
         if: ${{ github.ref == 'refs/heads/main' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          SHA256="$(sha256sum dist/app-release.apk | cut -d' ' -f1)"
           gh release delete apk-latest --cleanup-tag --yes || true
-          gh release create apk-latest dist/app-release.apk \
+          gh release create apk-latest dist/*.apk dist/SHA256SUMS.txt \
             --target "$GITHUB_SHA" --prerelease \
             --title "Latest APK (${GITHUB_SHA::7})" \
-            --notes "Signed v1+v2+v3, inspected with aapt dump badging and apksigner verify. Commit ${GITHUB_SHA}. SHA-256: ${SHA256}"
+            --notes "Install app-arm64-v8a-release.apk on any modern phone (app-armeabi-v7a-release.apk only for old 32-bit phones). Signed v1+v2+v3, inspected with aapt dump badging and apksigner verify, install-tested on emulators. Commit ${GITHUB_SHA}. Checksums: SHA256SUMS.txt"
 
-  # Installs the finished APK on an emulator the way a phone would and launches
-  # it. Informational: it never blocks the APK, which is already uploaded.
+  # Installs the finished x86_64 APK on emulators of several Android versions
+  # the way a phone would and launches it. Informational: it never blocks the
+  # APKs, which are already uploaded.
   install-test:
     needs: build
     runs-on: ubuntu-latest
     continue-on-error: true
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [24, 29, 34, 35, 36]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download the APK built above
+      - name: Download the APKs built above
         uses: actions/download-artifact@v4
         with:
           name: app-release
@@ -124,17 +151,17 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Install and launch on an Android 14 emulator
+      - name: Install and launch on an Android emulator (API ${{ matrix.api-level }})
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: ${{ matrix.api-level }}
           arch: x86_64
           target: google_apis
           disable-animations: true
-          script: bash tools/android/emulator_install_check.sh apk/app-release.apk
+          script: bash tools/android/emulator_install_check.sh apk/app-x86_64-release.apk
 
       - name: Publish the install report
         if: ${{ always() }}
         run: |
           test -f install-report.txt || echo "no report: the emulator did not start" > install-report.txt
-          python3 tools/ci/annotate.py $(grep -q "RESULT: INSTALLED AND RUNNING" install-report.txt && echo notice || echo error) "Emulator install test" --file install-report.txt
+          python3 tools/ci/annotate.py $(grep -q "RESULT: INSTALLED AND RUNNING" install-report.txt && echo notice || echo error) "Emulator install test API ${{ matrix.api-level }}" --file install-report.txt
