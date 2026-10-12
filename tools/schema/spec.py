@@ -291,7 +291,7 @@ MODELS = [
     ]),
     # ---------------------------------------------------------------- scholar layer
     Model("ScholarLayer", "scholar_layer.dart", "طبقة طالب العلم.", [
-        F("chains", "List<SanadChain>", "أسانيد تُدمج في شجرة الإسناد التفاعلية.", minItems=1),
+        F("chains", "List<SanadChain>", "أسانيد تُدمج في شجرة الإسناد التفاعلية؛ تبقى فارغة للحديث ما لم تُضف تراجم رواته إلى فهرس الرواة."),
         F("variants", "List<NarrationVariant>", "مصفوفة مقارنة الروايات."),
     ]),
     Model("SanadChain", "scholar_layer.dart", "إسناد واحد كما ورد في كتاب، مرتب من النبي ﷺ إلى المصنف.", [

@@ -1,0 +1,324 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_003",
+  "sequence": 3,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 3
+  },
+  "title": "أركان الإسلام الخمسة",
+  "teaser": {
+    "text": "غداً: بيتٌ يقوم على دعائم خمس… فما الدعائم التي لا يثبت البنيان بدونها؟"
+  },
+  "milestone": "بُنيان الإسلام",
+  "context": {
+    "narrative": "أتى رجلٌ عبدَ الله بن عمر رضي الله عنهما فسأله: ما حملك على أن تحج عاماً وتعتمر عاماً وتترك الجهاد في سبيل الله وقد علمتَ ما رغّب الله فيه؟ فأجابه: «يا ابن أخي، بُني الإسلام على خمس». وفي رواية لمسلم قدّم رجلٌ الحج على الصيام، فردّه ابن عمر وقال: هكذا سمعتُه من رسول الله ﷺ.",
+    "humanMotive": "سؤال عن ترك الجهاد مع ما فيه من فضل، فجاء الجواب ببيان دعائم الدين.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sahih_bukhari",
+        "locator": "4515",
+        "quote": "مَا حَمَلَكَ عَلَى أَنْ تَحُجَّ عَامًا وَتَعْتَمِرَ عَامًا، وَتَتْرُكَ الْجِهَادَ فِي سَبِيلِ اللَّهِ"
+      },
+      {
+        "sourceId": "sahih_bukhari",
+        "locator": "4515",
+        "quote": "يَا ابْنَ أَخِي بُنِيَ الإِسْلاَمُ عَلَى خَمْسٍ"
+      },
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "16",
+        "quote": "هَكَذَا سَمِعْتُهُ مِنْ رَسُولِ اللَّهِ"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص151",
+        "quote": "قيل له: فالجهاد؟ قال الجهاد حسن"
+      }
+    ],
+    "cautions": []
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَبِي عَبْدِ الرَّحْمَنِ عَبْدِ اللَّهِ بْنِ عُمَرَ بْنِ الْخَطَّابِ رَضِيَ اللَّهُ عَنْهُمَا قَالَ: سَمِعْتُ رَسُولَ اللَّهِ ﷺ يَقُولُ:"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "بُنِيَ الْإِسْلَامُ عَلَى خَمْسٍ: شَهَادَةِ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَنَّ مُحَمَّدًا رَسُولُ اللَّهِ، وَإِقَامِ الصَّلَاةِ، وَإِيتَاءِ الزَّكَاةِ، وَحَجِّ الْبَيْتِ، وَصَوْمِ رَمَضَانَ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_buniya",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 0,
+          "length": 2,
+          "surface": "بُنِيَ الْإِسْلَامُ"
+        },
+        "headword": "بُنِيَ الْإِسْلَامُ",
+        "meaning": "مُثِّل الإسلام ببنيان دعائمه هذه الخمس، فلا يثبت البنيان بدونها.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص144",
+            "quote": "والمقصود تمثيل الإسلام ببنيانه ودعائم البنيان هذه الخمس، فلا يثبت البنيان بدونها"
+          }
+        ]
+      },
+      {
+        "id": "g_shahada",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 4,
+          "length": 1,
+          "surface": "شَهَادَةِ"
+        },
+        "headword": "الشَّهَادَة",
+        "meaning": "المراد بالشهادتين الإيمان بالله ورسوله.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص144",
+            "quote": "والمراد بالشهادتين الإيمان بالله ورسوله"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح البخاري، رقم 8 · صحيح مسلم، رقم 16",
+      "references": [
+        {
+          "sourceId": "sahih_bukhari",
+          "hadithNumber": "8",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-bukhari.json → hadithnumber 8"
+        },
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "16",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 16.01"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ الْبُخَارِيُّ، وَمُسْلِمٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 3,
+        "label": "بناء الإسلام"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 4,
+        "endToken": 13,
+        "label": "الشهادتان"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 14,
+        "endToken": 17,
+        "label": "الصلاة والزكاة"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 18,
+        "endToken": 21,
+        "label": "الحج والصيام"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 3,
+          "length": 1,
+          "surface": "خَمْسٍ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 4,
+          "length": 1,
+          "surface": "شَهَادَةِ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 21,
+          "length": 1,
+          "surface": "رَمَضَانَ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "ضغط العمل صار يأكل وقتك حتى صرتَ تؤخّر الصلاة عن وقتها، وتقول لنفسك: أنا مشغول بأعمال نافعة للناس كثيرة، وهي تعوّض ما فاتني من العبادة.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أعيد ترتيب يومي فأجعل الأركان الخمسة أصل بنياني، وأبني بقية الأعمال النافعة فوقها.",
+          "feedback": "أحسنت؛ فالأركان دعائم البنيان، وبقية خصال الإسلام تتمة له."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أحافظ على أكثر الأركان، وأرجو أن يغني حسن معاملتي للناس عن الباقي.",
+          "feedback": "حسن المعاملة مطلوب، غير أن الحديث يجعل الأركان الخمس دعائم لا يثبت البنيان بدونها."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "نفع الناس أعظم من العبادات، فأقدّمه على الأركان متى تعارضا.",
+          "feedback": "نفع الناس من تمام البنيان، لكنه لا يقوم مقام الدعائم التي بُني عليها."
+        }
+      ],
+      "takeaway": "الإسلام بناءٌ دعائمه الخمس؛ فاجعلها أساس يومك ثم أتمّ بناءك بسائر الخصال.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص144",
+          "quote": "والمقصود تمثيل الإسلام ببنيانه ودعائم البنيان هذه الخمس، فلا يثبت البنيان بدونها"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص144",
+          "quote": "وبقية خصال الإسلام كتتمة البنيان"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "اجعل الأركان الخمسة أصل يومك وسنتك، فلا يثبت بنيانك بدونها.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص144",
+            "quote": "فلا يثبت البنيان بدونها"
+          }
+        ]
+      },
+      {
+        "text": "بقية خصال الإسلام تتمة للبنيان؛ فلا تُهمل التتمة، ولا تُقدّمها على الأصل.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص144",
+            "quote": "وبقية خصال الإسلام كتتمة البنيان"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 3",
+      "quote": null
+    },
+    "normalizations": [
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "نقل عبارة «[رواه …]» إلى takhrij.compilerStatement دون المعقوفين.",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s1",
+        "tokenIndex": 14,
+        "before": "سَمِعْت",
+        "after": "سَمِعْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "1599",
+          "quote": "سَمِعْتُ رَسُولَ اللَّهِ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 7,
+        "before": "إلَهَ",
+        "after": "إِلَهَ",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 8,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "رواية مسلم (16) تقدّم الحج على الصيام في بعض طرقها وتصحّحها بقول ابن عمر: «صيام رمضان والحج»؛ والمتن المعروض بلفظ الأربعين (الحج ثم الصوم) كما في البخاري (8).",
+      "صُحّح ضبط بعض الكلمات بمطابقة صورة الكلمة (رسماً لا سياقاً) في موضع مشكول من الصحيحين المثبّتين، وهو مسجّل في provenance.vocalizationEdits؛ تُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

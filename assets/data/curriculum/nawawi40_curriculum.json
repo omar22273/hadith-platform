@@ -21,6 +21,54 @@
       "number": 2,
       "title": "الإسلام والإيمان والإحسان",
       "assetPath": "assets/data/hadith/nawawi40/nawawi40_002.json"
+    },
+    {
+      "hadithId": "nawawi40_003",
+      "number": 3,
+      "title": "أركان الإسلام الخمسة",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_003.json"
+    },
+    {
+      "hadithId": "nawawi40_004",
+      "number": 4,
+      "title": "مراحل خلق الإنسان والقدر",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_004.json"
+    },
+    {
+      "hadithId": "nawawi40_005",
+      "number": 5,
+      "title": "رد البدع والمحدثات",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_005.json"
+    },
+    {
+      "hadithId": "nawawi40_006",
+      "number": 6,
+      "title": "الحلال بيّن والحرام بيّن والشبهات",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_006.json"
+    },
+    {
+      "hadithId": "nawawi40_007",
+      "number": 7,
+      "title": "الدين النصيحة",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_007.json"
+    },
+    {
+      "hadithId": "nawawi40_008",
+      "number": 8,
+      "title": "حرمة دم المسلم وماله",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_008.json"
+    },
+    {
+      "hadithId": "nawawi40_009",
+      "number": 9,
+      "title": "اجتناب ما نهى عنه والأمر بالاستطاعة",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_009.json"
+    },
+    {
+      "hadithId": "nawawi40_010",
+      "number": 10,
+      "title": "أكل الحلال وأثر طيب المطعم في استجابة الدعاء",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_010.json"
     }
   ]
 }

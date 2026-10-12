@@ -75,6 +75,18 @@ class _NarratorsList extends StatelessWidget {
         ids.add(variant.companionNarratorId);
       }
     }
+    if (ids.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            'تراجم رواة هذا الحديث قيد التوثيق ولم تُضَف بعد.',
+            textAlign: TextAlign.center,
+            style: text.bodyMedium?.copyWith(color: palette.inkSoft, height: 1.7),
+          ),
+        ),
+      );
+    }
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       itemCount: ids.length,

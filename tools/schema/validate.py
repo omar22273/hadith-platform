@@ -13,9 +13,13 @@ def check(path, defname=None):
     print(("OK  " if not errs else "FAIL"), path)
     for e in errs[:10]: print("   ", list(e.path), e.message[:200])
     return not errs
+import glob, os
+hadith_files = sorted(
+    os.path.relpath(path, root)
+    for path in glob.glob(f"{root}/assets/data/hadith/nawawi40/nawawi40_*.json")
+)
 ok = all([
-    check("assets/data/hadith/nawawi40/nawawi40_001.json"),
-    check("assets/data/hadith/nawawi40/nawawi40_002.json"),
+    *[check(path) for path in hadith_files],
     check("assets/data/catalogs/narrators.json", "NarratorCatalog"),
     check("assets/data/catalogs/sources.json", "SourceCatalog"),
     check("assets/data/seerah_dataset.json", "SeerahDataset"),

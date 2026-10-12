@@ -1,0 +1,361 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_008",
+  "sequence": 8,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 8
+  },
+  "title": "حرمة دم المسلم وماله",
+  "teaser": {
+    "text": "غداً: ما الذي يصون الدم والمال في الإسلام… ومتى يُستثنى؟"
+  },
+  "milestone": "عصمة الدم والمال",
+  "context": {
+    "narrative": "روى عبد الله بن عمر رضي الله عنهما أن النبي ﷺ أُمر بقتال الناس حتى يدخلوا في الإسلام بشروطه، فإذا فعلوا عصموا دماءهم وأموالهم إلا بحق الإسلام. وذكر ابن رجب في شرح معناه ما جرى بعد وفاة النبي ﷺ حين كفر من كفر من العرب، فسأل عمرُ أبا بكر: كيف تقاتل الناس؟ فأجابه أبو بكر بأنه يقاتل من فرّق بين الصلاة والزكاة.",
+    "humanMotive": "بيان ما تُصان به الدماء والأموال في الإسلام، وما يُستثنى منها بحق الإسلام.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص225",
+        "quote": "من رواية واقد بن محمد بن زيد بن عبد الله بن عمر عن أبيه، عن جده عبد الله بن عمر"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص231",
+        "quote": "قال عمر لأبي بكر: كيف تقاتل الناس وقد قال رسول الله صلى الله عليه وسلم: أمرت أن أقاتل الناس"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص231",
+        "quote": "فقال أبو بكر: والله لأقاتلن من فرق بين الصلاة والزكاة"
+      },
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "22",
+        "quote": "أُمِرْتُ أَنْ أُقَاتِلَ النَّاسَ حَتَّى يَشْهَدُوا"
+      }
+    ],
+    "cautions": [
+      {
+        "text": "ينبّه ابن رجب إلى أن النبي ﷺ كان يقبل ممن جاءه يريد الإسلام الشهادتين فقط ويعصم دمه بذلك، ولم يكن يشترط عليه أن يلتزم الصلاة والزكاة ابتداءً، وأنه أنكر على أسامة قتله من قال: لا إله إلا الله.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص227",
+            "quote": "ومن المعلوم بالضرورة أن النبي صلى الله عليه وسلم كان يقبل من كل من جاءه يريد الدخول في الإسلام الشهادتين فقط، ويعصم دمه بذلك"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص227",
+            "quote": "ولم يكن صلى الله عليه وسلم يشترط على من جاءه يريد الإسلام أن يلتزم الصلاة والزكاة"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص227",
+            "quote": "أنكر على أسامة بن زيد قتله لمن قال: لا إله إلا الله لما رفع عليه السيف"
+          }
+        ]
+      }
+    ]
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنِ ابْنِ عُمَرَ رَضِيَ اللَّهُ عَنْهُمَا، أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ:"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "أُمِرْتُ أَنْ أُقَاتِلَ النَّاسَ حَتَّى يَشْهَدُوا أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَنَّ مُحَمَّدًا رَسُولُ اللَّهِ، وَيُقِيمُوا الصَّلَاةَ، وَيُؤْتُوا الزَّكَاةَ؛ فَإِذَا فَعَلُوا ذَلِكَ عَصَمُوا مِنِّي دِمَاءَهُمْ وَأَمْوَالَهُمْ إِلَّا بِحَقِّ الْإِسْلَامِ، وَحِسَابُهُمْ عَلَى اللَّهِ تَعَالَى."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_isma",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 22,
+          "length": 1,
+          "surface": "عَصَمُوا"
+        },
+        "headword": "عَصَمُوا",
+        "meaning": "صارت دماؤهم وأموالهم معصومة محفوظة بالشهادتين، لا تُستباح إلا بحقها.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص229",
+            "quote": "الإجابة إلى الشهادتين عصمة للنفوس والأموال إلا بحقها"
+          }
+        ]
+      },
+      {
+        "id": "g_haqq",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 27,
+          "length": 2,
+          "surface": "بِحَقِّ الْإِسْلَامِ"
+        },
+        "headword": "بِحَقِّ الْإِسْلَامِ",
+        "meaning": "من حق الإسلام إقام الصلاة وإيتاء الزكاة، وأن لا يرتكب المسلم ما يوجب الحدود.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص232",
+            "quote": "فجعل من حق الإسلام إقام الصلاة وإيتاء الزكاة، كما أن من حقه أن لا يرتكب الحدود"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح البخاري، رقم 25 · صحيح مسلم، رقم 22",
+      "references": [
+        {
+          "sourceId": "sahih_bukhari",
+          "hadithNumber": "25",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-bukhari.json → hadithnumber 25"
+        },
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "22",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 22"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ الْبُخَارِيُّ، وَمُسْلِمٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 5,
+        "label": "الأمر بقتال الناس"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 6,
+        "endToken": 14,
+        "label": "الشهادتان"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 15,
+        "endToken": 18,
+        "label": "الصلاة والزكاة"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 19,
+        "endToken": 28,
+        "label": "عصمة الدم والمال"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 2,
+          "length": 1,
+          "surface": "أُقَاتِلَ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 22,
+          "length": 1,
+          "surface": "عَصَمُوا"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 24,
+          "length": 1,
+          "surface": "دِمَاءَهُمْ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 27,
+          "length": 2,
+          "surface": "بِحَقِّ الْإِسْلَامِ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "اختلفتَ مع شريك لك في التجارة وهو مسلم يؤدي الصلاة والزكاة، وأغراك أحدهم بأن تستولي على جزء من ماله مستغلاً تقصيره في أمر آخر.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أحفظ له ماله فلا أتعدّى عليه، وأطالب بحقي بالطرق المشروعة وحدها، وأترك حسابه على الله.",
+          "feedback": "أحسنت؛ فمن أتى بالشهادتين وأقام الصلاة وآتى الزكاة عُصم دمه وماله إلا بحق الإسلام، وحسابه على الله."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "لا آخذ من ماله شيئاً، لكنني أشهّر بتقصيره بين الناس.",
+          "feedback": "امتناعك عن ماله حسن، غير أن حساب الباطن على الله لا إلينا."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "تقصيره يبيح لي أن آخذ جزءاً من ماله.",
+          "feedback": "عصمة المال لا تسقط بتقصير شخصي، ولا تُستباح إلا بحق الإسلام كما قرره الشرع."
+        }
+      ],
+      "takeaway": "من دخل في الإسلام عُصم دمه وماله إلا بحقه، وحسابه على الله؛ فلا نستبيح حرمة مسلم بظن أو خلاف.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص229",
+          "quote": "الإجابة إلى الشهادتين عصمة للنفوس والأموال إلا بحقها"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص232",
+          "quote": "فجعل من حق الإسلام إقام الصلاة وإيتاء الزكاة، كما أن من حقه أن لا يرتكب الحدود"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "دم المسلم وماله معصومان؛ فلا تتعدَّ على أحدهما إلا بحق الشرع وبالطرق التي قرّرها.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص229",
+            "quote": "الإجابة إلى الشهادتين عصمة للنفوس والأموال إلا بحقها"
+          }
+        ]
+      },
+      {
+        "text": "أقم الصلاة وآتِ الزكاة وتجنّب ما يوجب الحدود؛ فهذا من حق الإسلام الذي به تتم العصمة.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص232",
+            "quote": "فجعل من حق الإسلام إقام الصلاة وإيتاء الزكاة، كما أن من حقه أن لا يرتكب الحدود"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 8",
+      "quote": null
+    },
+    "normalizations": [
+      "حذف وسم <br> الزائد من المصدر الرقمي.",
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "نقل عبارة «[رواه …]» إلى takhrij.compilerStatement دون المعقوفين.",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s1",
+        "tokenIndex": 0,
+        "before": "عَنْ",
+        "after": "عَنِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_bukhari",
+          "locator": "8",
+          "quote": "عَنِ ابْنِ عُمَرَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 8,
+        "before": "إلَهَ",
+        "after": "إِلَهَ",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 9,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 26,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "قوله «إِلَّا بِحَقِّ الْإِسْلَامِ» لفظ البخاري وحده؛ وفي مسلم (22) «إِلَّا بِحَقِّهَا» (جامع العلوم ج١ ص٢٢٥).",
+      "صُحّح ضبط بعض الكلمات بمطابقة صورة الكلمة (رسماً لا سياقاً) في موضع مشكول من الصحيحين المثبّتين، وهو مسجّل في provenance.vocalizationEdits؛ تُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

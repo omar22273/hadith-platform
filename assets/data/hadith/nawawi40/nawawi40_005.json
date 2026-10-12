@@ -1,0 +1,305 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_005",
+  "sequence": 5,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 5
+  },
+  "title": "رد البدع والمحدثات",
+  "teaser": {
+    "text": "غداً: ميزانٌ للأعمال في ظاهرها يقابل ميزان النيات في باطنها… فما هو؟"
+  },
+  "milestone": "ميزان الأعمال الظاهر",
+  "context": {
+    "narrative": "روت أم المؤمنين عائشة رضي الله عنها هذه الكلمة الجامعة عن رسول الله ﷺ من رواية القاسم بن محمد عن عمته عائشة، وألفاظها مختلفة ومعناها متقارب: «من أحدث في أمرنا هذا ما ليس منه فهو رد»، وفي رواية لمسلم: «من عمل عملاً ليس عليه أمرنا فهو رد». وعدّها ابن رجب أصلاً عظيماً من أصول الإسلام.",
+    "humanMotive": "جعل ميزان للأعمال في ظاهرها: هل هي على أمر الشرع أم خارجة عنه؟",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "1718",
+        "quote": "عَنْ عَائِشَةَ، قَالَتْ قَالَ رَسُولُ اللَّهِ"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص175",
+        "quote": "من حديث القاسم بن محمد عن عمته عائشة رضي الله عنها وألفاظه مختلفة، ومعناها متقارب"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص175",
+        "quote": "وهذا الحديث أصل عظيم من أصول الإسلام، وهو كالميزان للأعمال في ظاهرها كما أن حديث: «الأعمال بالنيات» ميزان للأعمال في باطنها"
+      }
+    ],
+    "cautions": []
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أُمِّ الْمُؤْمِنِينَ أُمِّ عَبْدِ اللَّهِ عَائِشَةَ رَضِيَ اللَّهُ عَنْهَا، قَالَتْ: قَالَ: رَسُولُ اللَّهِ ﷺ"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "مَنْ أَحْدَثَ فِي أَمْرِنَا هَذَا مَا لَيْسَ مِنْهُ فَهُوَ رَدٌّ"
+      },
+      {
+        "id": "s3",
+        "voice": "narration",
+        "text": "وَفِي رِوَايَةٍ لِمُسْلِمٍ:"
+      },
+      {
+        "id": "s4",
+        "voice": "prophet",
+        "text": "مَنْ عَمِلَ عَمَلًا لَيْسَ عَلَيْهِ أَمْرُنَا فَهُوَ رَدٌّ"
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_ahdatha",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 1,
+          "length": 1,
+          "surface": "أَحْدَثَ"
+        },
+        "headword": "أَحْدَثَ",
+        "meaning": "أنشأ في الدين ما لم يأذن به الله ورسوله، فليس من الدين في شيء.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص175",
+            "quote": "وكل من أحدث في الدين ما لم يأذن به الله ورسوله، فليس من الدين في شيء"
+          }
+        ]
+      },
+      {
+        "id": "g_amrina",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 3,
+          "length": 1,
+          "surface": "أَمْرِنَا"
+        },
+        "headword": "أَمْرِنَا",
+        "meaning": "المراد بأمره هنا: دينه وشرعه.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص176",
+            "quote": "والمراد بأمره هاهنا: دينه وشرعه"
+          }
+        ]
+      },
+      {
+        "id": "g_radd",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 9,
+          "length": 1,
+          "surface": "رَدٌّ"
+        },
+        "headword": "رَدٌّ",
+        "meaning": "مردود على عامله غير مقبول منه.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص175",
+            "quote": "فهو مردود على عامله"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح البخاري، رقم 2697 · صحيح مسلم، رقم 1718",
+      "references": [
+        {
+          "sourceId": "sahih_bukhari",
+          "hadithNumber": "2697",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-bukhari.json → hadithnumber 2697"
+        },
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "1718",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 1718.01"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ الْبُخَارِيُّ، وَمُسْلِمٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 4,
+        "label": "إحداث ما ليس من الدين"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 5,
+        "endToken": 9,
+        "label": "النتيجة: فهو رد"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s4",
+        "startToken": 0,
+        "endToken": 7,
+        "label": "رواية مسلم"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 1,
+          "length": 1,
+          "surface": "أَحْدَثَ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 3,
+          "length": 1,
+          "surface": "أَمْرِنَا"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 9,
+          "length": 1,
+          "surface": "رَدٌّ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "انتشر في دائرتك عمل يُنسب إليه فضلٌ عظيم، وحين سألتَ عن دليله لم تجد من يذكر له أصلاً، وعرض عليك زميلك أن تشاركهم فيه.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أسأل أهل العلم عن أصل هذا العمل في الشرع، فإن لم يكن له أصل لم أتقرّب به، مع الرفق بزملائي.",
+          "feedback": "أحسنت؛ فالأعمال ينبغي أن تكون تحت أحكام الشريعة، وما ليس عليه أمر الله ورسوله فهو مردود."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أشاركهم مجاملةً دون أن أعتقد له فضلاً، ولا أسأل عن أصله.",
+          "feedback": "حسن المجاملة لا يغني عن السؤال عن أصل العمل؛ فالميزان أمر الشرع."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "ما دام قصدهم الخير فكل عمل يظنّونه قربة مقبول.",
+          "feedback": "حسن القصد لا يصيّر العمل مشروعاً؛ فمن تقرّب إلى الله بما لم يجعله الله ورسوله قربة فعمله مردود عليه."
+        }
+      ],
+      "takeaway": "اعرض عملك على أمر الشرع: ما كان عليه أمر الله ورسوله فمقبول، وما كان خارجاً عنه فمردود على صاحبه.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص176",
+          "quote": "فمن كان عمله جاريا تحت أحكام الشرع موافقا لها، فهو مقبول، ومن كان خارجا عن ذلك، فهو مردود"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص177",
+          "quote": "فمن تقرب إلى الله بعمل لم يجعله الله ورسوله قربة إلى الله، فعمله باطل مردود عليه"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "قبل أن تتقرّب إلى الله بعمل، اسأل: هل لهذا العمل أصل في الدين؟",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص176",
+            "quote": "وقوله: \" ليس عليه أمرنا \" إشارة إلى أن أعمال العاملين كلهم ينبغي أن تكون تحت أحكام الشريعة"
+          }
+        ]
+      },
+      {
+        "text": "ما أُحدث في الدين مما لم يأذن به الله ورسوله فليس من الدين في شيء؛ فلا تجعله أساس عبادتك.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص175",
+            "quote": "وكل من أحدث في الدين ما لم يأذن به الله ورسوله، فليس من الدين في شيء"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 5",
+      "quote": null
+    },
+    "normalizations": [
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "نقل عبارة «[رواه …]» إلى takhrij.compilerStatement دون المعقوفين."
+    ],
+    "vocalizationEdits": []
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "لفظ الأربعين «ما ليس منه» هو لفظ مسلم (1718)؛ وفي البخاري (2697) «ما ليس فيه». ورواية مسلم الثانية «من عمل عملاً ليس عليه أمرنا» مثبتة في المتن كما وردت في الأربعين.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

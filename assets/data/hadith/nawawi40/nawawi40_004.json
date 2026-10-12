@@ -1,0 +1,409 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_004",
+  "sequence": 4,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 4
+  },
+  "title": "مراحل خلق الإنسان والقدر",
+  "teaser": {
+    "text": "غداً: الصادق المصدوق يحدّثنا عن رحلةٍ تبدأ قبل أن نُولد… وعن أربع كلماتٍ تُكتب."
+  },
+  "milestone": "رحلة الخلق والقدر",
+  "context": {
+    "narrative": "حدّث عبد الله بن مسعود رضي الله عنه بهذا الحديث وقدّم له بأن رسول الله ﷺ، وهو الصادق المصدوق، حدّثهم به. يصف الحديث أطوار خلق الإنسان في بطن أمه، كل طور أربعون يوماً، ثم إرسال الملك ونفخ الروح وكتابة أربع كلمات، ويختم ببيان أن العمل بخواتيمه. وقد بيّن ابن رجب أنه متفق على صحته وتلقته الأمة بالقبول.",
+    "humanMotive": "بيان رحلة الإنسان من أول خلقه إلى ما كُتب له، لحثه على الاستقامة والحذر من سوء الخاتمة.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sahih_bukhari",
+        "locator": "3208",
+        "quote": "قَالَ عَبْدُ اللَّهِ حَدَّثَنَا رَسُولُ اللَّهِ"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص152",
+        "quote": "هذا الحديث متفق على صحته، وتلقته الأمة بالقبول"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص154",
+        "quote": "ثم يكون علقة مثل ذلك» يعني: أربعين يوما"
+      }
+    ],
+    "cautions": [
+      {
+        "text": "نقل ابن رجب قولاً بأن قوله «فوالله الذي لا إله غيره…» إلى آخر الحديث مدرج من كلام ابن مسعود، وأن هذا المعنى رُوي عن النبي ﷺ من وجوه متعددة أيضاً؛ وقد أُبقي النص بلفظ الأربعين كما هو.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص168",
+            "quote": "إلى آخر الحديث مدرج من كلام ابن مسعود"
+          }
+        ]
+      }
+    ]
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَبِي عَبْدِ الرَّحْمَنِ عَبْدِ اللَّهِ بْنِ مَسْعُودٍ رَضِيَ اللهُ عَنْهُ قَالَ: حَدَّثَنَا رَسُولُ اللَّهِ ﷺ (وَهُوَ الصَّادِقُ الْمَصْدُوقُ):"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "إِنَّ أَحَدَكُمْ يُجْمَعُ خَلْقُهُ فِي بَطْنِ أُمِّهِ أَرْبَعِينَ يَوْمًا نُطْفَةً، ثُمَّ يَكُونُ عَلَقَةً مِثْلَ ذَلِكَ، ثُمَّ يَكُونُ مُضْغَةً مِثْلَ ذَلِكَ، ثُمَّ يُرْسَلُ إِلَيْهِ الْمَلَكُ فَيَنْفُخُ فِيهِ الرُّوحَ، وَيُؤْمَرُ بِأَرْبَعِ كَلِمَاتٍ: بِكَتْبِ رِزْقِهِ، وَأَجَلِهِ، وَعَمَلِهِ، وَشَقِيٍّ أَمْ سَعِيدٍ؛ فَوَاللَّهِ الَّذِي لَا إِلَهَ غَيْرُهُ إِنَّ أَحَدَكُمْ لَيَعْمَلُ بِعَمَلِ أَهْلِ الْجَنَّةِ حَتَّى مَا يَكُونُ بَيْنَهُ وَبَيْنَهَا إِلَّا ذِرَاعٌ فَيَسْبِقُ عَلَيْهِ الْكِتَابُ فَيَعْمَلُ بِعَمَلِ أَهْلِ النَّارِ فَيَدْخُلُهَا. وَإِنَّ أَحَدَكُمْ لَيَعْمَلُ بِعَمَلِ أَهْلِ النَّارِ حَتَّى مَا يَكُونُ بَيْنَهُ وَبَيْنَهَا إِلَّا ذِرَاعٌ فَيَسْبِقُ عَلَيْهِ الْكِتَابُ فَيَعْمَلُ بِعَمَلِ أَهْلِ الْجَنَّةِ فَيَدْخُلُهَا."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_yujma",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 2,
+          "length": 2,
+          "surface": "يُجْمَعُ خَلْقُهُ"
+        },
+        "headword": "يُجْمَعُ خَلْقُهُ",
+        "meaning": "رُوي عن ابن مسعود في تفسيره: أن النطفة إذا وقعت في الرحم انتشرت أربعين يوماً ثم تنحدر فتكون علقة، وذلك جمعها.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص153",
+            "quote": "إن النطفة إذا وقعت في الرحم طارت في كل شعرة وظفر، فتمكث أربعين يوما، ثم تنحدر في الرحم، فتكون علقة. قال: فذلك جمعها"
+          }
+        ]
+      },
+      {
+        "id": "g_alaqa",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 12,
+          "length": 1,
+          "surface": "عَلَقَةً"
+        },
+        "headword": "العَلَقَة",
+        "meaning": "قطعة من دم.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص154",
+            "quote": "والعلقة قطعة من دم"
+          }
+        ]
+      },
+      {
+        "id": "g_mudgha",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 17,
+          "length": 1,
+          "surface": "مُضْغَةً"
+        },
+        "headword": "المُضْغَة",
+        "meaning": "قطعة من لحم.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص154",
+            "quote": "والمضغة: قطعة من لحم"
+          }
+        ]
+      },
+      {
+        "id": "g_sabaqa",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 55,
+          "length": 3,
+          "surface": "فَيَسْبِقُ عَلَيْهِ الْكِتَابُ"
+        },
+        "headword": "فَيَسْبِقُ عَلَيْهِ الْكِتَابُ",
+        "meaning": "يغلب عليه ما سبق في الكتاب؛ فالخواتيم ميراث السوابق.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص172",
+            "quote": "فالخواتيم ميراث السوابق، فكل ذلك سبق في الكتاب السابق"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح البخاري، رقم 3208 · صحيح مسلم، رقم 2643",
+      "references": [
+        {
+          "sourceId": "sahih_bukhari",
+          "hadithNumber": "3208",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-bukhari.json → hadithnumber 3208"
+        },
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "2643",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 2643.01"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ الْبُخَارِيُّ، وَمُسْلِمٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 9,
+        "label": "بدء الخلق: النطفة"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 10,
+        "endToken": 19,
+        "label": "العلقة والمضغة"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 20,
+        "endToken": 29,
+        "label": "نفخ الروح"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 30,
+        "endToken": 36,
+        "label": "الكلمات الأربع"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 9,
+          "length": 1,
+          "surface": "نُطْفَةً"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 12,
+          "length": 1,
+          "surface": "عَلَقَةً"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 54,
+          "length": 1,
+          "surface": "ذِرَاعٌ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 57,
+          "length": 1,
+          "surface": "الْكِتَابُ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "تعثّرت خطتك المهنية التي ظننتَها مصيرك، فبدأتَ تقول لنفسك: ما دام كل شيء مكتوباً فلا فائدة من الاجتهاد.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أواصل العمل والاستقامة وأسأل الله حسن الخاتمة، فالأعمال بخواتيمها وأنا لا أعلم ما كُتب لي.",
+          "feedback": "أحسنت؛ فالحديث يوقظ الحذر من سوء الخاتمة ويدعو إلى الاستقامة، لا إلى ترك الأسباب."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أعمل وأنا مطمئن إلى أن عملي الحالي يكفيني ولا يحتاج إلى مراجعة.",
+          "feedback": "العمل الصالح مطلوب، لكن الحديث يعلّم أن القلب يبقى معلقاً بالخاتمة فلا يغتر بحاله."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "ما دام المقدور كُتب فلا أتعب نفسي بالعمل.",
+          "feedback": "الحديث يذكر أن الرجل يعمل حتى يسبق عليه الكتاب، فهو تحذير من سوء الخاتمة لا ترخيص بترك العمل."
+        }
+      ],
+      "takeaway": "لا يدري العبد ما كُتب له؛ فيجتهد في الاستقامة ويسأل الله حسن الخاتمة ويتقي الذنوب.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص172",
+          "quote": "فالخواتيم ميراث السوابق، فكل ذلك سبق في الكتاب السابق"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص172",
+          "quote": "ومن هنا كان يشتد خوف السلف من سوء الخواتيم"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "اتقِ الذنوب الخفية؛ فقد تكون خصلة باطنة لا يطلع عليها الناس سبباً لسوء الخاتمة.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص171",
+            "quote": "وأن خاتمة السوء تكون بسبب دسيسة باطنة للعبد لا يطلع عليها الناس"
+          }
+        ]
+      },
+      {
+        "text": "كن كالأبرار الذين تتعلق قلوبهم بالخواتيم: حافظ على طاعتك وسل الله الثبات.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص172",
+            "quote": "إن قلوب الأبرار معلقة بالخواتيم"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 4",
+      "quote": null
+    },
+    "normalizations": [
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "نقل عبارة «[رواه …]» إلى takhrij.compilerStatement دون المعقوفين.",
+      "استبدال الشرطتين المحيطتين بجملة معترضة بقوسين؛ لأن الشرطة تلتصق بالكلمة في التقسيم.",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s2",
+        "tokenIndex": 0,
+        "before": "إنَّ",
+        "after": "إِنَّ",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 22,
+        "before": "إلَيْهِ",
+        "after": "إِلَيْهِ",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 37,
+        "before": "فَوَاَللَّهِ",
+        "after": "فَوَاللَّهِ",
+        "rule": "fatha_on_wasl_alif",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_bukhari",
+          "locator": "3872",
+          "quote": "فَوَاللَّهِ مَا عَصَيْتُهُ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 40,
+        "before": "إلَهَ",
+        "after": "إِلَهَ",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 42,
+        "before": "إنَّ",
+        "after": "إِنَّ",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 53,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 74,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "لفظ الأربعين «يُجْمَعُ… ثُمَّ يُرْسَلُ إِلَيْهِ الْمَلَكُ فَيَنْفُخُ فِيهِ الرُّوحَ» أقرب إلى مسلم (2643)؛ وفي البخاري (3208) «ثُمَّ يَبْعَثُ اللَّهُ مَلَكًا» مع تقديم الكتابة على النفخ في اللفظ.",
+      "صُحّح ضبط بعض الكلمات بمطابقة صورة الكلمة (رسماً لا سياقاً) في موضع مشكول من الصحيحين المثبّتين، وهو مسجّل في provenance.vocalizationEdits؛ تُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}
