@@ -248,15 +248,19 @@ void main() {
     });
 
     test('completing every prepared wird finishes this edition of the curriculum', () {
-      final JourneyProgress progress = JourneyProgress.empty
-          .withCompletion('nawawi40_001', DateTime(2026, 10, 9, 21))
-          .withCompletion('nawawi40_002', DateTime(2026, 10, 10, 7));
+      JourneyProgress progress = JourneyProgress.empty;
+      for (int number = 1; number <= 10; number++) {
+        progress = progress.withCompletion(
+          'nawawi40_${number.toString().padLeft(3, '0')}',
+          DateTime(2026, 10, number, 7),
+        );
+      }
       final JourneySnapshot snapshot = snapshotAt(DateTime(2026, 10, 10, 7, 5), progress);
       expect(snapshot.todayKind, TodayKind.curriculumFinished);
-      expect(snapshot.completedCount, 2);
-      expect(snapshot.caravanIndex, 1);
-      expect(snapshot.progressFraction, closeTo(2 / 42, 1e-9));
-      expect(snapshot.segments.first.completed, 2);
+      expect(snapshot.completedCount, 10);
+      expect(snapshot.caravanIndex, 9);
+      expect(snapshot.progressFraction, closeTo(10 / 42, 1e-9));
+      expect(snapshot.segments.first.completed, 10);
     });
   });
 

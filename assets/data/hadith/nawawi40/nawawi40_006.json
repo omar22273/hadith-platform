@@ -1,0 +1,410 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_006",
+  "sequence": 6,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 6
+  },
+  "title": "الحلال بيّن والحرام بيّن والشبهات",
+  "teaser": {
+    "text": "غداً: بين الواضح الأبيض والواضح الأسود منطقةٌ رمادية… فكيف ينجو الحريص من الاقتراب من الحمى؟"
+  },
+  "milestone": "حدود الحلال والحرام",
+  "context": {
+    "narrative": "حدّث النعمان بن بشير رضي الله عنهما بهذا الحديث، وفي رواية مسلم أن النعمان أهوى بإصبعيه إلى أذنيه وهو يقول: سمعتُ رسول الله ﷺ. وقد بيّن ابن رجب أنه متفق على صحته من رواية الشعبي عن النعمان، وأن حديث النعمان أصح أحاديث الباب. ويقسم الحديث الأمور إلى حلال بيّن وحرام بيّن وبينهما مشتبهات.",
+    "humanMotive": "بيان حدود الحلال والحرام، وكيف يحمي المسلم دينه وعرضه من الاقتراب من الحرام.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "1599",
+        "quote": "وَأَهْوَى النُّعْمَانُ بِإِصْبَعَيْهِ إِلَى أُذُنَيْهِ"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص192",
+        "quote": "هذا الحديث صحيح متفق على صحته من رواية الشعبي عن النعمان بن بشير"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص192",
+        "quote": "وحديث النعمان أصح أحاديث الباب"
+      }
+    ],
+    "cautions": []
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَبِي عَبْدِ اللَّهِ النُّعْمَانِ بْنِ بَشِيرٍ رَضِيَ اللَّهُ عَنْهُمَا، قَالَ: سَمِعْتُ رَسُولَ اللَّهِ ﷺ يَقُولُ:"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "إِنَّ الْحَلَالَ بَيِّنٌ، وَإِنَّ الْحَرَامَ بَيِّنٌ، وَبَيْنَهُمَا أُمُورٌ مُشْتَبِهَاتٌ لَا يَعْلَمُهُنَّ كَثِيرٌ مِنَ النَّاسِ، فَمَنِ اتَّقَى الشُّبُهَاتِ فَقَدِ اسْتَبْرَأَ لِدِينِهِ وَعِرْضِهِ، وَمَنْ وَقَعَ فِي الشُّبُهَاتِ وَقَعَ فِي الْحَرَامِ، كَالرَّاعِي يَرْعَى حَوْلَ الْحِمَى يُوشِكُ أَنْ يَرْتَعَ فِيهِ، أَلَا وَإِنَّ لِكُلِّ مَلِكٍ حِمًى، أَلَا وَإِنَّ حِمَى اللَّهِ مَحَارِمُهُ، أَلَا وَإِنَّ فِي الْجَسَدِ مُضْغَةً إِذَا صَلَحَتْ صَلَحَ الْجَسَدُ كُلُّهُ، وَإِذَا فَسَدَتْ فَسَدَ الْجَسَدُ كُلُّهُ، أَلَا وَهِيَ الْقَلْبُ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_mushtabihat",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 8,
+          "length": 1,
+          "surface": "مُشْتَبِهَاتٌ"
+        },
+        "headword": "مُشْتَبِهَات",
+        "meaning": "أمور بين الحلال المحض والحرام المحض، تشتبه على كثير من الناس: أحلالٌ هي أم حرام؟ ويعلمها الراسخون في العلم.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص193",
+            "quote": "ولكن بين الأمرين أمور تشتبه على كثير من الناس، هل هي من الحلال أم من الحرام؟ وأما الراسخون في العلم، فلا يشتبه عليهم ذلك"
+          }
+        ]
+      },
+      {
+        "id": "g_ird",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 20,
+          "length": 1,
+          "surface": "وَعِرْضِهِ"
+        },
+        "headword": "العِرْض",
+        "meaning": "سمعة المرء؛ فمن اتقى المشتبهات حصّنها من القدح والطعن.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص203",
+            "quote": "فقد حصن عرضه من القدح والشين الداخل على من لا يجتنبها"
+          }
+        ]
+      },
+      {
+        "id": "g_hima",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 28,
+          "length": 4,
+          "surface": "كَالرَّاعِي يَرْعَى حَوْلَ الْحِمَى"
+        },
+        "headword": "يَرْعَى حَوْلَ الْحِمَى",
+        "meaning": "مَثَلٌ ضربه النبي ﷺ لمن وقع في الشبهات: يقرب أن يقع في الحرام المحض.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص206",
+            "quote": "هذا مثل ضربه النبي صلى الله عليه وسلم لمن وقع في الشبهات، وأنه يقرب وقوعه في الحرام المحض"
+          }
+        ]
+      },
+      {
+        "id": "g_mudgha",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 50,
+          "length": 1,
+          "surface": "مُضْغَةً"
+        },
+        "headword": "المُضْغَة",
+        "meaning": "قطعة من لحم.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص154",
+            "quote": "والمضغة: قطعة من لحم"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح البخاري، رقم 52 · صحيح مسلم، رقم 1599",
+      "references": [
+        {
+          "sourceId": "sahih_bukhari",
+          "hadithNumber": "52",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-bukhari.json → hadithnumber 52"
+        },
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "1599",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 1599.01"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ الْبُخَارِيُّ، وَمُسْلِمٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 8,
+        "label": "الحلال والحرام والمشتبهات"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 14,
+        "endToken": 27,
+        "label": "من اتقى الشبهات"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 28,
+        "endToken": 35,
+        "label": "مثل الراعي والحمى"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 46,
+        "endToken": 55,
+        "label": "مضغة القلب"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 8,
+          "length": 1,
+          "surface": "مُشْتَبِهَاتٌ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 18,
+          "length": 1,
+          "surface": "اسْتَبْرَأَ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 34,
+          "length": 1,
+          "surface": "يَرْتَعَ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 63,
+          "length": 1,
+          "surface": "الْقَلْبُ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "عُرض عليك عمل براتب مغرٍ في مجال اختلف فيه أهل العلم، ولم تتبيّن لك حقيقة بعض معاملاته. قال لك أصحابك: الجميع يعمل فيه.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أسأل أهل العلم الموثوقين وأتبيّن المعاملات، فإن بقي الاشتباه تركتُه احتياطاً لديني وعِرضي.",
+          "feedback": "أحسنت؛ فمن اتقى الشبهات استبرأ لدينه وعرضه."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أقبل العمل وأتجنّب ما أستطيع من المعاملات المشتبهة.",
+          "feedback": "حرصك محمود، لكن الحديث يحذّر من الاقتراب من الحمى؛ فالأسلم أن تتبيّن قبل الدخول."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "ما دام الجميع يعمل فيه فلا حرج عليّ.",
+          "feedback": "كثرة من يفعل لا تزيل الاشتباه؛ ومن رعى حول الحمى أوشك أن يقع فيه."
+        }
+      ],
+      "takeaway": "اتقِ المشتبه حتى تتبيّن، فمن رعى حول الحمى أوشك أن يرتع فيه، وصلاح الجسد كله بصلاح القلب.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص206",
+          "quote": "هذا مثل ضربه النبي صلى الله عليه وسلم لمن وقع في الشبهات، وأنه يقرب وقوعه في الحرام المحض"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص203",
+          "quote": "فقد حصن عرضه من القدح والشين الداخل على من لا يجتنبها"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "اجعل بينك وبين المحرمات حاجزاً، ولا تقف على حدّها.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص207",
+            "quote": "وفي هذا إشارة إلى أنه ينبغي التباعد عن المحرمات، وأن يجعل الإنسان بينه وبينها حاجزا"
+          }
+        ]
+      },
+      {
+        "text": "القلب ملك الأعضاء وبقية الأعضاء جنوده؛ فإصلاحه أصل إصلاح الجوارح كلها.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص209",
+            "quote": "ولهذا يقال: القلب ملك الأعضاء، وبقية الأعضاء جنوده"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 6",
+      "quote": null
+    },
+    "normalizations": [
+      "حذف وسم <br> الزائد من المصدر الرقمي.",
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "نقل عبارة «[رواه …]» إلى takhrij.compilerStatement دون المعقوفين.",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s1",
+        "tokenIndex": 11,
+        "before": "سَمِعْت",
+        "after": "سَمِعْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_bukhari",
+          "locator": "52",
+          "quote": "سَمِعْتُ النُّعْمَانَ بْنَ بَشِيرٍ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 0,
+        "before": "إنَّ",
+        "after": "إِنَّ",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 12,
+        "before": "مِنْ",
+        "after": "مِنَ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_bukhari",
+          "locator": "52",
+          "quote": "مِنَ النَّاسِ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 14,
+        "before": "فَمَنْ",
+        "after": "فَمَنِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_bukhari",
+          "locator": "52",
+          "quote": "فَمَنِ اتَّقَى"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 17,
+        "before": "فَقْد",
+        "after": "فَقَدِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_bukhari",
+          "locator": "4695",
+          "quote": "فَقَدِ اسْتَيْقَنُوا"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 51,
+        "before": "إذَا",
+        "after": "إِذَا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 56,
+        "before": "وَإذَا",
+        "after": "وَإِذَا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "لفظ الأربعين «مُشْتَبِهَاتٌ… وَقَعَ فِي الْحَرَامِ… يَرْتَعَ» هو لفظ مسلم (1599)، وفي البخاري (52) «مُشَبَّهَاتٌ… يُوَاقِعَهُ».",
+      "صُحّح ضبط بعض الكلمات بمطابقة صورة الكلمة (رسماً لا سياقاً) في موضع مشكول من الصحيحين المثبّتين، وهو مسجّل في provenance.vocalizationEdits؛ تُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

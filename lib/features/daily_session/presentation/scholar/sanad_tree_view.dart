@@ -31,6 +31,19 @@ class SanadTreeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
+    if (bundle.hadith.scholar.chains.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            'لم تُضَف أسانيد هذا الحديث وتراجم رواته إلى الفهرس بعد؛ '
+            'وهي قيد التوثيق من المصادر.',
+            textAlign: TextAlign.center,
+            style: text.bodyMedium?.copyWith(color: palette.inkSoft, height: 1.7),
+          ),
+        ),
+      );
+    }
     final SanadTree tree = SanadTree.build(bundle.hadith.scholar.chains);
     final double width = _padding * 2 + tree.columns * (_nodeWidth + _columnGap) - _columnGap;
     final double height = _padding * 2 + tree.depth * (_nodeHeight + _rowGap) - _rowGap;
