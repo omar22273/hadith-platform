@@ -6,10 +6,21 @@ spec so that they can never drift apart.
 
 
 class F:
-    def __init__(self, name, type_, doc, **schema):
+    """A model field.
+
+    `wire` is the JSON key when it differs from the Dart name (default: same).
+    `optional` fields may be absent from the file: they are not listed in the
+    schema's `required`, are read with the *OrNull readers, and are omitted from
+    toJson when null, so files written before the field existed stay valid and
+    round-trip unchanged.
+    """
+
+    def __init__(self, name, type_, doc, wire=None, optional=False, **schema):
         self.name = name
         self.type = type_
         self.doc = doc
+        self.wire = wire or name
+        self.optional = optional
         self.schema = schema
 
 
@@ -440,6 +451,9 @@ MODELS = [
               F("sceneDescription", "String", "الوصف البصري والزماني للمشهد، مصوغاً من الشواهد وحدها."),
               F("challenge", "String", "المأزق أو الحدث الواقعي، مصوغاً من الشواهد وحدها."),
               F("propheticDecision", "String", "القرار النبوي ونتيجته، مصوغاً من الشواهد وحدها."),
+              F("detailedNarrative", "String?",
+                "الرواية الكاملة وتفاصيل الحدث، اختيارية: فقرات تفصل بينها سطور فارغة، تُنقل من المصادر الموثقة في evidence وحدها وتخضع لمراجعة review. غيابها يعرض نصوص المشاهد الموثقة كاملة.",
+                wire="detailed_narrative", optional=True, minLength=1),
               F("evidence", "List<SeerahEvidence>", "النصوص المصدرية الموثقة منقولة بنصها.", minItems=1),
               F("review", "ReviewInfo", "حالة المراجعة العلمية."),
           ]),
@@ -452,6 +466,22 @@ MODELS = [
     Model("SeerahEvidence", "seerah_station.dart", "شاهد مصدري لمشهد من مشاهد المحطة.", [
         F("scene", "E:SeerahScene", "المشهد الذي يشهد له النص."),
         F("source", "SourceRef", "المصدر والموضع ونص الشاهد حرفياً."),
+    ]),
+    # ---------------------------------------------------------------- adhkar
+    Model("AdhkarCatalog", "adhkar.dart", "ملف الأذكار النبوية لوِرد الأذكار، مرتبة كما تُعرض.", [
+        F("schemaVersion", "String", "إصدار المخطط.", **SEMVER),
+        F("id", "String", "المعرّف.", **ID),
+        F("title", "String", "العنوان."),
+        F("items", "List<DhikrItem>", "الأذكار بترتيب عرضها في الوِرد.", minItems=1),
+    ]),
+    Model("DhikrItem", "adhkar.dart", "ذكر نبوي بعدده المسنون الثابت وشواهده الموثقة.", [
+        F("id", "String", "معرّف الذكر.", **ID),
+        F("order", "int", "الترتيب في الوِرد.", minimum=1),
+        F("title", "String", "عنوان الذكر."),
+        F("text", "String", "نص الذكر مشكولاً كما في الشاهد حرفياً، وهو جزء من نص أحد الشواهد."),
+        F("count", "int", "العدد المسنون الثابت في الحديث؛ بلوغه يقفل الذكر.", minimum=1, maximum=1000),
+        F("evidence", "List<SourceRef>", "الشواهد: نص الحديث حرفياً من المصدر المعتمد مع موضعه.", minItems=1),
+        F("review", "ReviewInfo", "حالة المراجعة العلمية."),
     ]),
     # ---------------------------------------------------------------- admin intake
     Model("HadithDraft", "hadith_draft.dart", "مسودة حديث من لوحة الإدخال، تُحوَّل لاحقاً إلى HadithDailyModel بعد التوثيق.", [
@@ -475,6 +505,7 @@ FILE_DOCS = {
     "token_anchor.dart": "مراسي الكلمات في المتن.",
     "review_info.dart": "حالة المراجعة العلمية المشتركة بين الحديث والسيرة.",
     "seerah_station.dart": "محطات رحلة السيرة ومشاهدها الثلاثة.",
+    "adhkar.dart": "وِرد الأذكار النبوية: الأذكار بأعدادها المسنونة وشواهدها.",
     "hadith_draft.dart": "مسودات الإدخال المصدّرة من لوحة الإدارة.",
     "hadith_daily_model.dart": "النموذج الجذري للوِرد اليومي.",
     "historical_context.dart": "المرحلة الأولى: سياق الورود.",
@@ -500,5 +531,6 @@ FILE_DIRS = {
     "source_catalog.dart": "core/content/models",
     "review_info.dart": "core/content/models",
     "seerah_station.dart": "features/seerah/data/models",
+    "adhkar.dart": "features/adhkar/data/models",
     "hadith_draft.dart": "features/admin/data/models",
 }

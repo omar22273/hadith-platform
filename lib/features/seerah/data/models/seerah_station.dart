@@ -160,6 +160,7 @@ class SeerahStationModel {
     required this.sceneDescription,
     required this.challenge,
     required this.propheticDecision,
+    this.detailedNarrative,
     required this.evidence,
     required this.review,
   });
@@ -177,6 +178,7 @@ class SeerahStationModel {
       sceneDescription: readString(json, 'sceneDescription'),
       challenge: readString(json, 'challenge'),
       propheticDecision: readString(json, 'propheticDecision'),
+      detailedNarrative: readStringOrNull(json, 'detailed_narrative'),
       evidence: readModelList(json, 'evidence', SeerahEvidence.fromJson),
       review: readModel(json, 'review', ReviewInfo.fromJson),
     );
@@ -212,6 +214,9 @@ class SeerahStationModel {
   /// القرار النبوي ونتيجته، مصوغاً من الشواهد وحدها.
   final String propheticDecision;
 
+  /// الرواية الكاملة وتفاصيل الحدث، اختيارية: فقرات تفصل بينها سطور فارغة، تُنقل من المصادر الموثقة في evidence وحدها وتخضع لمراجعة review. غيابها يعرض نصوص المشاهد الموثقة كاملة.
+  final String? detailedNarrative;
+
   /// النصوص المصدرية الموثقة منقولة بنصها.
   final List<SeerahEvidence> evidence;
 
@@ -224,6 +229,24 @@ class SeerahStationModel {
       evidence.where((SeerahEvidence item) => item.scene == scene),
     );
   }
+
+  /// فقرات الرواية المفصلة (تفصل بينها سطور فارغة)؛ فارغة إن غابت الرواية
+  /// أو كانت بياضاً، فيعود العرض إلى نصوص المشاهد الموثقة.
+  List<String> get narrativeParagraphs {
+    final String? text = detailedNarrative;
+    if (text == null) {
+      return const <String>[];
+    }
+    return List<String>.unmodifiable(
+      text
+          .split(RegExp(r'\n\s*\n'))
+          .map((String paragraph) => paragraph.trim())
+          .where((String paragraph) => paragraph.isNotEmpty),
+    );
+  }
+
+  /// هل للمحطة رواية مفصلة جاهزة للعرض.
+  bool get hasDetailedNarrative => narrativeParagraphs.isNotEmpty;
 
   /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
   JsonMap toJson() {
@@ -238,6 +261,7 @@ class SeerahStationModel {
       'sceneDescription': sceneDescription,
       'challenge': challenge,
       'propheticDecision': propheticDecision,
+      if (detailedNarrative != null) 'detailed_narrative': detailedNarrative,
       'evidence': evidence.map((SeerahEvidence item) => item.toJson()).toList(),
       'review': review.toJson(),
     };
@@ -259,6 +283,7 @@ class SeerahStationModel {
         sceneDescription == other.sceneDescription &&
         challenge == other.challenge &&
         propheticDecision == other.propheticDecision &&
+        detailedNarrative == other.detailedNarrative &&
         listEquals(evidence, other.evidence) &&
         review == other.review;
   }
@@ -276,6 +301,7 @@ class SeerahStationModel {
       sceneDescription,
       challenge,
       propheticDecision,
+      detailedNarrative,
       Object.hashAll(evidence),
       review,
     ]);

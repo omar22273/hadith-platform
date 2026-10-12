@@ -11,10 +11,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/text/arabic_digits.dart';
 import '../../../../core/theme/app_palette.dart';
-import '../../../../core/theme/feedback_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/ui/app_shapes.dart';
-import '../../../../core/ui/smooth_surface.dart';
+import '../../../../core/ui/completion_flash.dart';
+import '../../../../core/ui/gated_next_button.dart';
 import '../../../hadith/domain/practice_engine.dart';
 import '../../application/review_controllers.dart';
 import '../../domain/review_deck.dart';
@@ -80,7 +80,7 @@ class WordOrderBoard extends ConsumerWidget {
           style: text.bodySmall?.copyWith(color: palette.inkSoft),
         ),
         const SizedBox(height: 12),
-        _CompletionFlash(
+        CompletionFlash(
           key: ValueKey<int>(state.index),
           completed: board.completed,
           child: _Line(board: board, onDrop: attempt),
@@ -118,7 +118,9 @@ class WordOrderBoard extends ConsumerWidget {
           const SizedBox(height: 12),
           // لا يتفعّل إلا إذا طابق المقطع الحالي المتن المشكول مطابقة تامة؛
           // والانتقال يمرّ عبر advance التي تتحقق من ذلك مرة ثانية في المتحكم.
-          _NextSegmentButton(
+          GatedNextButton(
+            buttonKey: const ValueKey<String>('order-next-segment'),
+            label: 'المقطع التالي',
             enabled: board.completed,
             onPressed: () {
               controller.advance();
@@ -181,52 +183,6 @@ class _MismatchNotice extends StatelessWidget {
           key: ValueKey<int>(notice == null ? -1 : board.mismatchTick),
           padding: EdgeInsets.only(top: notice == null ? 0 : 10),
           child: notice ?? const SizedBox(width: double.infinity),
-        ),
-      ),
-    );
-  }
-}
-
-/// زر «المقطع التالي ←»: رمادي معطّل ما لم يكتمل المقطع، ثم عريض بارز زمردي.
-class _NextSegmentButton extends StatelessWidget {
-  const _NextSegmentButton({required this.enabled, required this.onPressed});
-
-  final bool enabled;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 260),
-      curve: Curves.easeOutCubic,
-      width: double.infinity,
-      height: enabled ? 62 : 50,
-      child: FilledButton(
-        key: const ValueKey<String>('order-next-segment'),
-        onPressed: enabled ? onPressed : null,
-        style: FilledButton.styleFrom(
-          backgroundColor: palette.emerald,
-          foregroundColor: palette.onAccent,
-          disabledBackgroundColor: palette.lockedSoft,
-          disabledForegroundColor: palette.locked,
-          elevation: enabled ? 2 : 0,
-          shape: AppShapes.rounded(AppShapes.radiusMedium),
-          textStyle: AppTypography.ui(
-            color: palette.onAccent,
-            fontSize: enabled ? 18 : 15,
-            fontWeight: FontWeight.w700,
-            height: 1.3,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Flexible(child: Text('المقطع التالي', overflow: TextOverflow.ellipsis)),
-            const SizedBox(width: 10),
-            // arrow_forward ينعكس تلقائياً في الاتجاه من اليمين فيشير إلى اليسار «←».
-            Icon(Icons.arrow_forward_rounded, size: enabled ? 26 : 20),
-          ],
         ),
       ),
     );
@@ -298,68 +254,6 @@ class _ChallengePicker extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-}
-
-/// وميض أخضر عند اكتمال المقطع، ثم يستقر على أخضر هادئ. بلا حركة إن طُلب تقليلها.
-class _CompletionFlash extends StatefulWidget {
-  const _CompletionFlash({super.key, required this.completed, required this.child});
-
-  final bool completed;
-  final Widget child;
-
-  @override
-  State<_CompletionFlash> createState() => _CompletionFlashState();
-}
-
-class _CompletionFlashState extends State<_CompletionFlash> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 900),
-  );
-
-  @override
-  void didUpdateWidget(_CompletionFlash oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.completed && !oldWidget.completed) {
-      if (MediaQuery.disableAnimationsOf(context)) {
-        _controller.value = 1;
-      } else {
-        _controller.forward(from: 0);
-      }
-    } else if (!widget.completed) {
-      _controller.value = 0;
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    final FeedbackColors feedback = FeedbackColors.of(context);
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (BuildContext context, Widget? child) {
-        // وميض: يرتفع اللون الأخضر سريعاً ثم يهدأ إلى الأخضر الفاتح.
-        final double pulse = widget.completed ? (1 - Curves.easeOut.transform(_controller.value)) : 0;
-        final Color fill = widget.completed
-            ? Color.lerp(palette.emeraldSoft, feedback.rightBorder.withValues(alpha: 0.55), pulse)!
-            : palette.surface;
-        return SmoothSurface(
-          color: fill,
-          borderColor: widget.completed ? feedback.rightBorder : palette.line,
-          borderWidth: widget.completed ? 2 : 1,
-          padding: const EdgeInsets.all(14),
-          child: child!,
-        );
-      },
-      child: widget.child,
     );
   }
 }

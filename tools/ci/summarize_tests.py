@@ -11,6 +11,8 @@ import json
 import sys
 
 STACK_LINES = 12
+PRINT_LIMIT = 3
+PRINT_CHARS = 600
 
 
 def main(argv: list) -> int:
@@ -54,11 +56,16 @@ def main(argv: list) -> int:
     failed = [t for t in results if results[t] in ('failure', 'error')]
     lines = ['tests: %d visible, %d passed, %d failing (incl. hidden loaders)'
              % (len(visible), passed, len(failed))]
+    if failed:
+        lines.append('')
+        lines.append('failing tests:')
+        for test_id in failed:
+            lines.append('  - %s' % names.get(test_id, test_id))
     for test_id in failed:
         lines.append('')
         lines.append('FAIL: %s' % names.get(test_id, test_id))
-        for message in prints.get(test_id, [])[:20]:
-            lines.append('  print: %s' % message)
+        for message in prints.get(test_id, [])[:PRINT_LIMIT]:
+            lines.append('  print: %s' % message[:PRINT_CHARS])
         for error, stack in errors.get(test_id, []):
             lines.append('  error: %s' % error.strip())
             frames = [f for f in stack.splitlines() if f.strip()][:STACK_LINES]

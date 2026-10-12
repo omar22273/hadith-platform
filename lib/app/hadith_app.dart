@@ -1,6 +1,6 @@
 // جذر التطبيق: لغة عربية واتجاه من اليمين، وسمتان (النهاري التراثي والداكن)
 // تتبدلان بانتقال ناعم وتُحفظان في SharedPreferences، وإعدادات الخطوط والحجم،
-// والشاشة الرئيسية غلاف التبويبات الأربعة.
+// والشاشة الرئيسية غلاف التبويبات الخمسة.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';

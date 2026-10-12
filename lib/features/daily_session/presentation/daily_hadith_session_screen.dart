@@ -130,12 +130,17 @@ class _DailyHadithSessionScreenState extends ConsumerState<DailyHadithSessionScr
 
     final bool lastStage = state.stage == SessionStage.reflection;
     final bool canFinish = state.chosenOptionId != null && !_finishing;
+    // قفل التقدم: لا يخرج المستخدم من التثبيت إلا بعد مطابقة كل مقاطع المتن.
+    final bool practiceCleared = ref.watch(practiceClearedProvider(widget.hadithId));
+    final bool onPractice = state.stage == SessionStage.practice;
+    final bool nextLocked = onPractice && !practiceCleared;
     return Column(
       children: <Widget>[
         SessionHeader(
           bundle: bundle,
           state: state,
           isReview: !widget.countsTowardJourney,
+          practiceCleared: practiceCleared,
           onBack: () => Navigator.of(context).maybePop(),
           onToggleScholar: controller.toggleScholarLayer,
           onStageTap: controller.goTo,
@@ -192,7 +197,15 @@ class _DailyHadithSessionScreenState extends ConsumerState<DailyHadithSessionScr
                             ),
                           )
                         : FilledButton.icon(
-                            onPressed: controller.next,
+                            key: const ValueKey<String>('session-next'),
+                            // معطّل برمجياً (null) ورمادي باهت حتى يكتمل الترصيع.
+                            onPressed: nextLocked ? null : controller.next,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: onPractice ? palette.emerald : null,
+                              foregroundColor: onPractice ? palette.onAccent : null,
+                              disabledBackgroundColor: palette.lockedSoft,
+                              disabledForegroundColor: palette.locked,
+                            ),
                             icon: const Icon(Icons.arrow_forward_rounded),
                             label: Text('التالي: ${SessionStage.values[state.stage.index + 1].title}'),
                           ),

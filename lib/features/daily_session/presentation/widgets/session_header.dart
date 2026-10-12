@@ -20,6 +20,7 @@ class SessionHeader extends StatelessWidget {
     required this.bundle,
     required this.state,
     required this.isReview,
+    required this.practiceCleared,
     required this.onBack,
     required this.onToggleScholar,
     required this.onStageTap,
@@ -33,6 +34,9 @@ class SessionHeader extends StatelessWidget {
 
   /// هل هي مراجعة.
   final bool isReview;
+
+  /// هل اكتمل ترصيع المتن (تُفتح به المراحل التالية للتثبيت).
+  final bool practiceCleared;
 
   /// رجوع.
   final VoidCallback onBack;
@@ -112,7 +116,12 @@ class SessionHeader extends StatelessWidget {
           ),
           if (!scholar) ...<Widget>[
             const SizedBox(height: 10),
-            _StageBar(current: state.stage, visited: state.visited, onTap: onStageTap),
+            _StageBar(
+              current: state.stage,
+              visited: state.visited,
+              practiceCleared: practiceCleared,
+              onTap: onStageTap,
+            ),
           ],
         ],
       ),
@@ -184,11 +193,20 @@ class _HeaderPill extends StatelessWidget {
 }
 
 class _StageBar extends StatelessWidget {
-  const _StageBar({required this.current, required this.visited, required this.onTap});
+  const _StageBar({
+    required this.current,
+    required this.visited,
+    required this.practiceCleared,
+    required this.onTap,
+  });
 
   final SessionStage current;
   final Set<SessionStage> visited;
+  final bool practiceCleared;
   final ValueChanged<SessionStage> onTap;
+
+  /// المراحل التي بعد التثبيت مقفلة حتى يكتمل ترصيع المتن.
+  bool _locked(SessionStage stage) => stage.index > SessionStage.practice.index && !practiceCleared;
 
   @override
   Widget build(BuildContext context) {
@@ -204,9 +222,13 @@ class _StageBar extends StatelessWidget {
               child: Semantics(
                 button: true,
                 selected: stage == current,
-                label: 'المرحلة ${arabicDigits(stage.index + 1)}: ${stage.title}',
+                enabled: !_locked(stage),
+                label: _locked(stage)
+                    ? 'المرحلة ${arabicDigits(stage.index + 1)}: ${stage.title}، مقفلة حتى إتمام ترصيع المتن'
+                    : 'المرحلة ${arabicDigits(stage.index + 1)}: ${stage.title}',
                 child: InkWell(
-                  onTap: () => onTap(stage),
+                  // المراحل بعد التثبيت لا تُفتح بلمس الشريط قبل إتمام الترصيع.
+                  onTap: _locked(stage) ? null : () => onTap(stage),
                   customBorder: AppShapes.rounded(AppShapes.radiusSmall),
                   child: ExcludeSemantics(
                     child: Padding(
@@ -226,7 +248,9 @@ class _StageBar extends StatelessWidget {
                           Text(
                             stage.shortLabel,
                             style: text.labelSmall?.copyWith(
-                              color: stage == current ? palette.ink : palette.inkSoft,
+                              color: _locked(stage)
+                                  ? palette.locked
+                                  : (stage == current ? palette.ink : palette.inkSoft),
                               fontWeight: stage == current ? FontWeight.w700 : FontWeight.w400,
                             ),
                           ),

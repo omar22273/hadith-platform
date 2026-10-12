@@ -1,7 +1,7 @@
 name: hadith_platform
 description: منصة الحديث النبوي والتاريخ الإسلامي التفاعلية - الأربعون النووية ورحلة السيرة وميدان المراجعة.
 publish_to: none
-version: 2.2.0+5
+version: 2.2.1+6
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -32,6 +32,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/data/adhkar/
     - assets/data/catalogs/
     - assets/data/curriculum/
     - assets/data/hadith/nawawi40/

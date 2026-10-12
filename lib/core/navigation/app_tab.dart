@@ -15,6 +15,9 @@ enum AppTab {
   /// رحلة السيرة.
   seerah('رحلة السيرة', Icons.map_outlined, Icons.map_rounded),
 
+  /// وِرد الأذكار والسبحة النبوية.
+  adhkar('وِرد الأذكار', Icons.spa_outlined, Icons.spa_rounded),
+
   /// ميدان المراجعة.
   review('ميدان المراجعة', Icons.psychology_alt_outlined, Icons.psychology_alt_rounded),
 

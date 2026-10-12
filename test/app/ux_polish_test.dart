@@ -22,6 +22,7 @@ import 'package:hadith_platform/core/theme/app_theme.dart';
 import 'package:hadith_platform/features/seerah/data/models/seerah_station.dart';
 import 'package:hadith_platform/features/seerah/domain/seerah_checkpoint.dart';
 import 'package:hadith_platform/features/seerah/presentation/seerah_checkpoint_screen.dart';
+import 'package:hadith_platform/features/seerah/presentation/seerah_narrative_screen.dart';
 
 import '../support/app_harness.dart';
 import '../support/fakes.dart';
@@ -78,7 +79,7 @@ void main() {
     expect(find.text('الأعمال بالنيات'), findsNothing);
   });
 
-  testWidgets('seerah: station search and the full-narrative sheet', (WidgetTester tester) async {
+  testWidgets('seerah: station search and the full-narrative screen', (WidgetTester tester) async {
     // شاشة طويلة لتظهر البطاقة كلها بلا تمرير.
     await pumpApp(tester, size: const Size(412, 1800));
     await tester.tap(_navLabel('رحلة السيرة'));
@@ -92,17 +93,35 @@ void main() {
     await tester.tap(find.byTooltip('إغلاق البحث'));
     await settle(tester);
 
-    await tester.tap(find.text('التفاصيل والرواية الكاملة'));
+    await tester.tap(find.text('الرواية الكاملة وتفاصيل الحدث'));
     await settle(tester);
-    expect(find.byType(DraggableScrollableSheet), findsOneWidget);
-    expect(find.text('المشهد الزماني'), findsWidgets);
-    expect(find.text('المأزق والتحدي'), findsWidgets);
-    expect(find.text('القرار والنتيجة النبوية'), findsWidgets);
-    expect(find.text('النص المصدري'), findsWidgets);
+    expect(find.byType(SeerahNarrativeScreen), findsOneWidget);
+    // ملف البيانات الحالي بلا رواية مفصلة: يظهر التنبيه وتبقى المشاهد الموثقة.
+    expect(find.byKey(const ValueKey<String>('narrative-pending-note')), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('narrative-body')), findsNothing);
+    // القائمة كسولة: كل مشهد يُبنى حين يُمرَّر إليه.
+    final Finder pageScrollable = find
+        .descendant(of: find.byKey(const ValueKey<String>('narrative-scroll')), matching: find.byType(Scrollable))
+        .first;
+    const Map<String, String> scenes = <String, String>{
+      'setting': 'المشهد الزماني',
+      'challenge': 'المأزق والتحدي',
+      'decision': 'القرار والنتيجة النبوية',
+    };
+    for (final MapEntry<String, String> scene in scenes.entries) {
+      await tester.scrollUntilVisible(
+        find.byKey(ValueKey<String>('narrative-scene-${scene.key}')),
+        300,
+        scrollable: pageScrollable,
+      );
+      expect(find.text(scene.value), findsWidgets);
+    }
+    expect(find.textContaining('مصدر'), findsWidgets);
 
-    await tester.fling(find.byType(DraggableScrollableSheet), const Offset(0, 900), 3000);
+    await tester.tap(find.byType(BackButton));
     await settle(tester);
-    expect(find.byType(DraggableScrollableSheet), findsNothing);
+    expect(find.byType(SeerahNarrativeScreen), findsNothing);
+    expect(find.text('الرواية الكاملة وتفاصيل الحدث'), findsOneWidget);
   });
 
   testWidgets('word-order challenges unlock one after another', (WidgetTester tester) async {
@@ -228,7 +247,7 @@ void main() {
     );
     expect(tester.takeException(), isNull);
 
-    for (final String tab in <String>['رحلة السيرة', 'ميدان المراجعة', 'الإعدادات', 'الأربعين النووية']) {
+    for (final String tab in <String>['رحلة السيرة', 'وِرد الأذكار', 'ميدان المراجعة', 'الإعدادات', 'الأربعين النووية']) {
       await tester.tap(_navLabel(tab));
       await settle(tester);
       expect(tester.takeException(), isNull, reason: tab);

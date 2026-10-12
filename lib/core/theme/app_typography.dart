@@ -66,6 +66,22 @@ abstract final class AppTypography {
     );
   }
 
+  /// نص الرواية المفصلة: خط تراثي (أميري) مريح للعين وسطر رحب، يتبع حجم خط
+  /// المتن في الإعدادات. الحجم الممرر هو الحجم عند المعامل 1.
+  static TextStyle narrativeOf(
+    BuildContext context, {
+    required Color color,
+    double fontSize = 20,
+    FontWeight fontWeight = FontWeight.w400,
+  }) {
+    final ReadingTheme reading = ReadingTheme.of(context);
+    return athar(
+      color: color,
+      fontSize: fontSize * reading.matnScale,
+      fontWeight: fontWeight,
+    ).copyWith(height: 2.1);
+  }
+
   /// أسماء المحطات والعناوين التراثية.
   static TextStyle heritageTitle({
     required Color color,

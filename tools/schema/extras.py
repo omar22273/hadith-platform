@@ -124,6 +124,14 @@ EXTRAS = {
     return List<SeerahStationModel>.unmodifiable(result);
   }
 """,
+    "AdhkarCatalog": """
+  /// الأذكار مرتبة بحقل order كما تُعرض في الوِرد.
+  List<DhikrItem> get itemsInOrder {
+    final List<DhikrItem> result = List<DhikrItem>.of(items)
+      ..sort((DhikrItem a, DhikrItem b) => a.order.compareTo(b.order));
+    return List<DhikrItem>.unmodifiable(result);
+  }
+""",
     "SeerahStationModel": """
   /// شواهد مشهد واحد بترتيبها في الملف.
   List<SeerahEvidence> evidenceFor(SeerahScene scene) {
@@ -131,5 +139,23 @@ EXTRAS = {
       evidence.where((SeerahEvidence item) => item.scene == scene),
     );
   }
+
+  /// فقرات الرواية المفصلة (تفصل بينها سطور فارغة)؛ فارغة إن غابت الرواية
+  /// أو كانت بياضاً، فيعود العرض إلى نصوص المشاهد الموثقة.
+  List<String> get narrativeParagraphs {
+    final String? text = detailedNarrative;
+    if (text == null) {
+      return const <String>[];
+    }
+    return List<String>.unmodifiable(
+      text
+          .split(RegExp(r'\\n\\s*\\n'))
+          .map((String paragraph) => paragraph.trim())
+          .where((String paragraph) => paragraph.isNotEmpty),
+    );
+  }
+
+  /// هل للمحطة رواية مفصلة جاهزة للعرض.
+  bool get hasDetailedNarrative => narrativeParagraphs.isNotEmpty;
 """,
 }
