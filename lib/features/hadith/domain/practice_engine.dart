@@ -1,13 +1,15 @@
 // محرك رتّب ألفاظ الحديث (حساب صرف):
-// - ترصيع المتن: بعثرة كلمات كل مقطع حفظ ببذرة ثابتة للمستخدم في اليوم.
+// - ترصيع المتن: بعثرة عبارات الحديث التامة (كل مقطع حفظ عبارة) ببذرة ثابتة
+//   للمستخدم في اليوم؛ تُجمع العبارات المتجاورة في تمارين من أربع عبارات فأقل.
 // - التلاشي التدريجي: ترتيب إخفاء ثابت يبدأ بالكلمات المفتاحية، فما يُخفى
 //   عند ٢٥٪ يبقى مخفياً عند ٥٠٪ و٨٠٪.
-// الكلمات تُقرأ من المتن الموثق بعقد التقسيم المشترك؛ لا تُنشأ كلمة جديدة.
+// الكلمات والعبارات تُقرأ من المتن الموثق بعقد التقسيم المشترك؛ لا يُنشأ نص جديد.
 
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/text/arabic_digits.dart';
 import '../../../core/text/stable_hash.dart';
 import '../data/models/models.dart';
 
@@ -15,7 +17,24 @@ import '../data/models/models.dart';
 /// البصري على الكلمة الصحيحة التالية. التلميح لا يضع الكلمة ولا يفك القفل.
 const int hintAfterMistakes = 3;
 
-/// بلاطة في تمرين الترصيع.
+/// أكثر عدد من العبارات في تمرين ترتيب واحد.
+const int maxPhrasesPerDrill = 4;
+
+/// أحجام تمارين الترتيب لعدد من العبارات: متقاربة قدر الإمكان، لا يتجاوز أيٌّ
+/// منها [maxPhrasesPerDrill]، ولا يقل عن اثنتين ما دام العدد اثنتين فأكثر.
+List<int> phraseGroupSizes(int count, {int maxPerDrill = maxPhrasesPerDrill}) {
+  if (count <= 0) {
+    return const <int>[];
+  }
+  final int groups = (count + maxPerDrill - 1) ~/ maxPerDrill;
+  final int base = count ~/ groups;
+  final int extra = count % groups;
+  return List<int>.unmodifiable(<int>[
+    for (int group = 0; group < groups; group++) group < extra ? base + 1 : base,
+  ]);
+}
+
+/// بلاطة في تمرين الترتيب: عبارة كاملة من عبارات المتن.
 @immutable
 class PracticeTile {
   const PracticeTile({required this.id, required this.tokenIndex, required this.token});
@@ -23,28 +42,40 @@ class PracticeTile {
   /// موضع البلاطة في المصفوفة المبعثرة.
   final int id;
 
-  /// رقم الكلمة داخل مقطع الحفظ.
+  /// موضع العبارة الصحيح داخل التمرين.
   final int tokenIndex;
 
-  /// الكلمة.
+  /// العبارة: [MatnToken.raw] نصها بعلامات ترقيمها، و[MatnToken.core] كلماتها
+  /// المشكولة دون علامات الترقيم بمسافة واحدة بينها.
   final MatnToken token;
 }
 
-/// تمرين ترصيع مقطع واحد.
+/// تمرين ترتيب عبارات متجاورة من المتن.
 @immutable
 class ChunkDrill {
-  const ChunkDrill({required this.chunk, required this.tokens, required this.tiles});
+  const ChunkDrill({
+    required this.chunks,
+    required this.label,
+    required this.tokens,
+    required this.tiles,
+  });
 
-  /// مقطع الحفظ.
-  final PracticeChunk chunk;
+  /// مقاطع الحفظ (العبارات) التي يضمها التمرين بترتيبها الصحيح.
+  final List<PracticeChunk> chunks;
 
-  /// كلمات المقطع بالترتيب الصحيح.
+  /// عنوان التمرين في الواجهة.
+  final String label;
+
+  /// العبارات بالترتيب الصحيح.
   final List<MatnToken> tokens;
 
   /// البلاطات مبعثرة.
   final List<PracticeTile> tiles;
 
-  /// هل البلاطة صحيحة للموضع التالي. الكلمتان المتطابقتان رسماً وضبطاً متكافئتان.
+  /// معرّف ثابت للتمرين: معرّفات عباراته.
+  String get id => chunks.map((PracticeChunk chunk) => chunk.id).join('+');
+
+  /// هل البلاطة صحيحة للموضع التالي. العبارتان المتطابقتان رسماً وضبطاً متكافئتان.
   bool fits(int tileId, int position) {
     if (position < 0 || position >= tokens.length || tileId < 0 || tileId >= tiles.length) {
       return false;
@@ -125,27 +156,38 @@ class PracticeEngine {
       for (final String id in practice.reconstruction.chunkIds)
         if (practice.chunkById(id) != null) practice.chunkById(id)!,
     ];
+    final List<PracticeChunk> phraseChunks = <PracticeChunk>[
+      for (final PracticeChunk chunk in drillChunks.isEmpty ? practice.chunks : drillChunks)
+        if (tokensOf(chunk).isNotEmpty) chunk,
+    ];
     final List<ChunkDrill> drills = <ChunkDrill>[];
-    for (final PracticeChunk chunk in drillChunks.isEmpty ? practice.chunks : drillChunks) {
-      final List<MatnToken> tokens = tokensOf(chunk);
-      if (tokens.isEmpty) {
-        continue;
-      }
-      final List<int> order = List<int>.generate(tokens.length, (int i) => i);
-      final int chunkSeed = practice.reconstruction.shuffleStrategy == ShuffleStrategy.fixed
-          ? stableHash(chunk.id)
-          : seed ^ stableHash(chunk.id);
-      order.shuffle(Random(chunkSeed));
+    int cursor = 0;
+    for (final int size in phraseGroupSizes(phraseChunks.length)) {
+      final List<PracticeChunk> group = phraseChunks.sublist(cursor, cursor + size);
+      final List<MatnToken> phrases = <MatnToken>[
+        for (int i = 0; i < group.length; i++) _phraseOf(i, tokensOf(group[i])),
+      ];
+      final String label = size == 1
+          ? group.first.label
+          : 'العبارات ${arabicDigits(cursor + 1)}–${arabicDigits(cursor + size)}';
+      cursor += size;
+      final String drillId = group.map((PracticeChunk chunk) => chunk.id).join('+');
+      final List<int> order = List<int>.generate(phrases.length, (int i) => i);
+      final int drillSeed = practice.reconstruction.shuffleStrategy == ShuffleStrategy.fixed
+          ? stableHash(drillId)
+          : seed ^ stableHash(drillId);
+      order.shuffle(Random(drillSeed));
       if (order.length > 1 && _isIdentity(order)) {
         order.add(order.removeAt(0));
       }
       drills.add(
         ChunkDrill(
-          chunk: chunk,
-          tokens: List<MatnToken>.unmodifiable(tokens),
+          chunks: List<PracticeChunk>.unmodifiable(group),
+          label: label,
+          tokens: List<MatnToken>.unmodifiable(phrases),
           tiles: List<PracticeTile>.unmodifiable(<PracticeTile>[
             for (int id = 0; id < order.length; id++)
-              PracticeTile(id: id, tokenIndex: order[id], token: tokens[order[id]]),
+              PracticeTile(id: id, tokenIndex: order[id], token: phrases[order[id]]),
           ]),
         ),
       );
@@ -200,7 +242,7 @@ class PracticeEngine {
     );
   }
 
-  /// تمارين الترصيع بالترتيب.
+  /// تمارين ترتيب العبارات بالترتيب.
   final List<ChunkDrill> drills;
 
   /// كلمات التلاشي بالترتيب.
@@ -221,6 +263,17 @@ class PracticeEngine {
     final int percent = levels[index];
     final int count = (hideOrder.length * percent / 100).round();
     return hideOrder.take(count).toSet();
+  }
+
+  /// العبارة وحدةً واحدة: نصها بعلامات الترقيم، وكلماتها المشكولة بلا علامات.
+  static MatnToken _phraseOf(int index, List<MatnToken> words) {
+    return MatnToken(
+      index: index,
+      raw: words.map((MatnToken word) => word.raw).join(' '),
+      leading: '',
+      core: words.map((MatnToken word) => word.core).join(' '),
+      trailing: '',
+    );
   }
 
   static bool _isIdentity(List<int> order) {

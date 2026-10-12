@@ -147,9 +147,9 @@ void main() {
         }
       });
 
-      test('three or four ordered chunks with short labels', () {
+      test('four to fourteen ordered whole-phrase chunks with short labels', () {
         final List<PracticeChunk> chunks = model.practice.chunks;
-        expect(chunks.length, inInclusiveRange(3, 4));
+        expect(chunks.length, inInclusiveRange(4, 14));
         expect(model.practice.reconstruction.chunkIds, chunks.map((PracticeChunk c) => c.id).toList());
         for (final PracticeChunk chunk in chunks) {
           expect(chunk.label.trim(), isNotEmpty);
@@ -159,6 +159,7 @@ void main() {
           expect(chunk.startToken, greaterThanOrEqualTo(0));
           expect(chunk.endToken, lessThan(tokens.length));
           expect(chunk.startToken, lessThanOrEqualTo(chunk.endToken));
+          expect(chunk.endToken - chunk.startToken + 1, greaterThanOrEqualTo(2), reason: '${chunk.id} is a phrase, not a word');
         }
         for (int i = 1; i < chunks.length; i++) {
           final PracticeChunk previous = chunks[i - 1];

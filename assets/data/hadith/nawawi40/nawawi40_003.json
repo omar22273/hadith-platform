@@ -141,15 +141,29 @@
         "id": "c3",
         "segmentId": "s2",
         "startToken": 14,
-        "endToken": 17,
-        "label": "الصلاة والزكاة"
+        "endToken": 15,
+        "label": "إقام الصلاة"
       },
       {
         "id": "c4",
         "segmentId": "s2",
+        "startToken": 16,
+        "endToken": 17,
+        "label": "إيتاء الزكاة"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s2",
         "startToken": 18,
+        "endToken": 19,
+        "label": "حج البيت"
+      },
+      {
+        "id": "c6",
+        "segmentId": "s2",
+        "startToken": 20,
         "endToken": 21,
-        "label": "الحج والصيام"
+        "label": "صوم رمضان"
       }
     ],
     "reconstruction": {
@@ -157,7 +171,9 @@
         "c1",
         "c2",
         "c3",
-        "c4"
+        "c4",
+        "c5",
+        "c6"
       ],
       "shuffleStrategy": "per_user_per_day"
     },

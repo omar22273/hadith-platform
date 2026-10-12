@@ -158,29 +158,85 @@
         "id": "c1",
         "segmentId": "s2",
         "startToken": 0,
-        "endToken": 8,
-        "label": "الحلال والحرام والمشتبهات"
+        "endToken": 2,
+        "label": "الحلال بيّن"
       },
       {
         "id": "c2",
         "segmentId": "s2",
-        "startToken": 14,
-        "endToken": 27,
-        "label": "من اتقى الشبهات"
+        "startToken": 3,
+        "endToken": 5,
+        "label": "الحرام بيّن"
       },
       {
         "id": "c3",
+        "segmentId": "s2",
+        "startToken": 6,
+        "endToken": 13,
+        "label": "المشتبهات بينهما"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 14,
+        "endToken": 20,
+        "label": "من اتقى الشبهات"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s2",
+        "startToken": 21,
+        "endToken": 27,
+        "label": "من وقع في الشبهات"
+      },
+      {
+        "id": "c6",
         "segmentId": "s2",
         "startToken": 28,
         "endToken": 35,
         "label": "مثل الراعي والحمى"
       },
       {
-        "id": "c4",
+        "id": "c7",
+        "segmentId": "s2",
+        "startToken": 36,
+        "endToken": 40,
+        "label": "حمى الملوك"
+      },
+      {
+        "id": "c8",
+        "segmentId": "s2",
+        "startToken": 41,
+        "endToken": 45,
+        "label": "حمى الله محارمه"
+      },
+      {
+        "id": "c9",
         "segmentId": "s2",
         "startToken": 46,
+        "endToken": 50,
+        "label": "مضغة في الجسد"
+      },
+      {
+        "id": "c10",
+        "segmentId": "s2",
+        "startToken": 51,
         "endToken": 55,
-        "label": "مضغة القلب"
+        "label": "صلاحها صلاح الجسد"
+      },
+      {
+        "id": "c11",
+        "segmentId": "s2",
+        "startToken": 56,
+        "endToken": 60,
+        "label": "فسادها فساد الجسد"
+      },
+      {
+        "id": "c12",
+        "segmentId": "s2",
+        "startToken": 61,
+        "endToken": 63,
+        "label": "هي القلب"
       }
     ],
     "reconstruction": {
@@ -188,7 +244,15 @@
         "c1",
         "c2",
         "c3",
-        "c4"
+        "c4",
+        "c5",
+        "c6",
+        "c7",
+        "c8",
+        "c9",
+        "c10",
+        "c11",
+        "c12"
       ],
       "shuffleStrategy": "per_user_per_day"
     },

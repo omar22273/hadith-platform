@@ -13,6 +13,8 @@ import '../../../core/time/clock.dart';
 import '../../hadith/application/hadith_providers.dart';
 import '../../hadith/data/models/models.dart';
 import '../../hadith/domain/hadith_bundle.dart';
+import '../../hadith/domain/practice_engine.dart';
+import '../../journey/application/pacing_notifier.dart';
 import '../../journey/application/journey_progress_controller.dart';
 import '../../journey/domain/journey_progress.dart';
 import '../data/review_ledger_store.dart';
@@ -123,6 +125,7 @@ class OrderChallengeState {
     required this.board,
     required this.lastOutcome,
     this.completed = const <int>{},
+    this.skipped = false,
   });
 
   /// التحدي المختار.
@@ -136,6 +139,9 @@ class OrderChallengeState {
 
   /// رتب المقاطع التي اكتمل ترتيبها بنجاح.
   final Set<int> completed;
+
+  /// هل استُعمل زر «تجاوز للاختبار»: تُعرض التمارين التالية مرتبة من البداية.
+  final bool skipped;
 }
 
 /// متحكم تحديات الترتيب.
@@ -146,16 +152,23 @@ class OrderChallengeController extends Notifier<OrderChallengeState> {
     return _stateFor(deck, 0, const <int>{});
   }
 
-  OrderChallengeState _stateFor(ReviewDeck? deck, int index, Set<int> completed) {
+  OrderChallengeState _stateFor(
+    ReviewDeck? deck,
+    int index,
+    Set<int> completed, {
+    bool skipped = false,
+  }) {
     if (deck == null || deck.orderChallenges.isEmpty) {
       return const OrderChallengeState(index: 0, board: null, lastOutcome: null);
     }
     final int bounded = index < 0 ? 0 : (index >= deck.orderChallenges.length ? deck.orderChallenges.length - 1 : index);
+    final ChunkDrill drill = deck.orderChallenges[bounded].drill;
     return OrderChallengeState(
       index: bounded,
-      board: OrderBoard.start(deck.orderChallenges[bounded].drill),
+      board: skipped && completed.contains(bounded) ? OrderBoard.solved(drill) : OrderBoard.start(drill),
       lastOutcome: null,
       completed: completed,
+      skipped: skipped,
     );
   }
 
@@ -179,8 +192,24 @@ class OrderChallengeController extends Notifier<OrderChallengeState> {
       completed: outcome == PlacementOutcome.completed
           ? Set<int>.unmodifiable(<int>{...state.completed, state.index})
           : state.completed,
+      skipped: state.skipped,
     );
     return outcome;
+  }
+
+  /// زر «تجاوز للاختبار ⚡»: يرتّب كل عبارات كل التمارين ترتيباً صحيحاً، فيُفتح
+  /// «التالي» فوراً. لا يعمل إلا إذا كان وضع التجربة مفعّلاً في الإعدادات.
+  /// يعيد true إن نُفّذ.
+  bool skipAllForTesting() {
+    final ReviewDeck? deck = ref.read(reviewDeckProvider).value;
+    if (deck == null || deck.orderChallenges.isEmpty || !ref.read(testingSkipEnabledProvider)) {
+      return false;
+    }
+    final Set<int> all = Set<int>.unmodifiable(<int>{
+      for (int i = 0; i < deck.orderChallenges.length; i++) i,
+    });
+    state = _stateFor(deck, state.index, all, skipped: true);
+    return true;
   }
 
   /// ينتقل إلى المقطع التالي، ولا ينتقل أبداً ما لم يُرتَّب المقطع الحالي
@@ -195,7 +224,7 @@ class OrderChallengeController extends Notifier<OrderChallengeState> {
     if (next >= deck.orderChallenges.length) {
       return false;
     }
-    state = _stateFor(deck, next, state.completed);
+    state = _stateFor(deck, next, state.completed, skipped: state.skipped);
     return true;
   }
 
@@ -210,12 +239,13 @@ class OrderChallengeController extends Notifier<OrderChallengeState> {
       board: board.undo(),
       lastOutcome: null,
       completed: state.completed,
+      skipped: state.skipped,
     );
   }
 
   /// يعيد المقطع الحالي (ويبقى مفتوحاً ما اكتمل قبلاً).
   void reset() {
-    state = _stateFor(ref.read(reviewDeckProvider).value, state.index, state.completed);
+    state = _stateFor(ref.read(reviewDeckProvider).value, state.index, state.completed, skipped: false);
   }
 
   /// ينتقل إلى تحدٍّ مفتوح. المقاطع اللاحقة المقفلة لا تُفتح بالنقر.
@@ -223,7 +253,7 @@ class OrderChallengeController extends Notifier<OrderChallengeState> {
     if (index < 0 || index > openLimit) {
       return;
     }
-    state = _stateFor(ref.read(reviewDeckProvider).value, index, state.completed);
+    state = _stateFor(ref.read(reviewDeckProvider).value, index, state.completed, skipped: state.skipped);
   }
 }
 

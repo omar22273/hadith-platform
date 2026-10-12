@@ -1,8 +1,9 @@
-// تحدي ترتيب كلمات المتن المشكولة: تُلمس الكلمة (أو تُسحب) من البلاطات المبعثرة
-// إلى الموضع التالي في السطر العلوي، فتثبت إن طابقته رسماً وضبطاً، وإلا اهتزت
-// بلطف وعادت. فإن أخطأ ثلاث مرات متتالية في المقطع أومضت الكلمة الصحيحة التالية
-// بكهرماني هادئ؛ والقفل على حاله حتى يكتمل المقطع.
-// الكلمات معروضة بضبطها كما في ملف الحديث حرفاً بحرف.
+// تحدي ترتيب عبارات المتن المشكولة: تُلمس العبارة (أو تُسحب) من البلاطات المبعثرة
+// إلى الموضع التالي في الحوض العلوي، فتثبت إن طابقته رسماً وضبطاً، وإلا اهتزت
+// بلطف وعادت. فإن أخطأ ثلاث مرات متتالية في التمرين أومضت العبارة الصحيحة التالية
+// بكهرماني هادئ؛ والقفل على حاله حتى يكتمل التمرين. وفي وضع التجربة يظهر زر
+// «تجاوز للاختبار ⚡» الذي يرتّب كل العبارات فوراً.
+// العبارات معروضة بضبطها كما في ملف الحديث حرفاً بحرف.
 
 import 'dart:math' as math;
 
@@ -17,7 +18,9 @@ import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/completion_flash.dart';
 import '../../../../core/ui/gated_next_button.dart';
 import '../../../../core/ui/hint_glow.dart';
+import '../../../../core/ui/testing_skip_button.dart';
 import '../../../hadith/domain/practice_engine.dart';
+import '../../../journey/application/pacing_notifier.dart';
 import '../../application/review_controllers.dart';
 import '../../domain/review_deck.dart';
 import '../../domain/review_sessions.dart';
@@ -61,9 +64,15 @@ class WordOrderBoard extends ConsumerWidget {
       }
     }
 
+    final bool testingSkip = ref.watch(testingSkipEnabledProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
+        if (testingSkip) ...<Widget>[
+          TestingSkipButton(onPressed: () => controller.skipAllForTesting()),
+          const SizedBox(height: 12),
+        ],
         _ChallengePicker(
           count: deck.orderChallenges.length,
           selected: state.index,
@@ -78,7 +87,7 @@ class WordOrderBoard extends ConsumerWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'المس الكلمة لتنتقل إلى السطر العلوي بالترتيب، أو اسحبها. الكلمة غير المطابقة تعود بلطف.',
+          'المس العبارة لتنتقل إلى الحوض العلوي بالترتيب، أو اسحبها. العبارة غير المطابقة تعود بلطف.',
           style: text.bodySmall?.copyWith(color: palette.inkSoft),
         ),
         const SizedBox(height: 12),
@@ -93,7 +102,7 @@ class WordOrderBoard extends ConsumerWidget {
           _CompletedBanner(mistakes: board.mistakes, onAgain: controller.reset)
         else ...<Widget>[
           Text(
-            'الكلمات المبعثرة',
+            'العبارات المبعثرة',
             style: text.labelMedium?.copyWith(color: palette.inkSoft),
           ),
           const SizedBox(height: 8),
@@ -111,7 +120,7 @@ class WordOrderBoard extends ConsumerWidget {
               TextButton.icon(
                 onPressed: controller.reset,
                 icon: const Icon(Icons.restart_alt_rounded),
-                label: const Text('ابدأ المقطع من جديد'),
+                label: const Text('ابدأ التمرين من جديد'),
               ),
             ],
           ),
@@ -167,7 +176,7 @@ class _MismatchNotice extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'ليست هذه الكلمة التالية في المتن، فعادت إلى مكانها. جرّب كلمة أخرى.',
+                        'ليست هذه العبارة التالية في المتن، فعادت إلى مكانها. جرّب عبارة أخرى.',
                         style: AppTypography.ui(color: palette.amberText, fontSize: 13, height: 1.6),
                       ),
                     ),
@@ -225,8 +234,8 @@ class _ChallengePicker extends StatelessWidget {
           return Semantics(
             enabled: !locked,
             label: locked
-                ? 'المقطع ${arabicDigits(index + 1)} مقفل حتى إتمام ما قبله'
-                : 'المقطع ${arabicDigits(index + 1)}${done ? '، مكتمل' : ''}',
+                ? 'التمرين ${arabicDigits(index + 1)} مقفل حتى إتمام ما قبله'
+                : 'التمرين ${arabicDigits(index + 1)}${done ? '، مكتمل' : ''}',
             child: ExcludeSemantics(
               child: ChoiceChip(
                 selected: active && !locked,
@@ -269,15 +278,19 @@ class _Line extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
-    final TextStyle word = AppTypography.matnOf(context, color: palette.ink, fontSize: 22);
+    final TextStyle phrase = AppTypography.matnOf(context, color: palette.ink, fontSize: 21);
     final List<Widget> children = <Widget>[];
     for (int position = 0; position < board.drill.tokens.length; position++) {
       if (position < board.placedTiles.length) {
         final PracticeTile tile = board.drill.tiles[board.placedTiles[position]];
         children.add(
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
-            child: Text(tile.token.core, style: word.copyWith(color: palette.emeraldText)),
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: Text(
+              tile.token.core,
+              key: ValueKey<String>('placed-phrase-$position'),
+              style: phrase.copyWith(color: palette.emeraldText, height: 1.8),
+            ),
           ),
         );
       } else if (position == board.nextPosition) {
@@ -288,11 +301,11 @@ class _Line extends StatelessWidget {
             builder: (BuildContext context, List<int?> candidates, List<dynamic> rejected) {
               final bool hovering = candidates.isNotEmpty;
               return Semantics(
-                label: 'الموضع ${arabicDigits(position + 1)}: أفلت الكلمة هنا',
+                label: 'الموضع ${arabicDigits(position + 1)}: أفلت العبارة هنا',
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 160),
-                  constraints: const BoxConstraints(minWidth: 64, minHeight: 46),
-                  margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+                  constraints: const BoxConstraints(minHeight: 46),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
                   decoration: ShapeDecoration(
                     color: hovering ? palette.amberSoft : palette.surfaceMuted,
                     shape: AppShapes.rounded(
@@ -302,7 +315,7 @@ class _Line extends StatelessWidget {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    arabicDigits(position + 1),
+                    'العبارة ${arabicDigits(position + 1)}',
                     style: AppTypography.ui(color: palette.amberText, fontSize: 13, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -313,9 +326,8 @@ class _Line extends StatelessWidget {
       } else {
         children.add(
           Container(
-            width: 40,
             height: 4,
-            margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 20),
+            margin: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
               color: palette.line,
               borderRadius: BorderRadius.circular(2),
@@ -324,10 +336,8 @@ class _Line extends StatelessWidget {
         );
       }
     }
-    return Wrap(
-      alignment: WrapAlignment.start,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      runSpacing: 4,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: children,
     );
   }
@@ -338,25 +348,27 @@ class _Pool extends StatelessWidget {
 
   final OrderBoard board;
 
-  /// الكلمة التي تومض بتلميح كهرماني بعد ثلاث محاولات خاطئة متتالية.
+  /// العبارة التي تومض بتلميح كهرماني بعد ثلاث محاولات خاطئة متتالية.
   final int? hintTile;
   final ValueChanged<int> onTapTile;
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         for (final PracticeTile tile in board.drill.tiles)
           if (!board.isUsed(tile.id))
             _ShakingTile(
               key: ValueKey<String>('tile-${tile.id}'),
               shakeTick: board.lastMismatchTile == tile.id ? board.mismatchTick : 0,
-              child: _DraggableTile(
-                tile: tile,
-                hinted: tile.id == hintTile,
-                onTap: () => onTapTile(tile.id),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: _DraggableTile(
+                  tile: tile,
+                  hinted: tile.id == hintTile,
+                  onTap: () => onTapTile(tile.id),
+                ),
               ),
             ),
       ],
@@ -378,8 +390,8 @@ class _DraggableTile extends StatelessWidget {
     return Semantics(
       button: true,
       label: hinted
-          ? 'الكلمة ${tile.token.core}. تلميح: هذه الكلمة التالية. المسها لوضعها'
-          : 'الكلمة ${tile.token.core}. المسها لوضعها في الموضع التالي',
+          ? 'العبارة ${tile.token.core}. تلميح: هذه العبارة التالية. المسها لوضعها'
+          : 'العبارة ${tile.token.core}. المسها لوضعها في الموضع التالي',
       child: ExcludeSemantics(
         child: Draggable<int>(
           data: tile.id,
@@ -415,10 +427,10 @@ class _TileFace extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Text(
           label,
-          style: AppTypography.matnOf(context, color: palette.ink, fontSize: 22),
+          style: AppTypography.matnOf(context, color: palette.ink, fontSize: 21).copyWith(height: 1.8),
         ),
       ),
     );
@@ -463,7 +475,7 @@ class _CompletedBanner extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Text(
-          mistakes == 0 ? 'رتّبتَ المقطع كاملاً من أول محاولة. بارك الله في حفظك.' : 'اكتمل المقطع. التكرار يرسّخ الحفظ.',
+          mistakes == 0 ? 'رتّبتَ العبارات كاملةً من أول محاولة. بارك الله في حفظك.' : 'اكتمل الترتيب. التكرار يرسّخ الحفظ.',
           textAlign: TextAlign.center,
           style: text.titleSmall?.copyWith(color: palette.emeraldText, fontWeight: FontWeight.w700),
         ),
@@ -472,7 +484,7 @@ class _CompletedBanner extends StatelessWidget {
           child: TextButton.icon(
             onPressed: onAgain,
             icon: const Icon(Icons.replay_rounded),
-            label: const Text('أعد المقطع'),
+            label: const Text('أعد التمرين'),
           ),
         ),
       ],

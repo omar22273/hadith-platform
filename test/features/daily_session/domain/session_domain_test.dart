@@ -20,23 +20,26 @@ void main() {
   group('practice engine', () {
     final PracticeEngine engine = PracticeEngine.fromHadith(first, seed: 20261009);
 
-    test('builds one drill per reconstruction chunk', () {
-      expect(engine.drills.length, first.practice.reconstruction.chunkIds.length);
+    test('groups the reconstruction phrases into drills of at most four', () {
+      final int phrases = first.practice.reconstruction.chunkIds.length;
+      expect(engine.drills.fold<int>(0, (int sum, ChunkDrill d) => sum + d.tokens.length), phrases);
+      expect(engine.drills.every((ChunkDrill d) => d.tokens.length >= 2 && d.tokens.length <= maxPhrasesPerDrill), isTrue);
+      expect(engine.drills.map((ChunkDrill d) => d.chunks.length).toList(), phraseGroupSizes(phrases));
     });
 
-    test('tiles are a shuffled permutation of the chunk words', () {
+    test('tiles are a shuffled permutation of the drill phrases', () {
       for (final ChunkDrill drill in engine.drills) {
         final List<int> order = drill.tiles.map((PracticeTile t) => t.tokenIndex).toList();
         expect((List<int>.of(order)..sort()), List<int>.generate(drill.tokens.length, (int i) => i));
         if (drill.tokens.length > 1) {
           expect(order, isNot(List<int>.generate(drill.tokens.length, (int i) => i)));
         }
-        final PracticeTile firstWord = drill.tiles.firstWhere((PracticeTile t) => t.tokenIndex == 0);
-        expect(drill.fits(firstWord.id, 0), isTrue);
+        final PracticeTile firstPhrase = drill.tiles.firstWhere((PracticeTile t) => t.tokenIndex == 0);
+        expect(drill.fits(firstPhrase.id, 0), isTrue);
       }
     });
 
-    test('the hint is the next correct word, and only after three consecutive mistakes', () {
+    test('the hint is the next correct phrase, and only after three consecutive mistakes', () {
       for (final ChunkDrill drill in engine.drills) {
         final List<int> placed = <int>[];
         for (int position = 0; position < drill.tokens.length; position++) {
@@ -45,8 +48,8 @@ void main() {
           final int? hint = drill.hintTile(placed, hintAfterMistakes);
           expect(hint, isNotNull);
           expect(placed, isNot(contains(hint)));
-          expect(drill.fits(hint!, position), isTrue, reason: 'it is a word that belongs at ${position + 1}');
-          expect(drill.hintTile(placed, hintAfterMistakes + 4), hint, reason: 'it stays on the same word');
+          expect(drill.fits(hint!, position), isTrue, reason: 'it is a phrase that belongs at ${position + 1}');
+          expect(drill.hintTile(placed, hintAfterMistakes + 4), hint, reason: 'it stays on the same phrase');
           placed.add(hint);
         }
         expect(drill.hintTile(placed, hintAfterMistakes), isNull, reason: 'nothing to hint once complete');
