@@ -126,20 +126,20 @@ void main() {
       return ProviderScope.containerOf(tester.element(find.byType(SeerahStationScreen)));
     }
 
-    /// يفتح القسم القابل للطي بلمس رأسه.
-    Future<void> expandSection(WidgetTester tester) async {
-      final Finder tile = find.byKey(const ValueKey<String>('station-narrative'));
-      await tester.scrollUntilVisible(tile, 300, scrollable: pageScrollable());
-      await tester.tap(find.text(seerahNarrativeTitle));
-      await settle(tester);
-    }
-
     /// المحرك الرأسي للصفحة وحده (كل نص قابل للتحديد يحمل Scrollable داخلياً).
     Finder pageScrollable() {
       return find.descendant(
         of: find.byKey(const ValueKey<String>('station-scroll')),
         matching: find.byType(Scrollable),
       ).first;
+    }
+
+    /// يفتح القسم القابل للطي بلمس رأسه.
+    Future<void> expandSection(WidgetTester tester) async {
+      final Finder tile = find.byKey(const ValueKey<String>('station-narrative'));
+      await tester.scrollUntilVisible(tile, 300, scrollable: pageScrollable());
+      await tester.tap(find.text(seerahNarrativeTitle));
+      await settle(tester);
     }
 
     /// القائمة كسولة: ما بعد الشاشة لا يُبنى، فيُمرَّر إليه أولاً.

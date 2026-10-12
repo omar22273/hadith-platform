@@ -186,11 +186,14 @@ void main() {
       await openStation(tester, badr, size: const Size(360, 740), textScale: 1.3);
       expect(tester.takeException(), isNull);
 
+      // الشاشة ضيقة والخط كبير: الخيار الأول قد يقع تحت حافة الشاشة، فيُمرَّر إليه.
+      final Finder scroll = find.descendant(of: key('station-scroll'), matching: find.byType(Scrollable)).first;
+      await tester.scrollUntilVisible(key('station-option-0'), 200, scrollable: scroll);
       await tester.tap(key('station-option-0'));
       await settle(tester);
       expect(tester.takeException(), isNull);
+      expect(key('station-continue'), findsOneWidget, reason: 'choosing an option reveals the decision');
 
-      final Finder scroll = find.descendant(of: key('station-scroll'), matching: find.byType(Scrollable)).first;
       await tester.scrollUntilVisible(key('station-narrative'), 300, scrollable: scroll);
       await tester.tap(find.text('الرواية التاريخية وتفاصيل الأحداث'));
       await settle(tester);

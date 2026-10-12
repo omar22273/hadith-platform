@@ -55,7 +55,7 @@ String _title(WidgetTester tester) {
 
 /// متحكم صفحات الأذكار.
 PageController _pages(WidgetTester tester) {
-  return tester.widget<PageView>(find.byKey(const ValueKey<String>('adhkar-pages'))).controller;
+  return tester.widget<PageView>(find.byKey(const ValueKey<String>('adhkar-pages'))).controller!;
 }
 
 /// يسحب الصفحة أفقياً. الواجهة من اليمين إلى اليسار: صفحة الذكر التالي عن

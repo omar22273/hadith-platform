@@ -273,11 +273,17 @@ void main() {
     expect(container.read(sessionControllerProvider(_id)).mistakeStreak, 0);
     expect(glow, findsNothing);
 
-    // «متتالية»: خطآن ثم كلمة صحيحة ثم خطأ لا تُضيء شيئاً.
+    // «متتالية»: خطآن ثم كلمة صحيحة تُصفّر العدّاد، فخطأ بعدها لا يُضيء شيئاً.
+    // المقطع قصير (٣ كلمات): يُتراجع عن الصحيحة كي يبقى خطأ ممكناً في الموضع نفسه.
     await tapWrong();
     await tapWrong();
+    expect(container.read(sessionControllerProvider(_id)).mistakeStreak, 2);
     await tester.tap(_tileFinder(0, _tile(container, drill, 1, matching: true)));
     await settle(tester);
+    expect(container.read(sessionControllerProvider(_id)).mistakeStreak, 0);
+    controller.undoTile();
+    await settle(tester);
+    expect(container.read(sessionControllerProvider(_id)).placedTiles, <int>[right]);
     await tapWrong();
     expect(container.read(sessionControllerProvider(_id)).mistakeStreak, 1);
     expect(glow, findsNothing);

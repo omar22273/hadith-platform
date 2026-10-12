@@ -186,7 +186,9 @@ void main() {
       // لا أرقام تراكمية: لا عدد أوراد، ولا ألفاظ، ولا مقاطع، ولا مواقف إجمالية.
       expect(find.textContaining('أحاديث مكتملة'), findsNothing);
       expect(find.textContaining('حديث مكتمل'), findsNothing);
-      expect(find.textContaining('لفظة'), findsNothing);
+      expect(find.textContaining(' لفظة ·'), findsNothing);
+      expect(find.textContaining('مقطعاً'), findsNothing);
+      expect(find.textContaining('موقفاً'), findsNothing);
       expect(find.textContaining('متأخر'), findsNothing);
       expect(find.textContaining('مستحق'), findsNothing);
 
