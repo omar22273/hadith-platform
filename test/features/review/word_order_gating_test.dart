@@ -169,7 +169,13 @@ void main() {
     await tester.tap(nextButton);
     await settle(tester);
     expect(container.read(orderChallengeProvider).index, 1);
-    expect(tester.widget<FilledButton>(find.byKey(const ValueKey<String>('order-next-segment'))).onPressed, isNull);
+    final Finder secondNext = find.byKey(const ValueKey<String>('order-next-segment'));
+    if (deck.orderChallenges.length > 2) {
+      expect(tester.widget<FilledButton>(secondNext).onPressed, isNull, reason: 'the next segment starts locked again');
+    } else {
+      expect(secondNext, findsNothing, reason: 'the last segment has no next button');
+    }
+    expect(container.read(orderChallengeProvider).board!.completed, isFalse);
     expect(tester.takeException(), isNull);
   });
 
