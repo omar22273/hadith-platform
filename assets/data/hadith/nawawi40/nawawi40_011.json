@@ -1,0 +1,336 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_011",
+  "sequence": 11,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 11
+  },
+  "title": "دع ما يريبك",
+  "teaser": {
+    "text": "غداً: قلبٌ يضطرب أمام أمرٍ لا تدري أحلالٌ هو أم لا… فماذا قال النبي ﷺ لسبطه الحسن؟"
+  },
+  "milestone": "الورع والشبهات",
+  "context": {
+    "narrative": "سأل أبو الحوراء السعدي الحسنَ بن علي رضي الله عنهما: ما حفظتَ من رسول الله ﷺ؟ فأجابه: حفظتُ منه «دع ما يريبك إلى ما لا يريبك». وبيّن ابن رجب أن الحديث قطعة من حديث طويل فيه ذكر قنوت الوتر، وأن عند الترمذي وغيره زيادة: «فإن الصدق طمأنينة والكذب ريبة».",
+    "humanMotive": "سؤال عن أثرٍ حفظه سبط النبي ﷺ من كلامه، فكان الجواب قاعدةً في الورع.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sunan_tirmidhi",
+        "locator": "2518",
+        "quote": "قُلْتُ لِلْحَسَنِ بْنِ عَلِيٍّ مَا حَفِظْتَ مِنْ رَسُولِ اللَّهِ"
+      },
+      {
+        "sourceId": "sunan_tirmidhi",
+        "locator": "2518",
+        "quote": "فَإِنَّ الصِّدْقَ طُمَأْنِينَةٌ وَإِنَّ الْكَذِبَ رِيبَةٌ"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص277",
+        "quote": "وهذا الحديث قطعة من حديث طويل فيه ذكر قنوت الوتر"
+      }
+    ],
+    "cautions": []
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَبِي مُحَمَّدٍ الْحَسَنِ بْنِ عَلِيِّ بْنِ أَبِي طَالِبٍ سِبْطِ رَسُولِ اللَّهِ ﷺ وَرَيْحَانَتِهِ رَضِيَ اللَّهُ عَنْهُمَا، قَالَ: حَفِظْتُ مِنْ رَسُولِ اللَّهِ ﷺ"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "دَعْ مَا يُرِيبُكَ إِلَى مَا لَا يُرِيبُكَ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_raib",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 2,
+          "length": 1,
+          "surface": "يُرِيبُكَ"
+        },
+        "headword": "يُرِيبُكَ",
+        "meaning": "الريب بمعنى القلق والاضطراب.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص279",
+            "quote": "والريب: بمعنى القلق والاضطراب"
+          }
+        ]
+      },
+      {
+        "id": "g_la_yuribuk",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 5,
+          "length": 2,
+          "surface": "لَا يُرِيبُكَ"
+        },
+        "headword": "مَا لَا يُرِيبُكَ",
+        "meaning": "الحلال المحض لا يحصل لمؤمن في قلبه منه ريب، بل تسكن إليه النفس ويطمئن به القلب.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص279",
+            "quote": "فإن الحلال المحض لا يحصل لمؤمن في قلبه منه ريب"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص279",
+            "quote": "بل تسكن إليه النفس، ويطمئن به القلب"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "سنن الترمذي، رقم 2518 · سنن النسائي، رقم 5711",
+      "references": [
+        {
+          "sourceId": "sunan_tirmidhi",
+          "hadithNumber": "2518",
+          "numberingSystem": "other",
+          "digitalLocator": "editions/ara-tirmidhi.json → hadithnumber 2518"
+        },
+        {
+          "sourceId": "sunan_nasai",
+          "hadithNumber": "5711",
+          "numberingSystem": "other",
+          "digitalLocator": "editions/ara-nasai.json → hadithnumber 5711"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ التِّرْمِذِيُّ، وَالنَّسَائِيّ وَقَالَ التِّرْمِذِيُّ: حَدِيثٌ حَسَنٌ صَحِيحٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s1",
+        "startToken": 9,
+        "endToken": 17,
+        "label": "سبط النبي ﷺ وريحانته"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s1",
+        "startToken": 18,
+        "endToken": 22,
+        "label": "حفظ الحسن عن النبي ﷺ"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 2,
+        "label": "دع ما يريبك"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 3,
+        "endToken": 6,
+        "label": "إلى ما لا يريبك"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 2,
+          "length": 1,
+          "surface": "يُرِيبُكَ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 5,
+          "length": 2,
+          "surface": "لَا يُرِيبُكَ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "عُرض عليك ربحٌ سريع في معاملة يضطرب قلبك منها، ولا تجزم أنها محرمة؛ وكل من استشرتَ من زملائك يقول: ما دامت ليست حراماً قطعاً فخذها.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أترك ما يريبني إلى ما لا ريب فيه، فالحلال الخالص تسكن إليه النفس ويطمئن به القلب.",
+          "feedback": "أحسنت؛ هذا هو الوقوف عند الشبهات واتقاؤها كما شرحه ابن رجب."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أتورع في دقائق الأمور وأتساهل في ظاهر ما حُرِّم عليّ.",
+          "feedback": "التدقيق في الشبهات إنما يصلح لمن استقامت أحواله كلها، لا لمن يقع في ظاهر المحرمات."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "أقبلها؛ فلا يلزمني الترك ما لم يثبت التحريم قطعاً.",
+          "feedback": "الحديث يوجّه إلى ترك ما يريب إلى ما لا ريب فيه، لا إلى انتظار اليقين بالتحريم."
+        }
+      ],
+      "takeaway": "إذا اضطرب قلبك أمام أمرٍ فاتركه إلى ما تطمئن إليه النفس ويسكن به القلب.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص279",
+          "quote": "ومعنى هذا الحديث يرجع إلى الوقوف عند الشبهات واتقائها"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص282",
+          "quote": "فأما من يقع في انتهاك المحرمات الظاهرة، ثم يريد أن يتورع عن شيء من دقائق الشبه، فإنه لا يحتمل له ذلك"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "اجعل الحلال المتيقَّن معيارك؛ فالحلال الخالص تسكن إليه النفس ويطمئن به القلب.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص279",
+            "quote": "بل تسكن إليه النفس، ويطمئن به القلب"
+          }
+        ]
+      },
+      {
+        "text": "لا تجعل التورع في دقائق الأمور غطاءً لظاهرٍ مقصِّر؛ ابدأ بالظاهر ثم الأدق.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص282",
+            "quote": "إنما يصلح لمن استقامت أحواله كلها"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 11",
+      "quote": null
+    },
+    "normalizations": [
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s1",
+        "tokenIndex": 18,
+        "before": "حَفِظْت",
+        "after": "حَفِظْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2518",
+          "quote": "قَالَ حَفِظْتُ مِنْ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 2,
+        "before": "يُرِيبُك",
+        "after": "يُرِيبُكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2518",
+          "quote": "مَا يَرِيبُكَ إِلَى"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 3,
+        "before": "إلَى",
+        "after": "إِلَى",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 6,
+        "before": "يُرِيبُك",
+        "after": "يُرِيبُكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2518",
+          "quote": "لاَ يَرِيبُكَ فَإِنَّ"
+        }
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "الحديثان الواردان في الترمذي (2518) والنسائي (5711) مقابَلان بنصيهما المشكولين؛ ولفظ الأربعين «يُرِيبُك» بضم الياء، وفي الترمذي والنسائي «يَرِيبُكَ» بفتحها، ولم يُغيَّر المتن المعروض.",
+      "الزيادة «فإن الصدق طمأنينة والكذب ريبة» ثابتة في الترمذي وليست في لفظ الأربعين؛ لم تُدرج في المتن.",
+      "صُحّح ضبط بعض الكلمات بمطابقتها رسماً في المتن المشكول للحديث نفسه من مصدره المثبّت، ولم يُغيَّر إلا ما سقط من الحركات؛ وهو مسجّل في provenance.vocalizationEdits وتُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

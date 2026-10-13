@@ -1,0 +1,658 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_019",
+  "sequence": 19,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 19
+  },
+  "title": "احفظ الله يحفظك",
+  "teaser": {
+    "text": "غداً: وصية لغلام خلف النبي ﷺ على الدابة… كلماتٌ قليلة تبني علاقتك بالله وتحرّرك من الخوف من الخلق."
+  },
+  "milestone": "حفظ الله والاستعانة به",
+  "context": {
+    "narrative": "كان عبد الله بن عباس غلاماً يوماً خلف النبي ﷺ على الدابة، فناداه: «يا غلام، إني أعلّمك كلمات»، ثم أوصاه بحفظ الله وسؤاله والاستعانة به، وبيّن له أن النفع والضر بيد الله وحده. وقد خرّج الترمذي الحديث من طريق حنش الصنعاني عن ابن عباس وقال: حديث حسن صحيح.",
+    "humanMotive": "تعليم غلام ما يبني عليه عمره: ألّا يتعلّق قلبه بغير الله في سؤاله وخوفه ورجائه.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sunan_tirmidhi",
+        "locator": "2516",
+        "quote": "كُنْتُ خَلْفَ رَسُولِ اللَّهِ"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص458",
+        "quote": "هذا الحديث خرجه الترمذي من رواية حنش الصنعاني، عن ابن عباس"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص460",
+        "quote": "وأصح الطرق كلها طريق حنش الصنعاني التي خرجها الترمذي"
+      }
+    ],
+    "cautions": [
+      {
+        "text": "اللفظ الذي ذكره النووي بعد رواية الترمذي («تجده أمامك…») ليس من رواية الترمذي: بيّن ابن رجب أن لفظ أحمد أتمّ منه، وأن لفظ النووي رواه عبد بن حميد بإسناد ضعيف؛ لذا اقتُصر في التدريب على لفظ الترمذي الحسن.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص459",
+            "quote": "وهذا اللفظ أتم من اللفظ الذي ذكره الشيخ رحمه الله، وعزاه إلى غير الترمذي"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص459",
+            "quote": "رواه عبد بن حميد في \" مسنده \" بإسناد ضعيف عن عطاء، عن ابن عباس"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص461",
+            "quote": "فطريق حنش التي خرجها الترمذي حسنة جيدة"
+          }
+        ]
+      }
+    ]
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ عَبْدِ اللَّهِ بْنِ عَبَّاسٍ رَضِيَ اللَّهُ عَنْهُمَا قَالَ: كُنْتُ خَلْفَ رَسُولِ اللَّهِ ﷺ يَوْمًا، فَقَالَ:"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "يَا غُلَامِ! إِنِّي أُعَلِّمُكَ كَلِمَاتٍ: احْفَظِ اللَّهَ يَحْفَظْكَ، احْفَظِ اللَّهَ تَجِدْهُ تُجَاهَكَ، إِذَا سَأَلْتَ فَاسْأَلِ اللَّهَ، وَإِذَا اسْتَعَنْتَ فَاسْتَعِنْ بِاللَّهِ، وَاعْلَمْ أَنَّ الْأُمَّةَ لَوِ اجْتَمَعَتْ عَلَى أَنْ يَنْفَعُوكَ بِشَيْءٍ لَمْ يَنْفَعُوكَ إِلَّا بِشَيْءٍ قَدْ كَتَبَهُ اللَّهُ لَكَ، وَإِنْ اجْتَمَعُوا عَلَى أَنْ يَضُرُّوكَ بِشَيْءٍ لَمْ يَضُرُّوكَ إِلَّا بِشَيْءٍ قَدْ كَتَبَهُ اللَّهُ عَلَيْكَ؛ رُفِعَتِ الْأَقْلَامُ، وَجَفَّتِ الصُّحُفُ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_ihfaz",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 5,
+          "length": 3,
+          "surface": "احْفَظِ اللَّهَ يَحْفَظْكَ"
+        },
+        "headword": "احْفَظِ اللَّهَ",
+        "meaning": "احفظ حدوده وحقوقه وأوامره ونواهيه؛ بالامتثال عند أوامره والاجتناب عند نواهيه، والوقوف عند حدوده.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص461",
+            "quote": "يعني: احفظ حدوده، وحقوقه، وأوامره، ونواهيه"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص464",
+            "quote": "حفظه الله، فإن الجزاء من جنس العمل"
+          }
+        ]
+      },
+      {
+        "id": "g_tujahak",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 10,
+          "length": 2,
+          "surface": "تَجِدْهُ تُجَاهَكَ"
+        },
+        "headword": "تُجَاهَكَ",
+        "meaning": "أي: وجدت الله معك في كل أحوالك حيث توجهت، يحوطك وينصرك ويحفظك ويوفقك ويسددك (وفي رواية: «أمامك»).",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص470",
+            "quote": "وجد الله معه في كل أحواله حيث توجه يحوطه وينصره ويحفظه ويوفقه ويسدده"
+          }
+        ]
+      },
+      {
+        "id": "g_rufiat",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 51,
+          "length": 4,
+          "surface": "رُفِعَتِ الْأَقْلَامُ وَجَفَّتِ الصُّحُفُ"
+        },
+        "headword": "رُفِعَتِ الْأَقْلَامُ وَجَفَّتِ الصُّحُفُ",
+        "meaning": "كناية عن تقدّم كتابة المقادير كلها والفراغ منها من أمد بعيد؛ فالكتاب إذا فُرغ منه وطال عهده رُفعت عنه الأقلام وجفّ مداده.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص481",
+            "quote": "هو كناية عن تقدم كتابة المقادير كلها، والفراغ منها من أمد بعيد"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "سنن الترمذي، رقم 2516",
+      "references": [
+        {
+          "sourceId": "sunan_tirmidhi",
+          "hadithNumber": "2516",
+          "numberingSystem": "other",
+          "digitalLocator": "editions/ara-tirmidhi.json → hadithnumber 2516"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ التِّرْمِذِيُّ وَقَالَ: حَدِيثٌ حَسَنٌ صَحِيحٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s1",
+        "startToken": 9,
+        "endToken": 15,
+        "label": "كنت خلف النبي ﷺ يوماً"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 4,
+        "label": "يا غلام إني أعلمك كلمات"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 5,
+        "endToken": 7,
+        "label": "احفظ الله يحفظك"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 8,
+        "endToken": 11,
+        "label": "احفظ الله تجده تجاهك"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s2",
+        "startToken": 12,
+        "endToken": 15,
+        "label": "إذا سألت فاسأل الله"
+      },
+      {
+        "id": "c6",
+        "segmentId": "s2",
+        "startToken": 16,
+        "endToken": 19,
+        "label": "وإذا استعنت فاستعن بالله"
+      },
+      {
+        "id": "c7",
+        "segmentId": "s2",
+        "startToken": 20,
+        "endToken": 36,
+        "label": "لو اجتمعت الأمة على نفعك"
+      },
+      {
+        "id": "c8",
+        "segmentId": "s2",
+        "startToken": 37,
+        "endToken": 50,
+        "label": "وإن اجتمعوا على ضرك"
+      },
+      {
+        "id": "c9",
+        "segmentId": "s2",
+        "startToken": 51,
+        "endToken": 54,
+        "label": "رفعت الأقلام وجفت الصحف"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5",
+        "c6",
+        "c7",
+        "c8",
+        "c9"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 5,
+          "length": 3,
+          "surface": "احْفَظِ اللَّهَ يَحْفَظْكَ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 10,
+          "length": 2,
+          "surface": "تَجِدْهُ تُجَاهَكَ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 51,
+          "length": 2,
+          "surface": "رُفِعَتِ الْأَقْلَامُ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "ضاق بك أمرٌ في عملك، ولك قريبٌ ذو نفوذ يستطيع أن يخفّف عنك، لكنك تعلم أنه قد يمنّ عليك ويذلّك. ماذا تفعل أولاً؟",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أسأل الله أولاً وأستعين به، وأتوكل عليه، ثم آخذ بما أستطيع من الأسباب المباحة دون أن يتعلّق قلبي بأحد سواه.",
+          "feedback": "أحسنت؛ فالسؤال فيه إظهار الذل والحاجة ولا يصلح إلا لله، والتوكل نفسه من أعظم الأسباب التي تُطلب بها الحوائج."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أطلب من قريبي وأنا أرى في قلبي أنه هو الذي سينفعني.",
+          "feedback": "العبد عاجز عن الاستقلال بجلب مصالحه ودفع مضاره، ولا معين له إلا الله؛ فتعلّق القلب بالمخلوق هو موضع الخلل."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "ما دام كل شيء مكتوباً فلا حاجة إلى دعاء ولا إلى سعي.",
+          "feedback": "الحديث يربط كتابة المقادير بحفظ الله وسؤاله والاستعانة به لا بتركها، والتوكل من أعظم الأسباب."
+        }
+      ],
+      "takeaway": "احفظ حدود الله يحفظك، واسأله وحده، واستعن به، وقلبك معلّق بأن النفع والضر بيده.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص480",
+          "quote": "واعلم أن سؤال الله تعالى دون خلقه هو المتعين"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص480",
+          "quote": "فلأن العبد عاجز عن الاستقلال بجلب مصالحه، ودفع مضاره"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص492",
+          "quote": "وهو من أعظم الأسباب التي تطلب بها الحوائج، فإن الله يكفي من توكل عليه"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "احفظ حدود الله وحقوقه؛ فمن حفظها حفظه الله جزاءً من جنس عمله.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص464",
+            "quote": "حفظه الله، فإن الجزاء من جنس العمل"
+          }
+        ]
+      },
+      {
+        "text": "اجعل سؤالك واستعانتك لله وحده؛ فهو الذي يعلم أنه لا يعطي ولا يمنع غيره فيفرده بالخوف والرجاء.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص483",
+            "quote": "فمن يعلم أنه لا ينفع ولا يضر، ولا يعطي ولا يمنع غير الله، أوجب له ذلك إفراده بالخوف والرجاء والمحبة والسؤال"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 19",
+      "quote": null
+    },
+    "normalizations": [
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».",
+      "حُذفت الرواية الثانية المعزوّة في الأربعين إلى «غير الترمذي» من المتن التدريبي؛ لأنها ليست في أي طبعة مشكولة مثبّتة في المشروع تُقابَل عليها، ولأن ابن رجب ذكر أنها رُويت بإسناد ضعيف، وكتابتها بالضبط من الذاكرة ممنوعة.",
+      "حذف علامات التنصيص حول كلام النبي ﷺ والراوي؛ إذ يحدده حقل voice.",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s1",
+        "tokenIndex": 9,
+        "before": "كُنْت",
+        "after": "كُنْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "قَالَ كُنْتُ خَلْفَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 2,
+        "before": "إنِّي",
+        "after": "إِنِّي",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 3,
+        "before": "أُعَلِّمُك",
+        "after": "أُعَلِّمُكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "إِنِّي أُعَلِّمُكَ كَلِمَاتٍ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 5,
+        "before": "احْفَظْ",
+        "after": "احْفَظِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "كَلِمَاتٍ احْفَظِ اللَّهَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 7,
+        "before": "يَحْفَظْك",
+        "after": "يَحْفَظْكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "اللَّهَ يَحْفَظْكَ احْفَظِ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 8,
+        "before": "احْفَظْ",
+        "after": "احْفَظِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "يَحْفَظْكَ احْفَظِ اللَّهَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 11,
+        "before": "تُجَاهَك",
+        "after": "تُجَاهَكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "تَجِدْهُ تُجَاهَكَ إِذَا"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 12,
+        "before": "إذَا",
+        "after": "إِذَا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 13,
+        "before": "سَأَلْت",
+        "after": "سَأَلْتَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "إِذَا سَأَلْتَ فَاسْأَلِ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 14,
+        "before": "فَاسْأَلْ",
+        "after": "فَاسْأَلِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "سَأَلْتَ فَاسْأَلِ اللَّهَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 17,
+        "before": "اسْتَعَنْت",
+        "after": "اسْتَعَنْتَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "وَإِذَا اسْتَعَنْتَ فَاسْتَعِنْ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 19,
+        "before": "بِاَللَّهِ",
+        "after": "بِاللَّهِ",
+        "rule": "fatha_on_wasl_alif",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "فَاسْتَعِنْ بِاللَّهِ وَاعْلَمْ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 23,
+        "before": "لَوْ",
+        "after": "لَوِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "الأُمَّةَ لَوِ اجْتَمَعَتْ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 27,
+        "before": "يَنْفَعُوك",
+        "after": "يَنْفَعُوكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "أَنْ يَنْفَعُوكَ بِشَيْءٍ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 30,
+        "before": "يَنْفَعُوك",
+        "after": "يَنْفَعُوكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "لَمْ يَنْفَعُوكَ إِلاَّ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 31,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 36,
+        "before": "لَك",
+        "after": "لَكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "اللَّهُ لَكَ وَلَوِ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 41,
+        "before": "يَضُرُّوك",
+        "after": "يَضُرُّوكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "أَنْ يَضُرُّوكَ بِشَيْءٍ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 44,
+        "before": "يَضُرُّوك",
+        "after": "يَضُرُّوكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "لَمْ يَضُرُّوكَ إِلاَّ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 45,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 50,
+        "before": "عَلَيْك",
+        "after": "عَلَيْكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "اللَّهُ عَلَيْكَ رُفِعَتِ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 51,
+        "before": "رُفِعَتْ",
+        "after": "رُفِعَتِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "عَلَيْكَ رُفِعَتِ الأَقْلاَمُ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 53,
+        "before": "وَجَفَّتْ",
+        "after": "وَجَفَّتِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "2516",
+          "quote": "الأَقْلاَمُ وَجَفَّتِ الصُّحُفُ"
+        }
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "المتن هنا رواية الترمذي (2516) وحدها، وهي أول رواية في الأربعين؛ وحُذفت منها الرواية الثانية «وفي رواية غير الترمذي» لعدم وجود نص مشكول مثبّت لها، ولضعف إسنادها بحسب ابن رجب.",
+      "الضبط مُقابَل على متن الترمذي (2516)، وفيه «وَلَوِ اجْتَمَعُوا» بينما في الأربعين «وَإِنْ اجْتَمَعُوا» فاستُبقي لفظ الأربعين ولم يُغيَّر.",
+      "صُحّح ضبط بعض الكلمات بمطابقتها رسماً في المتن المشكول للحديث نفسه من مصدره المثبّت، ولم يُغيَّر إلا ما سقط من الحركات؛ وهو مسجّل في provenance.vocalizationEdits وتُراجع على طبعة محققة.",
+      "بقي ضبط 1 موضعاً من المتن كما في المصدر الرقمي لعدم وجود مقابل مشكول موثق لها في المصادر المثبّتة (آخر الكلمة أو السكون قبل همزة الوصل): وَإِنْ؛ تُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

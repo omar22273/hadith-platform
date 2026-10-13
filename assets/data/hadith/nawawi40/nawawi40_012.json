@@ -1,0 +1,307 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_012",
+  "sequence": 12,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 12
+  },
+  "title": "من حسن إسلام المرء",
+  "teaser": {
+    "text": "غداً: كلمةٌ واحدة تفرّق بين من يملأ وقته بما يعنيه ومن يضيّعه فيما لا يعنيه."
+  },
+  "milestone": "حسن الإسلام وترك الفضول",
+  "context": {
+    "narrative": "لم يرد في المصادر المثبّتة سبب لورود هذا الحديث؛ يرويه الترمذي وابن ماجه من حديث أبي هريرة، وبيّن ابن رجب أنه «أصل عظيم من أصول الأدب» وأن أبا محمد بن أبي زيد جعله أحد أربعة أحاديث تتفرع منها جماع آداب الخير.",
+    "humanMotive": "بيان معيار يحفظ وقت المسلم ولسانه: أن يقتصر على ما يعنيه في الإسلام من قول وفعل.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sunan_tirmidhi",
+        "locator": "2317",
+        "quote": "مِنْ حُسْنِ إِسْلاَمِ الْمَرْءِ تَرْكُهُ مَا لاَ يَعْنِيهِ"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص287",
+        "quote": "وهذا الحديث أصل عظيم من أصول الأدب"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص287",
+        "quote": "جماع آداب الخير وأزمته تتفرع من أربعة أحاديث"
+      }
+    ],
+    "cautions": [
+      {
+        "text": "قال الترمذي عن هذا الحديث: «غريب»، ورأى أكثر الأئمة أن الصحيح فيه الإرسال؛ فهو مما يُراجَع فيه أهل الشأن.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص286",
+            "quote": "وقال الترمذي: غريب"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص286",
+            "quote": "وأما أكثر الأئمة، فقالوا: ليس هو بمحفوظ بهذا الإسناد"
+          }
+        ]
+      }
+    ]
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَبِي هُرَيْرَةَ رَضِيَ اللهُ عَنْهُ قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "مِنْ حُسْنِ إِسْلَامِ الْمَرْءِ تَرْكُهُ مَا لَا يَعْنِيهِ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_yaniih",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 7,
+          "length": 1,
+          "surface": "يَعْنِيهِ"
+        },
+        "headword": "يَعْنِيهِ",
+        "meaning": "تتعلق عنايته به ويكون من مقصده ومطلوبه، والعناية شدة الاهتمام بالشيء.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص287",
+            "quote": "ومعنى يعنيه: أنه تتعلق عنايته به، ويكون من مقصده ومطلوبه، والعناية: شدة الاهتمام بالشيء"
+          }
+        ]
+      },
+      {
+        "id": "g_husn_islam",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 1,
+          "length": 2,
+          "surface": "حُسْنِ إِسْلَامِ"
+        },
+        "headword": "حُسْنِ إِسْلَامِ",
+        "meaning": "من حسن إسلامه ترك ما لا يعنيه من قول وفعل واقتصر على ما يعنيه من الأقوال والأفعال.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص287",
+            "quote": "أن من حسن إسلامه تركه ما لا يعنيه من قول وفعل، واقتصر على ما يعنيه من الأقوال والأفعال"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "سنن الترمذي، رقم 2317 · سنن ابن ماجه، رقم 3976",
+      "references": [
+        {
+          "sourceId": "sunan_tirmidhi",
+          "hadithNumber": "2317",
+          "numberingSystem": "other",
+          "digitalLocator": "editions/ara-tirmidhi.json → hadithnumber 2317"
+        },
+        {
+          "sourceId": "sunan_ibn_majah",
+          "hadithNumber": "3976",
+          "numberingSystem": "other",
+          "digitalLocator": "editions/ara-ibnmajah.json → hadithnumber 3976"
+        }
+      ],
+      "compilerStatement": {
+        "text": "حَدِيثٌ حَسَنٌ، رَوَاهُ التِّرْمِذِيُّ، ابن ماجه",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s1",
+        "startToken": 0,
+        "endToken": 5,
+        "label": "رواية أبي هريرة"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s1",
+        "startToken": 6,
+        "endToken": 10,
+        "label": "قال رسول الله ﷺ"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 3,
+        "label": "من حسن إسلام المرء"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 4,
+        "endToken": 7,
+        "label": "تركه ما لا يعنيه"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 4,
+          "length": 1,
+          "surface": "تَرْكُهُ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 7,
+          "length": 1,
+          "surface": "يَعْنِيهِ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "في مجموعة المحادثة يكثر الكلام عن أحوال الناس وأخبارهم، وتجد في نفسك ميلاً إلى التعليق وتتبّع الجديد، وإن كان وقتك ضيقاً وعندك ما هو أهم.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أسأل نفسي: أيعنيني هذا في ديني أو شأني؟ فأقتصر على ما يعنيني وأحفظ لساني من لغو الكلام.",
+          "feedback": "أحسنت؛ فمن حسن الإسلام ترك ما لا يعني من قول وفعل، وأكثر ذلك حفظ اللسان من لغو الكلام."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أكفّ عن الكلام في أحوال الناس، لكنني أبقى أقضي الساعات فيما لا حاجة لي به من المباحات.",
+          "feedback": "الحديث يشمل فضول المباحات التي لا يُحتاج إليها، لا الكلام وحده."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "أترك ما لا يعنيني بحسب ما تميل إليه نفسي، فما أحببته عدَدته مما يعنيني وما كرهته تركته.",
+          "feedback": "المراد بما يعني ما كان كذلك بحكم الشرع والإسلام، لا بحكم الهوى وطلب النفس."
+        }
+      ],
+      "takeaway": "مقياس حسن إسلامك: أن تقتصر على ما يعنيك بحكم الشرع، وتترك ما سواه من قول وفعل.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص287",
+          "quote": "وليس المراد أنه يترك ما لا عناية له به ولا إرادة بحكم الهوى وطلب النفس"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص289",
+          "quote": "وأكثر ما يراد بترك ما لا يعني حفظ اللسان من لغو الكلام"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "قبل أن تتكلم أو تفعل اسأل: هل هذا مما يعنيني؟ وما لا يعنيك فدَعه.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص287",
+            "quote": "أن من حسن إسلامه تركه ما لا يعنيه من قول وفعل"
+          }
+        ]
+      },
+      {
+        "text": "اشمل بالترك المحرمات والمشتبهات والمكروهات وفضول المباحات التي لا حاجة لك بها.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص288",
+            "quote": "اقتضى ترك ما لا يعني كله من المحرمات والمشتبهات والمكروهات، وفضول المباحات التي لا يحتاج إليها"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 12",
+      "quote": null
+    },
+    "normalizations": [
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s2",
+        "tokenIndex": 2,
+        "before": "إسْلَامِ",
+        "after": "إِسْلَامِ",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "رقم الترمذي الذي ورد في تعليق المصدر الرقمي (2318) هو حديث «إنّ من حسن إسلام المرء تركه…» المرسل عن علي بن حسين؛ والمتن المعروض بلفظ الأربعين مقابَل بحديث أبي هريرة في الترمذي (2317) وابن ماجه (3976).",
+      "درجة الحديث عند المصنف «حسن»؛ وبيان ابن رجب لعلل الإسناد مثبت في حقل التنبيهات ولم يُجتهد في حكم زائد عليه.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

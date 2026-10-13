@@ -1,0 +1,319 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_013",
+  "sequence": 13,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 13
+  },
+  "title": "أن تحب لأخيك ما تحب لنفسك",
+  "teaser": {
+    "text": "غداً: ميزانٌ بسيط يقيس صدق إيمانك… وجوابه في قلبك لا في لسانك."
+  },
+  "milestone": "محبة الخير للمؤمنين",
+  "context": {
+    "narrative": "لم يرد في المصادر المثبّتة سبب لورود هذا الحديث؛ رواه قتادة عن أنس بن مالك رضي الله عنه، وفي إحدى روايات مسلم جاء بالقسم: «والذي نفسي بيده لا يؤمن عبد حتى يحب لجاره - أو قال لأخيه - ما يحب لنفسه». وبيّن ابن رجب أن هذا الخلق إنما يأتي من كمال سلامة الصدر من الغل والغش والحسد.",
+    "humanMotive": "بيان علامة من علامات كمال الإيمان: أن يُحب المرء لإخوانه ما يحب لنفسه.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sahih_bukhari",
+        "locator": "13",
+        "quote": "لا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ"
+      },
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "45",
+        "quote": "وَالَّذِي نَفْسِي بِيَدِهِ لاَ يُؤْمِنُ عَبْدٌ حَتَّى يُحِبَّ لِجَارِهِ - أَوْ قَالَ لأَخِيهِ - مَا يُحِبُّ لِنَفْسِهِ"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص305",
+        "quote": "وهذا كله إنما يأتي من كمال سلامة الصدر من الغل والغش والحسد"
+      }
+    ],
+    "cautions": [
+      {
+        "text": "ليس المقصود ظاهر النفي في «لا يؤمن» خروجاً من الإيمان، بل نفي بلوغ حقيقته وكماله؛ وفي لفظ أحمد «لا يبلغ عبد حقيقة الإيمان».",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص301",
+            "quote": "لا يبلغ عبد حقيقة الإيمان حتى يحب للناس ما يحب لنفسه من الخير"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص301",
+            "quote": "وأن المراد بنفي الإيمان نفي بلوغ حقيقته ونهايته"
+          }
+        ]
+      }
+    ]
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَبِي حَمْزَةَ أَنَسِ بْنِ مَالِكٍ رَضِيَ اللهُ عَنْهُ خَادِمِ رَسُولِ اللَّهِ ﷺ عَنِ النَّبِيِّ ﷺ قَالَ:"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_la_yumin",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 0,
+          "length": 2,
+          "surface": "لَا يُؤْمِنُ"
+        },
+        "headword": "لَا يُؤْمِنُ",
+        "meaning": "المراد بنفي الإيمان نفي بلوغ حقيقته ونهايته؛ فالإيمان كثيراً ما يُنفى لانتفاء بعض أركانه وواجباته.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص301",
+            "quote": "وأن المراد بنفي الإيمان نفي بلوغ حقيقته ونهايته، فإن الإيمان كثيرا ما ينفى لانتفاء بعض أركانه وواجباته"
+          }
+        ]
+      },
+      {
+        "id": "g_yuhibbu",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 4,
+          "length": 2,
+          "surface": "يُحِبَّ لِأَخِيهِ"
+        },
+        "headword": "يُحِبَّ لِأَخِيهِ",
+        "meaning": "أن يحب المرء لأخيه المؤمن ما يحب لنفسه، ويكره له ما يكره لنفسه.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص302",
+            "quote": "أن يحب المرء لأخيه المؤمن ما يحب لنفسه، ويكره له ما يكره لنفسه"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح البخاري، رقم 13 · صحيح مسلم، رقم 45",
+      "references": [
+        {
+          "sourceId": "sahih_bukhari",
+          "hadithNumber": "13",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-bukhari.json → hadithnumber 13"
+        },
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "45",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 45.01"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ الْبُخَارِيُّ، وَمُسْلِمٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s1",
+        "startToken": 9,
+        "endToken": 16,
+        "label": "خادم رسول الله ﷺ"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 2,
+        "label": "لا يؤمن أحدكم"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 3,
+        "endToken": 5,
+        "label": "حتى يحب لأخيه"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 6,
+        "endToken": 8,
+        "label": "ما يحب لنفسه"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 0,
+          "length": 2,
+          "surface": "لَا يُؤْمِنُ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 4,
+          "length": 1,
+          "surface": "يُحِبَّ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 8,
+          "length": 1,
+          "surface": "لِنَفْسِهِ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "زميلك الذي بدأ معك في العمل نفسه نال ترقية أو فرصة كنتَ تتمناها، وبين يديك أن تساعده في خطوته التالية أو أن تتجاهله، وفي صدرك ضيقٌ خفيّ.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أسرّ بما أُعطي أخي وأريد له من الخير ما أريده لنفسي، وأعينه كما أحب أن أُعان.",
+          "feedback": "أحسنت؛ فالمؤمن يسره ما يسر أخاه المؤمن ويريد له ما يريده لنفسه من الخير."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أتمنى له الخير بلساني، لكن يضيق صدري إن تفوّق عليّ فأتجاهله.",
+          "feedback": "هذا هو أثر الحسد: يكره الحاسد أن يفوقه أحد في خير أو يساويه فيه."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "أحب أن أتميز عن الناس بما أعطاني الله، وأنفرد به عنهم.",
+          "feedback": "الإيمان يقتضي أن يشركك المؤمنون فيما أعطاك الله من الخير من غير أن ينقص منه شيء."
+        }
+      ],
+      "takeaway": "من أحب لأخيه ما يحب لنفسه سلم صدره من الحسد وكمل إيمانه.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص302",
+          "quote": "أن من جملة خصال الإيمان الواجبة أن يحب المرء لأخيه المؤمن ما يحب لنفسه"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص305",
+          "quote": "يدل على أن المؤمن يسره ما يسر أخاه المؤمن"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "اجعل محبة الخير لإخوانك خلقاً واجباً من خصال الإيمان، وراقب قلبك عند نعمة تُعطاها غيرُك.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص302",
+            "quote": "أن من جملة خصال الإيمان الواجبة أن يحب المرء لأخيه المؤمن ما يحب لنفسه"
+          }
+        ]
+      },
+      {
+        "text": "طهّر صدرك من الغل والغش والحسد؛ فهي منبع الكراهية لخير الآخرين.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص305",
+            "quote": "وهذا كله إنما يأتي من كمال سلامة الصدر من الغل والغش والحسد"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 13",
+      "quote": null
+    },
+    "normalizations": [
+      "حذف وسم <br> الزائد من المصدر الرقمي.",
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "حذف تكرار عبارة العزو في آخر النص الرقمي؛ فهي مثبتة مرة واحدة في takhrij.compilerStatement.",
+      "نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s1",
+        "tokenIndex": 13,
+        "before": "عَنْ",
+        "after": "عَنِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_bukhari",
+          "locator": "13",
+          "quote": "ـ عَنِ النَّبِيِّ"
+        }
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "لفظ الأربعين «لأخيه» هو لفظ البخاري (13)؛ وفي مسلم (45) «لأخيه - أو قال لجاره -» بالشك، وفي رواية أخرى القسم.",
+      "صُحّح ضبط بعض الكلمات بمطابقتها رسماً في المتن المشكول للحديث نفسه من مصدره المثبّت، ولم يُغيَّر إلا ما سقط من الحركات؛ وهو مسجّل في provenance.vocalizationEdits وتُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

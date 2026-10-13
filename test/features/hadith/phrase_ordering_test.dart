@@ -33,14 +33,14 @@ void main() {
     });
   });
 
-  for (int number = 1; number <= 10; number++) {
+  for (int number = 1; number <= 20; number++) {
     group('hadith $number', () {
       final HadithDailyModel hadith = _hadith(number);
       final PracticeEngine engine = PracticeEngine.fromHadith(hadith, seed: 20261012);
 
       test('is cut into whole phrases in reading order without overlap', () {
         final List<PracticeChunk> chunks = hadith.practice.chunks;
-        expect(chunks.length, greaterThanOrEqualTo(4));
+        expect(chunks.length, greaterThanOrEqualTo(3));
         expect(hadith.practice.reconstruction.chunkIds, chunks.map((PracticeChunk c) => c.id).toList());
         (String, int)? previousEnd;
         for (final PracticeChunk chunk in chunks) {

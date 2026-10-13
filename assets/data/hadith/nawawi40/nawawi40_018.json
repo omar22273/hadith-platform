@@ -1,0 +1,358 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_018",
+  "sequence": 18,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 18
+  },
+  "title": "اتق الله حيثما كنت",
+  "teaser": {
+    "text": "غداً: ثلاث كلمات توصي بها لمن تحب: تقوى الله، ومحو الخطأ بالحسنة، وحسن الخلق مع الناس."
+  },
+  "milestone": "التقوى وحسن الخلق",
+  "context": {
+    "narrative": "هذه وصيةٌ أوصى بها النبي ﷺ أبا ذر ومعاذ بن جبل رضي الله عنهما، ورُويت من وجوه عنهما. وبيّن ابن رجب أن معاذاً بعثه النبي ﷺ إلى اليمن معلماً ومفقهاً وقاضياً، فاحتاج إلى بيان حسن العشرة مع الناس إلى جانب التقوى.",
+    "humanMotive": "جمع حق الله وحق العباد في وصية واحدة: التقوى، ومحو الخطأ بالحسنة، وحسن الخلق.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sunan_tirmidhi",
+        "locator": "1987",
+        "quote": "قَالَ لِي رَسُولُ اللَّهِ"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص395",
+        "quote": "وقد روي عن النبي صلى الله عليه وسلم أنه وصى بهذه الوصية معاذا وأبا ذر من وجوه أخر"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص453",
+        "quote": "فإنه كان قد بعثه إلى اليمن معلما لهم ومفقها وقاضيا"
+      }
+    ],
+    "cautions": [
+      {
+        "text": "اختُلف في إسناد هذا الحديث: ورجّح الدارقطني الإرسال، وقد حسّنه الترمذي، وأشار ابن رجب إلى بُعد تصحيحه في بعض النسخ.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص394",
+            "quote": "فهذا الحديث قد اختلف في إسناده"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص394",
+            "quote": "ورجح الدارقطني هذا المرسل"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص394",
+            "quote": "وما وقع في بعض النسخ من تصحيحه، فبعيد"
+          }
+        ]
+      }
+    ]
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَبِي ذَرٍّ جُنْدَبِ بْنِ جُنَادَةَ، وَأَبِي عَبْدِ الرَّحْمَنِ مُعَاذِ بْنِ جَبَلٍ رَضِيَ اللَّهُ عَنْهُمَا، عَنْ رَسُولِ اللَّهِ ﷺ قَالَ:"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "اتَّقِ اللَّهَ حَيْثُمَا كُنْتَ، وَأَتْبِعِ السَّيِّئَةَ الْحَسَنَةَ تَمْحُهَا، وَخَالِقِ النَّاسَ بِخُلُقٍ حَسَنٍ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_ittaqi",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 0,
+          "length": 2,
+          "surface": "اتَّقِ اللَّهَ"
+        },
+        "headword": "اتَّقِ اللَّهَ",
+        "meaning": "أصل التقوى أن يجعل العبد بينه وبين ما يخافه ويحذره وقاية تقيه منه.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص397",
+            "quote": "وأصل التقوى أن يجعل العبد بينه وبين ما يخافه ويحذره وقاية تقيه منه"
+          }
+        ]
+      },
+      {
+        "id": "g_atbi",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 4,
+          "length": 3,
+          "surface": "وَأَتْبِعِ السَّيِّئَةَ الْحَسَنَةَ"
+        },
+        "headword": "أَتْبِعِ السَّيِّئَةَ الْحَسَنَةَ",
+        "meaning": "قد يراد بالحسنة التوبة من تلك السيئة، وقد يراد ما هو أعم من التوبة.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص415",
+            "quote": "قد يراد بالحسنة التوبة من تلك السيئة"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص418",
+            "quote": "ما هو أعم من التوبة"
+          }
+        ]
+      },
+      {
+        "id": "g_khaliq",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 8,
+          "length": 2,
+          "surface": "وَخَالِقِ النَّاسَ"
+        },
+        "headword": "خَالِقِ النَّاسَ",
+        "meaning": "هذا من خصال التقوى ولا تتم التقوى إلا به؛ وأفرده للحاجة إلى بيانه.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص453",
+            "quote": "هذا من خصال التقوى، ولا تتم التقوى إلا به"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "سنن الترمذي، رقم 1987",
+      "references": [
+        {
+          "sourceId": "sunan_tirmidhi",
+          "hadithNumber": "1987",
+          "numberingSystem": "other",
+          "digitalLocator": "editions/ara-tirmidhi.json → hadithnumber 1987"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ التِّرْمِذِيُّ وَقَالَ: حَدِيثٌ حَسَنٌ، وَفِي بَعْضِ النُّسَخِ: حَسَنٌ صَحِيحٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 3,
+        "label": "اتق الله حيثما كنت"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 4,
+        "endToken": 7,
+        "label": "وأتبع السيئة الحسنة"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 8,
+        "endToken": 11,
+        "label": "وخالق الناس بخلق حسن"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 0,
+          "length": 2,
+          "surface": "اتَّقِ اللَّهَ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 7,
+          "length": 1,
+          "surface": "تَمْحُهَا"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 10,
+          "length": 2,
+          "surface": "بِخُلُقٍ حَسَنٍ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "زلّ لسانك صباحاً بكلمة جارحة في حق زميلك، وأنت الآن في خلوة تتذكر ما جرى، وتفكر فيما تفعل.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أتقي الله في سري وعلانيتي، فأتبع هذه الزلة بحسنة تمحوها (توبة وعمل صالح)، وأصلح ما بيني وبين زميلي بخلق حسن.",
+          "feedback": "أحسنت؛ فقد يراد بالحسنة التوبة وما هو أعم منها، وحسن الخلق مع الناس من خصال التقوى."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أتوب إلى الله وحده، وأبقى على ما أنا عليه من جفوة مع زميلي.",
+          "feedback": "كثير من الناس يظن أن التقوى هي القيام بحق الله دون حقوق عباده، والحديث ينص على الأمرين."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "ما مضى قد مضى؛ فلا فائدة من حسنة بعد السيئة.",
+          "feedback": "ظاهر الحديث أن السيئات تمحى بالحسنات؛ فالأمر بإتباعها مقصود."
+        }
+      ],
+      "takeaway": "اتق الله حيثما كنت، وإذا زللت فاتبع الزلة حسنة تمحوها، وعاشر الناس بخلق حسن.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص410",
+          "quote": "مع أنه لابد أن يقع منه أحيانا تفريط في التقوى"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص453",
+          "quote": "فإن كثيرا من الناس يظن أن التقوى هي القيام بحق الله دون حقوق عباده"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "اجعل التقوى وصيتك لنفسك ولمن تحب؛ فهي وصية الله للأولين والآخرين.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص397",
+            "quote": "والتقوى وصية الله للأولين والآخرين"
+          }
+        ]
+      },
+      {
+        "text": "لا تظن التقوى في العبادة وحدها؛ فحسن الخلق مع الناس من خصالها ولا تتم إلا به.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص453",
+            "quote": "هذا من خصال التقوى، ولا تتم التقوى إلا به"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 18",
+      "quote": null
+    },
+    "normalizations": [
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s2",
+        "tokenIndex": 3,
+        "before": "كُنْت",
+        "after": "كُنْتَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "1987",
+          "quote": "حَيْثُمَا كُنْتَ وَأَتْبِعِ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 4,
+        "before": "وَأَتْبِعْ",
+        "after": "وَأَتْبِعِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "1987",
+          "quote": "كُنْتَ وَأَتْبِعِ السَّيِّئَةَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 8,
+        "before": "وَخَالِقْ",
+        "after": "وَخَالِقِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sunan_tirmidhi",
+          "locator": "1987",
+          "quote": "تَمْحُهَا وَخَالِقِ النَّاسَ"
+        }
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "رواية الترمذي (1987) عن أبي ذر؛ وفي الأربعين جُمع أبو ذر ومعاذ في الإسناد كما في المصدر الرقمي، وفي الترمذي أيضاً رواية عن معاذ.",
+      "الحديث غير مخرَّج في الصحيحين، ومصدر الضبط والمقابلة فيه هو متن الترمذي المثبّت.",
+      "صُحّح ضبط بعض الكلمات بمطابقتها رسماً في المتن المشكول للحديث نفسه من مصدره المثبّت، ولم يُغيَّر إلا ما سقط من الحركات؛ وهو مسجّل في provenance.vocalizationEdits وتُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}
