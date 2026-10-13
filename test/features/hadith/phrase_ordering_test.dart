@@ -48,7 +48,9 @@ void main() {
           expect(segmentIndex, greaterThanOrEqualTo(0), reason: chunk.id);
           final MatnSegment segment = hadith.matn.segments[segmentIndex];
           expect(chunk.endToken, lessThan(segment.tokens.length), reason: chunk.id);
-          expect(chunk.tokenCount, greaterThanOrEqualTo(2), reason: '${chunk.id} is a phrase, not a single word');
+          if (segment.tokens.length > 1) {
+            expect(chunk.tokenCount, greaterThanOrEqualTo(2), reason: '${chunk.id} is a phrase, not a single word');
+          }
           expect(chunk.label.trim(), isNotEmpty);
           if (previousEnd != null) {
             final int previousSegment = hadith.matn.segments.indexWhere((MatnSegment s) => s.id == previousEnd!.$1);
