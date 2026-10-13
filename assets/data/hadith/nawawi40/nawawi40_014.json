@@ -1,0 +1,492 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_014",
+  "sequence": 14,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 14
+  },
+  "title": "عصمة دم المسلم",
+  "teaser": {
+    "text": "غداً: حرمةٌ عظيمة لا تُستباح إلا بثلاثة أسباب محددة… فما هي، ولماذا هذا الضبط؟"
+  },
+  "milestone": "عصمة دم المسلم",
+  "context": {
+    "narrative": "لم يرد في المصادر المثبّتة سبب لورود هذا الحديث؛ يرويه الأعمش عن عبد الله بن مرة عن مسروق عن ابن مسعود رضي الله عنه. وفي رواية لمسلم: «قام فينا رسول الله ﷺ فقال: والذي لا إله غيره لا يحل دم رجل مسلم…»، فجاء بيانُ ما يعصم دم المسلم وما يبيحه في مقام خطبة وتأكيد.",
+    "humanMotive": "تعظيم حرمة دم المسلم، وحصر ما يبيحه في ثلاث خصال، سدّاً لباب التأول والتعدّي.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sahih_bukhari",
+        "locator": "6878",
+        "quote": "لاَ يَحِلُّ دَمُ امْرِئٍ مُسْلِمٍ يَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ اللَّهُ وَأَنِّي رَسُولُ اللَّهِ إِلاَّ بِإِحْدَى ثَلاَثٍ"
+      },
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "1676",
+        "quote": "قَامَ فِينَا رَسُولُ اللَّهِ صلى الله عليه وسلم فَقَالَ"
+      },
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "1676",
+        "quote": "وَالَّذِي لاَ إِلَهَ غَيْرُهُ لاَ يَحِلُّ دَمُ رَجُلٍ مُسْلِمٍ"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص325",
+        "quote": "فهذه الأنواع الثلاثة هي التي تبيح دم المسلم دون غيرها"
+      }
+    ],
+    "cautions": [
+      {
+        "text": "هذا الحديث يعظّم حرمة دم المسلم، أما تفاصيل الخصال الثلاث (الإحصان، وإثارة الفتن، والارتداد) ففيها مواضع نزاع بين العلماء؛ فهو للتعلّم والتعظيم، لا للاجتهاد الفردي في الوقائع.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص325",
+            "quote": "هذا هو محل النزاع بين العلماء"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص326",
+            "quote": "هذا ينبني على أنه هل يخرج من الدين بالكلية بذلك أم لا"
+          }
+        ]
+      }
+    ]
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنِ ابْنِ مَسْعُودٍ رَضِيَ اللهُ عَنْهُ قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "لَا يَحِلُّ دَمُ امْرِئٍ مُسْلِمٍ (يَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ، وَأَنِّي رَسُولُ اللَّهِ) إِلَّا بِإِحْدَى ثَلَاثٍ: الثَّيِّبُ الزَّانِي، وَالنَّفْسُ بِالنَّفْسِ، وَالتَّارِكُ لِدِينِهِ الْمُفَارِقُ لِلْجَمَاعَةِ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_thayyib",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 17,
+          "length": 2,
+          "surface": "الثَّيِّبُ الزَّانِي"
+        },
+        "headword": "الثَّيِّبُ الزَّانِي",
+        "meaning": "المراد الزنا بعد الإحصان؛ فالمحصن قد تمت عليه النعمة بنيل هذه الشهوة بالنكاح.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص325",
+            "quote": "فقد ذكر في الحديث أنه الزنا بعد الإحصان"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص325",
+            "quote": "فإن المحصن قد تمت عليه النعمة بنيل هذه الشهوة بالنكاح"
+          }
+        ]
+      },
+      {
+        "id": "g_nafs",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 19,
+          "length": 2,
+          "surface": "وَالنَّفْسُ بِالنَّفْسِ"
+        },
+        "headword": "النَّفْسُ بِالنَّفْسِ",
+        "meaning": "أن المكلف إذا قتل نفساً بغير حق عمداً فإنه يُقتل بها.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص314",
+            "quote": "فمعناه أن المكلف إذا قتل نفسا بغير حق عمدا، فإنه يقتل بها"
+          }
+        ]
+      },
+      {
+        "id": "g_tarik",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 21,
+          "length": 4,
+          "surface": "وَالتَّارِكُ لِدِينِهِ الْمُفَارِقُ لِلْجَمَاعَةِ"
+        },
+        "headword": "التَّارِكُ لِدِينِهِ الْمُفَارِقُ لِلْجَمَاعَةِ",
+        "meaning": "من ترك الإسلام وارتد عنه وفارق جماعة المسلمين.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص317",
+            "quote": "فالمراد به من ترك الإسلام، وارتد عنه، وفارق جماعة المسلمين"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح البخاري، رقم 6878 · صحيح مسلم، رقم 1676",
+      "references": [
+        {
+          "sourceId": "sahih_bukhari",
+          "hadithNumber": "6878",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-bukhari.json → hadithnumber 6878"
+        },
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "1676",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 1676.01"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ الْبُخَارِيُّ، وَمُسْلِمٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 4,
+        "label": "لا يحل دم امرئ مسلم"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 5,
+        "endToken": 13,
+        "label": "شهادة التوحيد والرسالة"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 14,
+        "endToken": 16,
+        "label": "إلا بإحدى ثلاث"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 17,
+        "endToken": 18,
+        "label": "الأولى: الثيب الزاني"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s2",
+        "startToken": 19,
+        "endToken": 20,
+        "label": "الثانية: النفس بالنفس"
+      },
+      {
+        "id": "c6",
+        "segmentId": "s2",
+        "startToken": 21,
+        "endToken": 24,
+        "label": "الثالثة: التارك لدينه"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5",
+        "c6"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 17,
+          "length": 2,
+          "surface": "الثَّيِّبُ الزَّانِي"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 19,
+          "length": 2,
+          "surface": "وَالنَّفْسُ بِالنَّفْسِ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 21,
+          "length": 4,
+          "surface": "وَالتَّارِكُ لِدِينِهِ الْمُفَارِقُ لِلْجَمَاعَةِ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "احتدم نقاش على الإنترنت بين مسلمين، فغلبك الغضب حتى خطر لك أن تحكم على خصمك بالخروج من الدين أو أن تتمنى له الأذى لما رأيت من خطئه.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أتذكر أن دم المسلم لا يُباح إلا بإحدى ثلاث، فأمسك يدي ولساني عن التعدي، وأترك الحكم على الناس بالهوى.",
+          "feedback": "أحسنت؛ فالأنواع الثلاثة هي التي تبيح دم المسلم دون غيرها، والتعدي بالهوى لا يؤتمن."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أمتنع عن الأذى الجسدي، لكنني أحكم عليه بالخروج من الدين لمجرد خطأ بدا لي.",
+          "feedback": "الخروج من الدين مسألة تدقيق وخلاف بين العلماء، فلا يُبنى فيها على انطباع."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "ما دام الخطأ كبيراً فمن حقي أن أعاقبه بنفسي.",
+          "feedback": "قال ابن رجب في غير النبي ﷺ: «ليس له ذلك»؛ لأنه غير مأمون عليه التعدي بالهوى."
+        }
+      ],
+      "takeaway": "دم المسلم معصوم إلا بإحدى ثلاث؛ فعظّم هذه الحرمة في لسانك ويدك، ودع تفصيل الأحكام لأهلها.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص325",
+          "quote": "فهذه الأنواع الثلاثة هي التي تبيح دم المسلم دون غيرها"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص329",
+          "quote": "وأما غيره، فليس له ذلك، لأنه غير مأمون عليه التعدي بالهوى"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "عظّم حرمة المسلم؛ فلا يُباح دمه إلا بإحدى ثلاث خصال دون غيرها.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص325",
+            "quote": "فهذه الأنواع الثلاثة هي التي تبيح دم المسلم دون غيرها"
+          }
+        ]
+      },
+      {
+        "text": "تثبّت قبل أن تحكم على أحد بالخروج من الدين؛ فالمسألة تنبني على التفصيل ولا تُترك للهوى.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص326",
+            "quote": "هذا ينبني على أنه هل يخرج من الدين بالكلية بذلك أم لا"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 14",
+      "quote": null
+    },
+    "normalizations": [
+      "حذف وسم <br> الزائد من المصدر الرقمي.",
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "تحويل المعقوفين اللذين يحيطان بزيادة «يشهد أن لا إله إلا الله وأني رسول الله» (وهي في لفظ الصحيحين) إلى قوسين؛ لأن المعقوف لا يُفصل في التقسيم إلى كلمات.",
+      "إغلاق الجملة المعترضة بقوس بدل المعقوف.",
+      "نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s1",
+        "tokenIndex": 0,
+        "before": "عَنْ",
+        "after": "عَنِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "1676",
+          "quote": "وَوَكِيعٌ عَنِ الأَعْمَشِ،"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 5,
+        "before": "يشهد",
+        "after": "يَشْهَدُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "1676",
+          "quote": "مُسْلِمٍ يَشْهَدُ أَنْ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 6,
+        "before": "أن",
+        "after": "أَنْ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "1676",
+          "quote": "يَشْهَدُ أَنْ لاَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 7,
+        "before": "لا",
+        "after": "لَا",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "1676",
+          "quote": "أَنْ لاَ إِلَهَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 8,
+        "before": "إله",
+        "after": "إِلَهَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "1676",
+          "quote": "لاَ إِلَهَ إِلاَّ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 9,
+        "before": "إلا",
+        "after": "إِلَّا",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "1676",
+          "quote": "إِلَهَ إِلاَّ اللَّهُ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 10,
+        "before": "الله",
+        "after": "اللَّهُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "1676",
+          "quote": "إِلاَّ اللَّهُ وَأَنِّي"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 11,
+        "before": "وأني",
+        "after": "وَأَنِّي",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "1676",
+          "quote": "اللَّهُ وَأَنِّي رَسُولُ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 12,
+        "before": "رسول",
+        "after": "رَسُولُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "1676",
+          "quote": "وَأَنِّي رَسُولُ اللَّهِ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 13,
+        "before": "الله",
+        "after": "اللَّهِ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "1676",
+          "quote": "رَسُولُ اللَّهِ إِلاَّ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 14,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "زيادة «يشهد أن لا إله إلا الله وأني رسول الله» ثابتة في لفظ البخاري (6878) ومسلم (1676)، وجاءت في الأربعين بين معقوفين ولم يكن نصها مشكولاً؛ ضُبطت بمقابلتها في مسلم، وعُرضت بين قوسين كما في المصدر.",
+      "لفظ «الزاني» هو لفظ البخاري؛ وفي مسلم (1676.01) «الزان» بحذف الياء، ولفظ الأربعين لم يُغيَّر.",
+      "الحديث في بيان عصمة الدم، وفي تفاصيله أحكام ونزاع علمي؛ لا يُستنبط منه حكم في واقعة مما لا يُرجع فيه إلى أهل العلم.",
+      "صُحّح ضبط بعض الكلمات بمطابقتها رسماً في المتن المشكول للحديث نفسه من مصدره المثبّت، ولم يُغيَّر إلا ما سقط من الحركات؛ وهو مسجّل في provenance.vocalizationEdits وتُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

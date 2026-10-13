@@ -145,7 +145,7 @@ void main() {
       final CurriculumItem? next = curriculum.itemAfter('nawawi40_001');
       expect(next?.hadithId, 'nawawi40_002');
       expect(curriculum.itemAfter('nawawi40_002')?.hadithId, 'nawawi40_003');
-      expect(curriculum.itemAfter('nawawi40_010'), isNull);
+      expect(curriculum.itemAfter('nawawi40_020'), isNull);
     });
 
     test('daily cap message is the blueprint wording', () {

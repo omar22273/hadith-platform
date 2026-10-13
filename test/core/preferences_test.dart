@@ -84,6 +84,6 @@ void main() {
       config.audioUrlFor('nawawi40_001').toString(),
       'https://cdn.hadithplatform.app/audio/hadith_nawawi40_001.mp3',
     );
-    expect(AppConfig.standard.version, '2.3.1');
+    expect(AppConfig.standard.version, '2.4.0');
   });
 }

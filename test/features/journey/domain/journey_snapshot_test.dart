@@ -209,13 +209,13 @@ void main() {
       expect(snapshot.segments.last.title, 'تتمة الأربعين');
       expect(snapshot.nodes[0].status, WirdNodeStatus.today);
       expect(snapshot.nodes[1].status, WirdNodeStatus.upcoming);
-      for (int index = 1; index < 10; index++) {
+      for (int index = 1; index < 20; index++) {
         expect(snapshot.nodes[index].status, WirdNodeStatus.upcoming, reason: 'node $index');
         expect(snapshot.nodes[index].item, isNotNull, reason: 'node $index');
       }
-      expect(snapshot.preparedCount, 10);
-      expect(snapshot.nodes[10].status, WirdNodeStatus.inPreparation);
-      expect(snapshot.nodes[10].item, isNull);
+      expect(snapshot.preparedCount, 20);
+      expect(snapshot.nodes[20].status, WirdNodeStatus.inPreparation);
+      expect(snapshot.nodes[20].item, isNull);
       expect(snapshot.todayKind, TodayKind.available);
       expect(snapshot.caravanIndex, 0);
     });
@@ -254,18 +254,19 @@ void main() {
 
     test('completing every prepared wird finishes this edition of the curriculum', () {
       JourneyProgress progress = JourneyProgress.empty;
-      for (int number = 1; number <= 10; number++) {
+      for (int number = 1; number <= 20; number++) {
         progress = progress.withCompletion(
           'nawawi40_${number.toString().padLeft(3, '0')}',
           DateTime(2026, 10, number, 7),
         );
       }
-      final JourneySnapshot snapshot = snapshotAt(DateTime(2026, 10, 10, 7, 5), progress);
+      final JourneySnapshot snapshot = snapshotAt(DateTime(2026, 10, 21, 7, 5), progress);
       expect(snapshot.todayKind, TodayKind.curriculumFinished);
-      expect(snapshot.completedCount, 10);
-      expect(snapshot.caravanIndex, 9);
-      expect(snapshot.progressFraction, closeTo(10 / 42, 1e-9));
+      expect(snapshot.completedCount, 20);
+      expect(snapshot.caravanIndex, 19);
+      expect(snapshot.progressFraction, closeTo(20 / 42, 1e-9));
       expect(snapshot.segments.first.completed, 10);
+      expect(snapshot.segments[1].completed, 10);
     });
   });
 

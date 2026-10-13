@@ -69,6 +69,66 @@
       "number": 10,
       "title": "أكل الحلال وأثر طيب المطعم في استجابة الدعاء",
       "assetPath": "assets/data/hadith/nawawi40/nawawi40_010.json"
+    },
+    {
+      "hadithId": "nawawi40_011",
+      "number": 11,
+      "title": "دع ما يريبك",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_011.json"
+    },
+    {
+      "hadithId": "nawawi40_012",
+      "number": 12,
+      "title": "من حسن إسلام المرء",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_012.json"
+    },
+    {
+      "hadithId": "nawawi40_013",
+      "number": 13,
+      "title": "أن تحب لأخيك ما تحب لنفسك",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_013.json"
+    },
+    {
+      "hadithId": "nawawi40_014",
+      "number": 14,
+      "title": "عصمة دم المسلم",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_014.json"
+    },
+    {
+      "hadithId": "nawawi40_015",
+      "number": 15,
+      "title": "قل خيراً أو اصمت",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_015.json"
+    },
+    {
+      "hadithId": "nawawi40_016",
+      "number": 16,
+      "title": "لا تغضب",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_016.json"
+    },
+    {
+      "hadithId": "nawawi40_017",
+      "number": 17,
+      "title": "الإحسان على كل شيء",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_017.json"
+    },
+    {
+      "hadithId": "nawawi40_018",
+      "number": 18,
+      "title": "اتق الله حيثما كنت",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_018.json"
+    },
+    {
+      "hadithId": "nawawi40_019",
+      "number": 19,
+      "title": "احفظ الله يحفظك",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_019.json"
+    },
+    {
+      "hadithId": "nawawi40_020",
+      "number": 20,
+      "title": "الحياء وكلام النبوة الأولى",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_020.json"
     }
   ]
 }

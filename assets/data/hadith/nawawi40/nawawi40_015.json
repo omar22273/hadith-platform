@@ -1,0 +1,389 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_015",
+  "sequence": 15,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 15
+  },
+  "title": "قل خيراً أو اصمت",
+  "teaser": {
+    "text": "غداً: ثلاث وصايا تقول: «من كان يؤمن بالله واليوم الآخر…» فما هي، وبماذا يبدأ المؤمن؟"
+  },
+  "milestone": "اللسان والجار والضيف",
+  "context": {
+    "narrative": "لم يرد في المصادر المثبّتة سبب لورود هذا الحديث؛ رواه البخاري ومسلم من طرق عن أبي هريرة رضي الله عنه، وجاء بمعناه عن أبي شريح الخزاعي. وفي بعض ألفاظه «فلا يؤذِ جاره»، وفي بعضها «فليحسن إلى جاره»، وبيّن ابن رجب أنها ثلاثة أشياء يؤمر بها المؤمن.",
+    "humanMotive": "جعل الكلام والجوار والضيافة من علامات الإيمان بالله واليوم الآخر.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "47",
+        "quote": "مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ"
+      },
+      {
+        "sourceId": "sahih_bukhari",
+        "locator": "6018",
+        "quote": "فَلاَ يُؤْذِ جَارَهُ"
+      },
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "47",
+        "quote": "فَلْيُحْسِنْ إِلَى جَارِهِ"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص331",
+        "quote": "هذا الحديث خرجاه من طرق عن أبي هريرة"
+      },
+      {
+        "sourceId": "jami_ulum_hikam",
+        "locator": "ج1 ص332",
+        "quote": "فهذه ثلاثة أشياء يؤمر بها المؤمن"
+      }
+    ],
+    "cautions": []
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَبِي هُرَيْرَةَ رَضِيَ اللهُ عَنْهُ أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ:"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ، وَمَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيُكْرِمْ جَارَهُ، وَمَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيُكْرِمْ ضَيْفَهُ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g_yasmut",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 6,
+          "length": 4,
+          "surface": "فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ"
+        },
+        "headword": "فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ",
+        "meaning": "أمر بقول الخير وبالصمت عما عداه، فليس هناك كلام يستوي قوله والصمت عنه.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص334",
+            "quote": "أمر بقول الخير، وبالصمت عما عداه"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص334",
+            "quote": "وهذا يدل على أنه ليس هناك كلام يستوي قوله والصمت عنه"
+          }
+        ]
+      },
+      {
+        "id": "g_jar",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 16,
+          "length": 2,
+          "surface": "فَلْيُكْرِمْ جَارَهُ"
+        },
+        "headword": "فَلْيُكْرِمْ جَارَهُ",
+        "meaning": "إكرام الجار والإحسان إليه مأمور به، وأذاه محرّم وهو في حق الجار أشد تحريماً.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص344",
+            "quote": "فأما إكرام الجار والإحسان إليه، فمأمور به"
+          },
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص342",
+            "quote": "ولكن في حق الجار هو أشد تحريما"
+          }
+        ]
+      },
+      {
+        "id": "g_dayf",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 24,
+          "length": 2,
+          "surface": "فَلْيُكْرِمْ ضَيْفَهُ"
+        },
+        "headword": "فَلْيُكْرِمْ ضَيْفَهُ",
+        "meaning": "المراد إحسان ضيافته.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص353",
+            "quote": "إكرام الضيف، والمراد إحسان ضيافته"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح البخاري، رقم 6018 · صحيح مسلم، رقم 47",
+      "references": [
+        {
+          "sourceId": "sahih_bukhari",
+          "hadithNumber": "6018",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-bukhari.json → hadithnumber 6018"
+        },
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "47",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 47.01"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ الْبُخَارِيُّ، وَمُسْلِمٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 5,
+        "label": "الإيمان بالله واليوم الآخر (١)"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 6,
+        "endToken": 9,
+        "label": "فليقل خيراً أو ليصمت"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 10,
+        "endToken": 15,
+        "label": "الإيمان بالله واليوم الآخر (٢)"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 16,
+        "endToken": 17,
+        "label": "فليكرم جاره"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s2",
+        "startToken": 18,
+        "endToken": 23,
+        "label": "الإيمان بالله واليوم الآخر (٣)"
+      },
+      {
+        "id": "c6",
+        "segmentId": "s2",
+        "startToken": 24,
+        "endToken": 25,
+        "label": "فليكرم ضيفه"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5",
+        "c6"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 7,
+          "length": 1,
+          "surface": "خَيْرًا"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 9,
+          "length": 1,
+          "surface": "لِيَصْمُتْ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 17,
+          "length": 1,
+          "surface": "جَارَهُ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 25,
+          "length": 1,
+          "surface": "ضَيْفَهُ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "اجتمع أهلك وضيوفك على مائدة، وتحوّل الحديث إلى الكلام في عيوب أحد الجيران، وفي نفسك رغبة في المشاركة، وأمامك ضيف يحتاج إلى عنايتك.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أقول خيراً أو أصمت، وأتولى إكرام ضيفي، وأكفّ ما يؤذي جاري من حديثي.",
+          "feedback": "أحسنت؛ فالحديث أمر بقول الخير وبالصمت عما عداه، وبإكرام الجار والضيف."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "ألزم الصمت، لكنني أهمل ضيفي وجاري فلا ألتفت إليهما.",
+          "feedback": "الإيمان هنا يتعلق بحقوق الله وبحقوق عباده معاً، ومنها إكرام الضيف والجار."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "الكلام المباح لا شيء فيه، فأتحدث بكل ما يخطر ببالي.",
+          "feedback": "ليس هناك كلام يستوي قوله والصمت عنه؛ فإما خير يُقال وإما صمت عما سواه."
+        }
+      ],
+      "takeaway": "قبل أن تتكلم اسأل: أخيرٌ هو؟ وإلا فاصمت؛ ثم أكرم جارك وضيفك.",
+      "basis": [
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص334",
+          "quote": "وهذا يدل على أنه ليس هناك كلام يستوي قوله والصمت عنه"
+        },
+        {
+          "sourceId": "jami_ulum_hikam",
+          "locator": "ج1 ص332",
+          "quote": "وتارة تتعلق بحقوق عباده كإكرام الضيف، وإكرام الجار، والكف عن أذاه"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "اجعل كلامك قسمين فقط: خيراً يُقال، أو صمتاً عما سواه.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص334",
+            "quote": "أمر بقول الخير، وبالصمت عما عداه"
+          }
+        ]
+      },
+      {
+        "text": "كُفَّ أذاك عن جارك؛ فأذى الجار أشد تحريماً من أذى غيره.",
+        "sources": [
+          {
+            "sourceId": "jami_ulum_hikam",
+            "locator": "ج1 ص342",
+            "quote": "ولكن في حق الجار هو أشد تحريما"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 15",
+      "quote": null
+    },
+    "normalizations": [
+      "حذف وسم <br> الزائد من المصدر الرقمي.",
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s2",
+        "tokenIndex": 3,
+        "before": "بِاَللَّهِ",
+        "after": "بِاللَّهِ",
+        "rule": "fatha_on_wasl_alif",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "47",
+          "quote": "يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 13,
+        "before": "بِاَللَّهِ",
+        "after": "بِاللَّهِ",
+        "rule": "fatha_on_wasl_alif",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "47",
+          "quote": "يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 21,
+        "before": "بِاَللَّهِ",
+        "after": "بِاللَّهِ",
+        "rule": "fatha_on_wasl_alif",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "47",
+          "quote": "يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ"
+        }
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "ترتيب الأربعين (قول الخير ثم الجار ثم الضيف) هو ترتيب مسلم (47.01)؛ وفي البخاري (6018) ترتيب آخر ولفظ «فلا يؤذِ جاره».",
+      "صيغة الجملة الأولى ووسائل الإكرام (كمدة الضيافة) واردة في شرح ابن رجب ولم يُعتمد منها حكم فقهي في المتن المعروض.",
+      "صُحّح ضبط بعض الكلمات بمطابقتها رسماً في المتن المشكول للحديث نفسه من مصدره المثبّت، ولم يُغيَّر إلا ما سقط من الحركات؛ وهو مسجّل في provenance.vocalizationEdits وتُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

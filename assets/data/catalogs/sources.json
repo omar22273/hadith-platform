@@ -47,6 +47,51 @@
       }
     },
     {
+      "id": "sunan_tirmidhi",
+      "title": "سنن الترمذي",
+      "author": "محمد بن عيسى الترمذي",
+      "authorDeathHijri": 279,
+      "kind": "hadith_collection",
+      "edition": null,
+      "digital": {
+        "provider": "fawazahmed0/hadith-api",
+        "repository": "https://github.com/fawazahmed0/hadith-api",
+        "path": "editions/ara-tirmidhi.json",
+        "commit": "df57907be35291c91ad6a6691180e22ca9920784",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "sunan_ibn_majah",
+      "title": "سنن ابن ماجه",
+      "author": "محمد بن يزيد ابن ماجه القزويني",
+      "authorDeathHijri": 273,
+      "kind": "hadith_collection",
+      "edition": null,
+      "digital": {
+        "provider": "fawazahmed0/hadith-api",
+        "repository": "https://github.com/fawazahmed0/hadith-api",
+        "path": "editions/ara-ibnmajah.json",
+        "commit": "df57907be35291c91ad6a6691180e22ca9920784",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "sunan_nasai",
+      "title": "سنن النسائي",
+      "author": "أحمد بن شعيب النسائي",
+      "authorDeathHijri": 303,
+      "kind": "hadith_collection",
+      "edition": null,
+      "digital": {
+        "provider": "fawazahmed0/hadith-api",
+        "repository": "https://github.com/fawazahmed0/hadith-api",
+        "path": "editions/ara-nasai.json",
+        "commit": "df57907be35291c91ad6a6691180e22ca9920784",
+        "retrievedAt": "2026-10-08"
+      }
+    },
+    {
       "id": "taqrib_tahdhib",
       "title": "تقريب التهذيب",
       "author": "ابن حجر العسقلاني",

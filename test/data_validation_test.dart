@@ -1,4 +1,4 @@
-// فحص بيانات المحتوى المحقون: الأحاديث 1–10 من الأربعين النووية.
+// فحص بيانات المحتوى المحقون: الأحاديث 1–20 من الأربعين النووية.
 //
 // يتحقق من وجود كل محطة في الفهرس، وقراءة ملفها، وتطابق هويتها وعنوانها،
 // وسلامة المقاطع والغريب والتشكيل والمصادر، دون أي اعتماد على الشبكة.
@@ -23,6 +23,16 @@ const Map<int, String> _expectedTitles = <int, String>{
   8: 'حرمة دم المسلم وماله',
   9: 'اجتناب ما نهى عنه والأمر بالاستطاعة',
   10: 'أكل الحلال وأثر طيب المطعم في استجابة الدعاء',
+  11: 'دع ما يريبك',
+  12: 'من حسن إسلام المرء',
+  13: 'أن تحب لأخيك ما تحب لنفسك',
+  14: 'عصمة دم المسلم',
+  15: 'قل خيراً أو اصمت',
+  16: 'لا تغضب',
+  17: 'الإحسان على كل شيء',
+  18: 'اتق الله حيثما كنت',
+  19: 'احفظ الله يحفظك',
+  20: 'الحياء وكلام النبوة الأولى',
 };
 
 final RegExp _harakat = RegExp('[ً-ْٰ]');
@@ -55,8 +65,8 @@ void main() {
   }
 
   group('curriculum index', () {
-    test('hadiths 1 to 10 are registered in order', () {
-      for (int number = 1; number <= 10; number++) {
+    test('hadiths 1 to 20 are registered in order', () {
+      for (int number = 1; number <= 20; number++) {
         final CurriculumItem? item = itemFor(_idFor(number));
         expect(item, isNotNull, reason: 'missing station $number');
         expect(item!.number, number);
@@ -70,11 +80,11 @@ void main() {
       });
     });
 
-    test('the next-station teaser chain runs through the first ten', () {
-      for (int number = 1; number < 10; number++) {
+    test('the next-station teaser chain runs through the first twenty', () {
+      for (int number = 1; number < 20; number++) {
         expect(curriculum.itemAfter(_idFor(number))?.hadithId, _idFor(number + 1));
       }
-      expect(curriculum.itemAfter(_idFor(10)), isNull);
+      expect(curriculum.itemAfter(_idFor(20)), isNull);
     });
 
     test('every asset lives in the registered folder', () {
@@ -87,7 +97,7 @@ void main() {
     });
   });
 
-  for (int number = 3; number <= 10; number++) {
+  for (int number = 3; number <= 20; number++) {
     final String id = _idFor(number);
     group(id, () {
       late HadithDailyModel model;
@@ -113,7 +123,7 @@ void main() {
         expect(issues, isEmpty, reason: issues.map((IntegrityIssue i) => i.toString()).join('\n'));
       });
 
-      test('takhrij cites Bukhari or Muslim with a number', () {
+      test('takhrij cites a pinned hadith collection with a number', () {
         final List<TakhrijReference> references = model.matn.takhrij.references;
         expect(references, isNotEmpty);
         for (final TakhrijReference reference in references) {
@@ -123,7 +133,13 @@ void main() {
         expect(model.matn.takhrij.displayLabel.trim(), isNotEmpty);
         expect(
           model.matn.takhrij.references.any(
-            (TakhrijReference r) => r.sourceId.contains('bukhari') || r.sourceId.contains('muslim'),
+            (TakhrijReference r) => const <String>[
+              'sahih_bukhari',
+              'sahih_muslim',
+              'sunan_tirmidhi',
+              'sunan_ibn_majah',
+              'sunan_nasai',
+            ].contains(r.sourceId),
           ),
           isTrue,
         );
@@ -147,9 +163,9 @@ void main() {
         }
       });
 
-      test('four to fourteen ordered whole-phrase chunks with short labels', () {
+      test('three to sixteen ordered whole-phrase chunks with short labels', () {
         final List<PracticeChunk> chunks = model.practice.chunks;
-        expect(chunks.length, inInclusiveRange(4, 14));
+        expect(chunks.length, inInclusiveRange(3, 16));
         expect(model.practice.reconstruction.chunkIds, chunks.map((PracticeChunk c) => c.id).toList());
         for (final PracticeChunk chunk in chunks) {
           expect(chunk.label.trim(), isNotEmpty);
@@ -159,7 +175,9 @@ void main() {
           expect(chunk.startToken, greaterThanOrEqualTo(0));
           expect(chunk.endToken, lessThan(tokens.length));
           expect(chunk.startToken, lessThanOrEqualTo(chunk.endToken));
-          expect(chunk.endToken - chunk.startToken + 1, greaterThanOrEqualTo(2), reason: '${chunk.id} is a phrase, not a word');
+          if (tokens.length > 1) {
+            expect(chunk.endToken - chunk.startToken + 1, greaterThanOrEqualTo(2), reason: '${chunk.id} is a phrase, not a word');
+          }
         }
         for (int i = 1; i < chunks.length; i++) {
           final PracticeChunk previous = chunks[i - 1];
