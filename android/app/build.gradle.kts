@@ -6,10 +6,12 @@ plugins {
 
 android {
     signingConfigs {
-        // The committed, deliberately public debug keystore: every build carries the same
-        // certificate, so a new APK installs over the previous one without clearing data.
-        getByName("debug") {
-            storeFile = rootProject.file("../tools/android/hadith-stable.keystore")
+        // One fixed, deliberately public keystore committed in the repository
+        // (android/app/fixed-debug.keystore). Every build, on every machine, carries the same
+        // certificate, so a new APK installs over the previous one (Personal and Work profile
+        // included) without clearing data. Nothing is generated at build time.
+        create("release") {
+            storeFile = file("fixed-debug.keystore")
             storePassword = "android"
             keyAlias = "androiddebugkey"
             keyPassword = "android"
@@ -34,16 +36,18 @@ android {
         // Flutter 3.35+ refuses to build below API 24 (Android 7.0), so 24 is the floor.
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
-        // versionCode and versionName come from pubspec.yaml.
-        versionCode = flutter.versionCode
+        // versionName comes from pubspec.yaml. versionCode grows with every CI build
+        // (GITHUB_RUN_NUMBER + 100, always above the codes of earlier releases), so a new
+        // build can never be rejected as a downgrade; local builds fall back to pubspec.
+        val ciRunNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull()
+        versionCode = if (ciRunNumber != null) 100 + ciRunNumber else flutter.versionCode
         versionName = flutter.versionName
     }
 
     buildTypes {
         release {
-            // The release build is signed with the debug config above (v1, v2 and v3),
-            // so the APK installs directly on a phone.
-            signingConfig = signingConfigs.getByName("debug")
+            // Signed exclusively with the fixed keystore above (v1, v2 and v3).
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
