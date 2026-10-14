@@ -21,6 +21,7 @@ import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/completion_flash.dart';
 import '../../../../core/ui/gated_next_button.dart';
 import '../../../../core/ui/hint_glow.dart';
+import '../../../../core/ui/rtl_inline.dart';
 import '../../../../core/ui/smooth_surface.dart';
 import '../../../../core/ui/testing_skip_button.dart';
 import '../../../hadith/domain/practice_engine.dart';
@@ -471,7 +472,8 @@ class _VanishingBoard extends StatelessWidget {
         spans.add(TextSpan(text: ' ', style: style));
       }
       if (hidden.contains(w) && !state.revealed.contains(w)) {
-        spans.add(
+        addRtlSafePlaceholder(
+          spans,
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
             child: Semantics(
@@ -497,6 +499,7 @@ class _VanishingBoard extends StatelessWidget {
               ),
             ),
           ),
+          style: style,
         );
       } else {
         final bool recalledWord = hidden.contains(w);
@@ -535,6 +538,7 @@ class _VanishingBoard extends StatelessWidget {
           child: Text.rich(
             TextSpan(children: spans),
             textAlign: TextAlign.justify,
+            textDirection: TextDirection.rtl,
           ),
         ),
         const SizedBox(height: 12),
