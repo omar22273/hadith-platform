@@ -123,7 +123,7 @@ void main() {
     });
 
     test('the planned path covers the whole collection', () {
-      expect(curriculum.plannedCount, 42);
+      expect(curriculum.plannedCount, 50);
       final Set<int> numbers = <int>{for (final CurriculumItem item in curriculum.items) item.number};
       expect(numbers.length, curriculum.items.length);
       expect(numbers.every((int n) => n >= 1 && n <= curriculum.plannedCount), isTrue);
@@ -146,7 +146,9 @@ void main() {
       expect(next?.hadithId, 'nawawi40_002');
       expect(curriculum.itemAfter('nawawi40_002')?.hadithId, 'nawawi40_003');
       expect(curriculum.itemAfter('nawawi40_020')?.hadithId, 'nawawi40_021');
-      expect(curriculum.itemAfter('nawawi40_042'), isNull);
+      expect(curriculum.itemAfter('nawawi40_042')?.hadithId, 'nawawi40_043');
+      expect(curriculum.itemAfter('nawawi40_049')?.hadithId, 'nawawi40_050');
+      expect(curriculum.itemAfter('nawawi40_050'), isNull);
     });
 
     test('daily cap message is the blueprint wording', () {

@@ -74,6 +74,9 @@ def find_anchor(segments, phrase):
 def gharib_entries(number, section, segments):
     """غريب الألفاظ للحديث من مفردات الكتاب، بحسب PICKS."""
     picks = PICKS[number]
+    if not picks:
+        # لا مفردات في الكتاب تنطبق على لفظ الحديث المعتمد: لا غريب يُولَّد من غيره.
+        return []
     if not MIN_GHARIB <= len(picks) <= MAX_GHARIB:
         raise ValueError(f"الحديث {number}: عدد الألفاظ {len(picks)} خارج {MIN_GHARIB}–{MAX_GHARIB}")
     entries = []

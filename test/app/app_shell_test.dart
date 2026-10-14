@@ -71,9 +71,9 @@ void main() {
     expect(tester.getSize(find.byType(IndexedStack)).height, greaterThan(600));
     expect(tester.getSize(find.byType(AppBottomBar)).height, lessThan(120));
     expect(find.byType(CaravanTrailView), findsOneWidget);
-    expect(find.byType(WirdNodeView), findsNWidgets(42));
+    expect(find.byType(WirdNodeView), findsNWidgets(50));
     expect(find.text('الأعمال بالنيات'), findsWidgets);
-    // الأحاديث الاثنان والأربعون كلها معدّة: لا عقدة «قيد الإعداد» في المسار.
+    // الأحاديث الخمسون كلها معدّة: لا عقدة «قيد الإعداد» في المسار.
     expect(find.text('قيد الإعداد'), findsNothing);
     expect(find.text('يا ابن آدم إنك ما دعوتني'), findsWidgets);
 

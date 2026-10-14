@@ -1,4 +1,4 @@
-// فحص بيانات المحتوى المحقون: الأحاديث 1–42 من الأربعين النووية.
+// فحص بيانات المحتوى المحقون: الأحاديث 1–42 من الأربعين النووية و43–50 من تتمة الخمسين الرجبية.
 //
 // يتحقق من وجود كل محطة في الفهرس، وقراءة ملفها، وتطابق هويتها وعنوانها،
 // وسلامة المقاطع والغريب والتشكيل والمصادر، دون أي اعتماد على الشبكة.
@@ -55,10 +55,22 @@ const Map<int, String> _expectedTitles = <int, String>{
   40: 'كن في الدنيا كأنك غريب',
   41: 'هواه تبعاً لما جئت به',
   42: 'يا ابن آدم إنك ما دعوتني',
+  43: 'ألحقوا الفرائض بأهلها',
+  44: 'الرضاعة تحرم ما تحرم الولادة',
+  45: 'تحريم بيع الخمر والميتة والخنزير والأصنام',
+  46: 'كل مسكر خمر وكل مسكر حرام',
+  47: 'ما ملأ آدمي وعاءً شراً من بطن',
+  48: 'أربع من كن فيه كان منافقاً خالصاً',
+  49: 'لو توكلتم على الله حق توكله',
+  50: 'لا يزال لسانك رطباً من ذكر الله',
 };
 
-/// آخر حديث في الأربعين النووية كما رتبها المصنف في هذا المسار.
-const int _lastHadith = 42;
+/// آخر حديث في المسار: الأربعون النووية (١–٤٢) ثم تتمة الخمسين الرجبية (٤٣–٥٠).
+const int _lastHadith = 50;
+
+/// الحديثان اللذان لا مفردات لهما في «التحفة الربانية» (الكتاب يشرح فيهما حديثاً آخر أو يكتفي بالفائدة)؛
+/// فلا غريب ولا مفردات لهما، ولا يُختلق بيان من خارج الكتاب.
+const Set<int> _noBookGlossary = <int>{46, 50};
 
 /// الحديثان اللذان لا نظير لهما في النسخ المثبتة من الكتب الستة؛ تخريجهما إلى نص الأربعين نفسه.
 const Set<int> _arbaunOnlyTakhrij = <int>{30, 41};
@@ -102,7 +114,7 @@ void main() {
   }
 
   group('curriculum index', () {
-    test('hadiths 1 to 42 are registered in order and fill the planned path', () {
+    test('hadiths 1 to 50 are registered in order and fill the planned path', () {
       expect(curriculum.plannedCount, _lastHadith);
       expect(curriculum.items.length, _lastHadith);
       for (int number = 1; number <= _lastHadith; number++) {
@@ -119,7 +131,7 @@ void main() {
       });
     });
 
-    test('the next-station teaser chain runs through all forty-two', () {
+    test('the next-station teaser chain runs through all fifty', () {
       for (int number = 1; number < _lastHadith; number++) {
         expect(curriculum.itemAfter(_idFor(number))?.hadithId, _idFor(number + 1));
       }
@@ -231,7 +243,11 @@ void main() {
 
       test('two to four gharib terms anchored to the matn', () {
         final List<GharibEntry> gharib = model.matn.gharib;
-        expect(gharib.length, inInclusiveRange(2, 4));
+        if (_noBookGlossary.contains(number)) {
+          expect(gharib, isEmpty, reason: 'the book has no vocabulary for hadith $number; none is invented');
+        } else {
+          expect(gharib.length, inInclusiveRange(2, 4));
+        }
         for (final GharibEntry entry in gharib) {
           expect(entry.headword.trim(), isNotEmpty);
           expect(entry.meaning.trim(), isNotEmpty);
@@ -283,7 +299,11 @@ void main() {
         expect(explanation!.source.sourceId, _tuhfaSourceId);
         expect(sources.byId(_tuhfaSourceId), isNotNull);
         expect(explanation.source.locator, 'الحديث $number');
-        expect(explanation.vocabulary, isNotEmpty);
+        if (_noBookGlossary.contains(number)) {
+          expect(explanation.vocabulary, isEmpty, reason: 'the book has no vocabulary for hadith $number');
+        } else {
+          expect(explanation.vocabulary, isNotEmpty);
+        }
         expect(explanation.benefits, isNotEmpty);
         for (final ExplanationTerm term in explanation.vocabulary) {
           expect(term.term.trim(), isNotEmpty);

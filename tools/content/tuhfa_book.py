@@ -31,14 +31,17 @@ ORDINALS = {
     "الحادي والثلاثون": 31, "الثاني والثلاثون": 32, "الثالث والثلاثون": 33, "الرابع والثلاثون": 34,
     "الخامس والثلاثون": 35, "السادس والثلاثون": 36, "السابع والثلاثون": 37, "الثامن والثلاثون": 38,
     "التاسع والثلاثون": 39, "الأربعون": 40, "الحادى والأربعون": 41, "الثاني والأربعون": 42,
+    # ملحق الكتاب: تتمة الخمسين (الأحاديث 43–50) التي ألحقها الحافظ ابن رجب بأحاديث النووي.
+    "الثالث والأربعون": 43, "الرابع والأربعون": 44, "الخامس والأربعون": 45, "السادس والأربعون": 46,
+    "السابع والأربعون": 47, "الثامن والأربعون": 48, "التاسع والأربعون": 49, "الخمسون": 50,
 }
+LAST_HADITH = 50
+COLOPHON = re.compile(r"^تم بحمد الله وحسن توفيقه")
 
 DIACRITICS = re.compile("[\u064b-\u065f\u0670\u0640\u06d6-\u06ed]")
 ARABIC_LETTER = re.compile("[\u0621-\u064a\u0671-\u06d3]")
 STRAY_CHARS = re.compile("[\u0f00-\u0fff\ufffd\u200c-\u200f\u2015<>{}|+#]")
 PAGE_FOOTER = re.compile(r"\(\s*[\d٠-٩۰-۹]*\s*ال?ت[حج]فة\s*\)")
-APPENDIX_HEADING = re.compile(
-    r"الحديث\s+(?:(?:الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع)\s+و\s*الأربعون|الخمسون)")
 NUMBER_MARK = r"(?:[\d٠-٩۰-۹]+|[Vvهـدا])"
 TERM_STOP = re.compile(r"[\.،؛»«]")
 PAIRS = (("«", "»"), ("(", ")"))
@@ -152,19 +155,18 @@ def _clean(lines, drop=()):
     return out, dropped
 
 
-def _cut_appendix(lines):
-    """ملحق الكتاب (الأحاديث 43–50) ليس من الأربعين النووية: يُقطع عند أول عنوان له."""
+def _cut_colophon(lines):
+    """خاتمة المطبعة بعد آخر حديث (تاريخ الطبع والتصحيح) ليست من الشرح: تُقطع عند أول سطر لها."""
     for index, line in enumerate(lines):
-        match = APPENDIX_HEADING.search(line)
-        if match:
-            head = line[:match.start()].rstrip()
-            return lines[:index] + ([head] if head else []), True
-    return lines, False
+        if COLOPHON.match(line.strip()):
+            return lines[:index]
+    return lines
 
 
 def _marker_index(lines, prefix, start=0):
     for index in range(start, len(lines)):
-        if lines[index].strip().startswith(prefix):
+        line = lines[index].strip()
+        if line.startswith(prefix) or (prefix == "يستفاد" and line.startswith("ما يستفاد")):
             return index
     return None
 
@@ -260,6 +262,11 @@ def _apply_entry_fixes(number, vocabulary, benefits, matn_text):
                 break
         else:
             raise ValueError(f"علامة تقسيم المفردات غير موجودة في الحديث {number}: «{marker[:40]}»")
+    for marker in fixes.BENEFIT_DROP.get(number, []):
+        kept = [item for item in items if marker not in item]
+        if len(kept) == len(items):
+            raise ValueError(f"الفائدة المراد حذفها غير موجودة في الحديث {number}: «{marker[:40]}»")
+        items = kept
     for old_term, replacements in fixes.VOCAB_REPLACE.get(number, {}).items():
         for index, entry in enumerate(vocab):
             if entry[0] == old_term:
@@ -292,15 +299,12 @@ def load_sections(path=DEFAULT_SOURCE, errors=None):
     headings = _find_headings(lines)
     sections = {}
     for position, (number, start) in enumerate(headings):
-        if number > 42:
-            continue
         end = headings[position + 1][1] if position + 1 < len(headings) else len(lines)
-        body = lines[start + 1:end]
+        body = _cut_colophon(lines[start + 1:end])
         wanted = set(fixes.DROP_LINES.get(number, ()))
         cleaned, dropped = _clean(body, wanted)
         if wanted - dropped:
             raise ValueError(f"سطر الحذف غير موجود في الحديث {number}: {sorted(wanted - dropped)}")
-        cleaned, _ = _cut_appendix(cleaned)
         vocab_at = _marker_index(cleaned, "المفردات")
         benefit_at = _marker_index(cleaned, "يستفاد", vocab_at or 0)
         matn_end = vocab_at if vocab_at is not None else benefit_at

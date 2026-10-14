@@ -219,16 +219,18 @@ def normalise(raw, data, corpus=None):
                 raise BuildError(f"إثبات التعديل التمهيدي لا يوافق النص الجديد: «{quote}»")
         text = text.replace(old, new, 1)
         applied.append(note)
-    start_marker, end_marker = data["statement"]
-    start = text.find(start_marker)
-    if start < 0:
-        raise BuildError(f"بداية عبارة المصنف غير موجودة: «{start_marker}»")
-    end = len(text) if end_marker is None else text.find(end_marker, start)
-    if end < 0:
-        raise BuildError(f"نهاية عبارة المصنف غير موجودة: «{end_marker}»")
-    statement = clean_statement(text[start:end])
-    text = squash(text[:start] + " " + text[end:])
-    applied.append("نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».")
+    statement = None
+    if data.get("statement") is not None:
+        start_marker, end_marker = data["statement"]
+        start = text.find(start_marker)
+        if start < 0:
+            raise BuildError(f"بداية عبارة المصنف غير موجودة: «{start_marker}»")
+        end = len(text) if end_marker is None else text.find(end_marker, start)
+        if end < 0:
+            raise BuildError(f"نهاية عبارة المصنف غير موجودة: «{end_marker}»")
+        statement = clean_statement(text[start:end])
+        text = squash(text[:start] + " " + text[end:])
+        applied.append("نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».")
     cut_from = data.get("truncate_from")
     if cut_from:
         position = text.find(cut_from)
@@ -429,7 +431,7 @@ ALIGNED_NOTE = (
 
 
 def build_hadith(number, data, corpus):
-    raw = corpus.nawawi.get(number)
+    raw = data.get("raw") or corpus.nawawi.get(number)
     if raw is None:
         raise BuildError(f"لا حديث {number} في الأربعين الرقمي")
     for spec in data.get("pre_sources", []):
@@ -506,7 +508,7 @@ def build_hadith(number, data, corpus):
         "takhrij": {
             "displayLabel": takhrij["label"],
             "references": references,
-            "compilerStatement": {"text": statement, "sourceId": MATN_SOURCE},
+            "compilerStatement": {"text": statement, "sourceId": MATN_SOURCE} if statement else None,
             "gradings": [],
         },
     }
@@ -570,7 +572,7 @@ def build_hadith(number, data, corpus):
             "segmentId": segment_id, "tokenIndex": local, "before": before, "after": after,
             "rule": rule, "method": method, "source": source,
         })
-    notes = list(COMMON_NOTES[:1])
+    notes = list(data["base_notes"]) if "base_notes" in data else list(COMMON_NOTES[:1])
     notes += data["notes"]
     if any(edit["method"] == "aligned_source" for edit in edits):
         notes.append(ALIGNED_NOTE)
@@ -587,7 +589,8 @@ def build_hadith(number, data, corpus):
         "schemaVersion": "2.0.0",
         "id": f"nawawi40_{number:03d}",
         "sequence": number,
-        "collection": {"id": "arbaun_nawawiyya", "title": "الأربعون النووية", "numberInCollection": number},
+        "collection": data.get("collection") or {
+            "id": "arbaun_nawawiyya", "title": "الأربعون النووية", "numberInCollection": number},
         "title": data["title"],
         "teaser": {"text": data["teaser"]},
         "milestone": data["milestone"],
@@ -597,8 +600,9 @@ def build_hadith(number, data, corpus):
         "reflection": reflection,
         "scholar": {"chains": [], "variants": []},
         "provenance": {
-            "matnSource": {"sourceId": MATN_SOURCE, "locator": f"الحديث {number}", "quote": None},
-            "normalizations": normalizations,
+            "matnSource": data.get("matn_source") or {
+                "sourceId": MATN_SOURCE, "locator": f"الحديث {number}", "quote": None},
+            "normalizations": normalizations + list(data.get("extra_normalizations", [])),
             "vocalizationEdits": edits,
         },
         "review": {"status": "pending_scholarly_review", "reviewer": None, "reviewedAt": None, "notes": notes},

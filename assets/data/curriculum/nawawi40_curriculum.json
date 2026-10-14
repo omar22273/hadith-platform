@@ -2,7 +2,7 @@
   "schemaVersion": "2.0.0",
   "id": "arbaun_nawawiyya_journey",
   "title": "رحلة الأربعين النووية",
-  "plannedCount": 42,
+  "plannedCount": 50,
   "dailyCap": {
     "newHadithPerDay": 1,
     "unlockAt": "fajr",
@@ -261,6 +261,54 @@
       "number": 42,
       "title": "يا ابن آدم إنك ما دعوتني",
       "assetPath": "assets/data/hadith/nawawi40/nawawi40_042.json"
+    },
+    {
+      "hadithId": "nawawi40_043",
+      "number": 43,
+      "title": "ألحقوا الفرائض بأهلها",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_043.json"
+    },
+    {
+      "hadithId": "nawawi40_044",
+      "number": 44,
+      "title": "الرضاعة تحرم ما تحرم الولادة",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_044.json"
+    },
+    {
+      "hadithId": "nawawi40_045",
+      "number": 45,
+      "title": "تحريم بيع الخمر والميتة والخنزير والأصنام",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_045.json"
+    },
+    {
+      "hadithId": "nawawi40_046",
+      "number": 46,
+      "title": "كل مسكر خمر وكل مسكر حرام",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_046.json"
+    },
+    {
+      "hadithId": "nawawi40_047",
+      "number": 47,
+      "title": "ما ملأ آدمي وعاءً شراً من بطن",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_047.json"
+    },
+    {
+      "hadithId": "nawawi40_048",
+      "number": 48,
+      "title": "أربع من كن فيه كان منافقاً خالصاً",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_048.json"
+    },
+    {
+      "hadithId": "nawawi40_049",
+      "number": 49,
+      "title": "لو توكلتم على الله حق توكله",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_049.json"
+    },
+    {
+      "hadithId": "nawawi40_050",
+      "number": 50,
+      "title": "لا يزال لسانك رطباً من ذكر الله",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_050.json"
     }
   ]
 }
