@@ -7,6 +7,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 
 import '../data/models/adhkar.dart';
 import 'adhkar_providers.dart';

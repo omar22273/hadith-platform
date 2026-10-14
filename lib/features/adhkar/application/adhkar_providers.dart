@@ -2,6 +2,7 @@
 // وإمهال الانتقال التلقائي بعد إتمام ذكر (تستبدله الاختبارات).
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 
 import '../../../core/content/asset_json_source.dart';
 import '../data/asset_adhkar_repository.dart';
