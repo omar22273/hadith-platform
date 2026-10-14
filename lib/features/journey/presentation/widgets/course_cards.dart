@@ -60,7 +60,7 @@ class _LockedCourseCard extends StatelessWidget {
       radius: AppShapes.radiusMedium,
       padding: const EdgeInsets.all(14),
       onTap: onTap,
-      semanticLabel: '${course.title}، ${CourseCatalog.lockedNote}. المس لمعاينة المساق',
+      semanticLabel: '${course.title}، ${course.unlockCondition}. المس لمعاينة المساق',
       child: Row(
         children: <Widget>[
           DecoratedBox(
@@ -88,7 +88,7 @@ class _LockedCourseCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  CourseCatalog.lockedNote,
+                  course.unlockCondition,
                   style: text.labelMedium?.copyWith(color: palette.amberText, fontWeight: FontWeight.w600),
                 ),
               ],

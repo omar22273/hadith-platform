@@ -28,6 +28,8 @@ class CurriculumCourse {
     required this.order,
     required this.summary,
     required this.volumeLabel,
+    required this.unlockCondition,
+    required this.motivation,
   });
 
   /// المعرّف.
@@ -51,6 +53,12 @@ class CurriculumCourse {
   /// حجم المساق (عدد الأحاديث وباقاتها).
   final String volumeLabel;
 
+  /// شرط فتح المساق، يظهر على بطاقته وفي ورقة معاينته.
+  final String unlockCondition;
+
+  /// رسالة التحفيز في ورقة المعاينة.
+  final String motivation;
+
   /// هل هو مقفل.
   bool get locked => status == CourseStatus.locked;
 
@@ -66,13 +74,6 @@ abstract final class CourseCatalog {
   /// عدد أحاديث المساق الأول، وبإتمامها تُفتح المساقات اللاحقة.
   static const int foundationHadithCount = 42;
 
-  /// وسم القفل المعروض على كل مساق لاحق.
-  static const String lockedNote = 'تُفتح بعد إتمام مسار الأربعين النووية';
-
-  /// رسالة التحفيز في ورقة المعاينة.
-  static final String motivation =
-      'يُفتح هذا المساق تلقائياً فور ختمك للأحاديث الـ ${arabicDigits(foundationHadithCount)} الحالية بالورد اليومي.';
-
   /// المساقات بترتيبها المنهجي.
   static final List<CurriculumCourse> courses = <CurriculumCourse>[
     CurriculumCourse(
@@ -83,6 +84,8 @@ abstract final class CourseCatalog {
       order: 1,
       summary: 'الأصل الجامع لقواعد الدين، وهو مساقك الحالي: ${arabicDigits(foundationHadithCount)} حديثاً بوردٍ يومي.',
       volumeLabel: '${arabicDigits(foundationHadithCount)} حديثاً',
+      unlockCondition: 'مفتوح',
+      motivation: 'هذا مساقك الحالي: أتمّ وِردك اليومي لتُفتح المساقات التالية.',
     ),
     const CurriculumCourse(
       id: 'tatimmat_al_khamsin',
@@ -92,6 +95,8 @@ abstract final class CourseCatalog {
       order: 2,
       summary: 'ثمانية أحاديث جامعة ألحقها الحافظ ابن رجب بأحاديث النووي لتكتمل بها قواعد الدين خمسين حديثاً.',
       volumeLabel: '٨ أحاديث',
+      unlockCondition: 'تُفتح بعد إتمام مسار الأربعين النووية',
+      motivation: 'يُفتح هذا المساق تلقائياً فور ختمك للأحاديث الـ ٤٢ الحالية بالورد اليومي.',
     ),
     const CurriculumCourse(
       id: 'miat_al_hady',
@@ -99,9 +104,11 @@ abstract final class CourseCatalog {
       author: 'انتقاء منصة هَدْي',
       status: CourseStatus.locked,
       order: 3,
-      summary: 'مائة حديث منتقاة في عشر باقات، في كل باقة عشرة أحاديث تتنوع بين العقيدة والعبادة والأخلاق والفقه والأحاديث القدسية، '
-          'فتنتقل بين الفنون ولا يتسلل إليك الملل.',
+      summary: 'نخبة منتقاة من أصح ما ثبت عن النبي ﷺ وأوثقها إسناداً في دواوين السنة؛ مصوغة في عشر باقات حية تكسر الرتابة، '
+          'وتنتقل بالدارس بين معالم العقيدة، ومكارم الأخلاق، وفقه المعاملات، والرقائق، والسنن اليومية.',
       volumeLabel: '١٠٠ حديث في ١٠ باقات',
+      unlockCondition: 'تُفتح بعد إتمام مسار تتمة الخمسين الرجبية',
+      motivation: 'يُفتح هذا المساق تلقائياً فور ختمك لمساق «تتمة الخمسين الرجبية».',
     ),
     const CurriculumCourse(
       id: 'safwat_al_muttafaq_alayh',
@@ -111,6 +118,8 @@ abstract final class CourseCatalog {
       order: 4,
       summary: 'باقات عشرية مختارة من أصح ما اتفق عليه الشيخان: أحاديث رواها البخاري ومسلم معاً في صحيحيهما.',
       volumeLabel: 'باقات عشرية',
+      unlockCondition: 'تُفتح بعد إتمام مسار مائة الهَدْي',
+      motivation: 'يُفتح هذا المساق تلقائياً فور ختمك لمساق «مائة الهَدْي».',
     ),
   ];
 
