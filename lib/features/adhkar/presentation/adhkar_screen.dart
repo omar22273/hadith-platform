@@ -130,7 +130,7 @@ class _CategoryCard extends ConsumerWidget {
           if (total > 0) ...<Widget>[
             const SizedBox(width: 10),
             _CountBadge(
-              key: ValueKey<String>('adhkar-card-count-${category.id}'),
+              labelKey: ValueKey<String>('adhkar-card-count-${category.id}'),
               label: arabicDigits(total),
             ),
           ],
@@ -222,7 +222,10 @@ class _IconTile extends StatelessWidget {
 
 /// دائرة صغيرة بعدد البطاقات.
 class _CountBadge extends StatelessWidget {
-  const _CountBadge({super.key, required this.label});
+  const _CountBadge({required this.labelKey, required this.label});
+
+  /// مفتاح نص العدد.
+  final Key labelKey;
 
   final String label;
 
@@ -238,6 +241,7 @@ class _CountBadge extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         child: Text(
           label,
+          key: labelKey,
           style: AppTypography.ui(color: palette.inkSoft, fontSize: 14, fontWeight: FontWeight.w700),
         ),
       ),

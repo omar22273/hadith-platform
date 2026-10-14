@@ -119,6 +119,9 @@ void main() {
       expect(state().counts, everyElement(0));
       expect(state().counts, hasLength(morning.length));
       expect(wird.tap(), DhikrTapResult.completed);
+      // يترك الاختبار بلا مؤقت معلّق: الانتقال التلقائي بعد الإتمام الأخير.
+      await tester.pump(const Duration(seconds: 2));
+      expect(state().index, 1);
     });
 
     testWidgets('choosing another dhikr cancels the pending automatic advance', (WidgetTester tester) async {

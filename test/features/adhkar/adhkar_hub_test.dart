@@ -157,14 +157,12 @@ void main() {
       await openHub(tester, size: const Size(360, 740), systemTextScale: 1.3);
       expect(tester.takeException(), isNull);
       for (final AdhkarCategory category in AdhkarCategories.all) {
-        await tester.ensureVisible(find.byKey(cardKey(category)));
-        await tester.pump();
+        await revealCard(tester, find.byKey(cardKey(category)));
         final Rect rect = tester.getRect(find.byKey(cardKey(category)));
         expect(rect.left, greaterThanOrEqualTo(0));
         expect(rect.right, lessThanOrEqualTo(360));
       }
-      await tester.ensureVisible(find.byKey(sebhaCardKey));
-      await tester.pump();
+      await revealCard(tester, find.byKey(sebhaCardKey));
       expect(tester.getRect(find.byKey(sebhaCardKey)).right, lessThanOrEqualTo(360));
       expect(tester.takeException(), isNull);
     });

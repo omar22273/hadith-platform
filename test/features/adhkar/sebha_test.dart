@@ -401,7 +401,7 @@ void main() {
       expect(tester.widget<Text>(find.byKey(const ValueKey<String>('adhkar-card-sebha-subtitle'))).data,
           'مجموع ما سبّحتَه: ٥');
 
-      await tester.ensureVisible(find.byKey(sebhaCardKey));
+      await revealCard(tester, find.byKey(sebhaCardKey));
       await tester.tap(find.byKey(sebhaCardKey));
       await settle(tester);
       expect(_count(tester), '٥');

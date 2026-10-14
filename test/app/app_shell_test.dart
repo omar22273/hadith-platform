@@ -100,7 +100,7 @@ void main() {
     await _settle(tester);
     expect(find.byType(AdhkarScreen), findsOneWidget);
     expect(find.byKey(const ValueKey<String>('adhkar-hub')), findsOneWidget);
-    expect(find.byKey(const ValueKey<String>('adhkar-card-sebha')), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('adhkar-card-adhkar_morning_evening')), findsOneWidget);
 
     await tester.tap(_navLabel('ميدان المراجعة'));
     await _settle(tester);

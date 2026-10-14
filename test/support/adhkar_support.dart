@@ -76,6 +76,16 @@ Future<ProviderContainer> openHub(
   return container;
 }
 
+/// يمرر قائمة المركز حتى تظهر البطاقة؛ القائمة كسولة فلا تُبنى البطاقات البعيدة قبل ذلك.
+Future<void> revealCard(WidgetTester tester, Finder card) async {
+  await tester.scrollUntilVisible(
+    card,
+    300,
+    scrollable: find.descendant(of: find.byKey(const ValueKey<String>('adhkar-hub')), matching: find.byType(Scrollable)),
+  );
+  await tester.pump();
+}
+
 /// يفتح فئة من المركز، وينتظر تحميل ملفها، ويعيد الحاوية.
 Future<ProviderContainer> openCategory(
   WidgetTester tester,
@@ -84,7 +94,7 @@ Future<ProviderContainer> openCategory(
   double systemTextScale = 1,
 }) async {
   final ProviderContainer container = await openHub(tester, size: size, systemTextScale: systemTextScale);
-  await tester.ensureVisible(find.byKey(cardKey(category)));
+  await revealCard(tester, find.byKey(cardKey(category)));
   await tester.tap(find.byKey(cardKey(category)));
   await settle(tester);
   await container.read(adhkarCatalogProvider(category.id).future);
@@ -101,7 +111,7 @@ Future<ProviderContainer> openSebha(
 }) async {
   final ProviderContainer container =
       await openHub(tester, size: size, systemTextScale: systemTextScale, stored: stored);
-  await tester.ensureVisible(find.byKey(sebhaCardKey));
+  await revealCard(tester, find.byKey(sebhaCardKey));
   await tester.tap(find.byKey(sebhaCardKey));
   await settle(tester);
   return container;
