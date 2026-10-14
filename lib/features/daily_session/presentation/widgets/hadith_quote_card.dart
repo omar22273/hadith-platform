@@ -9,6 +9,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/config/brand.dart';
 import '../../../../core/text/arabic_digits.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -26,7 +27,7 @@ class HadithQuoteCard extends StatelessWidget {
   static const double width = 360;
 
   /// اسم المنصة في التذييل.
-  static const String platformName = 'منصة الحديث النبوي';
+  static const String platformName = Brand.platformName;
 
   /// المتن الطويل يُضبط الهوامش بدل التوسيط.
   static const int justifyThreshold = 240;

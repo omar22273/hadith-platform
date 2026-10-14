@@ -1,5 +1,6 @@
-// قسم «مساقات لاحقة» أسفل مسار الأربعين: بطاقات مقفلة لعمدة الأحكام ورياض
-// الصالحين والمتفق عليه: نخبة الصحيحين، عليها وسم شرط الفتح.
+// قسم «مساقات لاحقة» أسفل مسار الأربعين: بطاقات المساقات الثاني والثالث والرابع
+// بترتيبها المنهجي (تتمة الخمسين الرجبية، مائة الهَدْي، صفوة المتفق عليه) مقفلة،
+// عليها وسم شرط الفتح، ولمسها يفتح ورقة معاينة سفلية بنبذة عن المساق.
 
 import 'package:flutter/material.dart';
 
@@ -59,7 +60,7 @@ class _LockedCourseCard extends StatelessWidget {
       radius: AppShapes.radiusMedium,
       padding: const EdgeInsets.all(14),
       onTap: onTap,
-      semanticLabel: '${course.title}، ${CourseCatalog.lockedNote}',
+      semanticLabel: '${course.title}، ${CourseCatalog.lockedNote}. المس لمعاينة المساق',
       child: Row(
         children: <Widget>[
           DecoratedBox(
@@ -81,7 +82,10 @@ class _LockedCourseCard extends StatelessWidget {
                   course.title,
                   style: text.titleMedium?.copyWith(color: palette.inkSoft, fontWeight: FontWeight.w700),
                 ),
-                Text(course.author, style: text.bodySmall?.copyWith(color: palette.locked)),
+                Text(
+                  '${course.orderLabel} · ${course.author}',
+                  style: text.bodySmall?.copyWith(color: palette.inkSoft),
+                ),
                 const SizedBox(height: 4),
                 Text(
                   CourseCatalog.lockedNote,
@@ -90,6 +94,7 @@ class _LockedCourseCard extends StatelessWidget {
               ],
             ),
           ),
+          Icon(Icons.chevron_left_rounded, color: palette.locked),
         ],
       ),
     );

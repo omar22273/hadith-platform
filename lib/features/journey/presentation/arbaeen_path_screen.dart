@@ -24,6 +24,7 @@ import '../domain/course_catalog.dart';
 import '../domain/journey_snapshot.dart';
 import 'widgets/caravan_trail_view.dart';
 import 'widgets/course_cards.dart';
+import 'widgets/course_preview_sheet.dart';
 import 'widgets/hadith_search_results.dart';
 import 'widgets/journey_summary_card.dart';
 import 'widgets/wird_sheet.dart';
@@ -86,10 +87,7 @@ class _ArbaeenPathScreenState extends ConsumerState<ArbaeenPathScreen> {
   }
 
   void _showLockedCourse(CurriculumCourse course) {
-    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('${course.title}: ${CourseCatalog.lockedNote}')));
+    unawaited(showCoursePreview(context, course));
   }
 
   @override

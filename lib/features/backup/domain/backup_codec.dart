@@ -13,6 +13,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../core/config/brand.dart';
 import '../../../core/storage/key_value_store.dart';
 
 /// خطأ في ملف النسخة؛ رسالته عربية موجهة للمستخدم.
@@ -117,7 +118,7 @@ abstract final class BackupCodec {
       throw const BackupFormatException('الملف ليس نسخة احتياطية صالحة: تعذرت قراءته أو هو تالف.');
     }
     if (decoded is! Map<String, dynamic> || decoded['format'] != BackupFormat.id) {
-      throw const BackupFormatException('هذا الملف ليس نسخة احتياطية من منصة الحديث النبوي.');
+      throw const BackupFormatException('هذا الملف ليس نسخة احتياطية من ${Brand.platformName}.');
     }
     final Object? version = decoded['version'];
     if (version is! int || version < 1) {

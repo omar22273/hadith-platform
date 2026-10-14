@@ -1,6 +1,7 @@
 // نص مشاركة الحديث: المتن المشكول كما هو في ملف البيانات حرفاً بحرف، يليه
 // التخريج الموثق. لا يُضاف إليه شرح ولا حكم من خارج الملف.
 
+import '../../../core/config/brand.dart';
 import '../../../core/text/arabic_digits.dart';
 import 'hadith_bundle.dart';
 
@@ -16,6 +17,6 @@ String buildHadithShareText(HadithBundle bundle) {
   }
   out
     ..writeln()
-    ..write('— منصة الحديث النبوي');
+    ..write('— ${Brand.platformName}');
   return out.toString();
 }

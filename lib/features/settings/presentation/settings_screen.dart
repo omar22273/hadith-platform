@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/app_config.dart';
+import '../../../core/config/brand.dart';
 import '../../../core/preferences/reading_preferences.dart';
 import '../../../core/preferences/reception_mode.dart';
 import '../../../core/preferences/theme_preference.dart';
@@ -539,8 +540,17 @@ class _AboutSectionState extends ConsumerState<_AboutSection> {
       icon: Icons.info_outline_rounded,
       children: <Widget>[
         Text(
-          'منصة الحديث النبوي والتاريخ الإسلامي: الأربعون النووية وِرداً يومياً، ورحلة السيرة بمشاهدها الثلاثة. '
-          'كل متن وشاهد يُقرأ من ملفات البيانات الموثقة بنصه وضبطه، ولا يولّد التطبيق نصاً ولا حكماً.',
+          Brand.platformName,
+          style: AppTypography.heritageTitle(color: palette.ink, fontSize: 26),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          Brand.tagline,
+          style: text.titleSmall?.copyWith(color: palette.amberText, fontWeight: FontWeight.w700, height: 1.7),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          Brand.aboutSummary,
           style: text.bodySmall?.copyWith(color: palette.inkSoft, height: 1.8),
         ),
         const SizedBox(height: 8),
@@ -549,7 +559,7 @@ class _AboutSectionState extends ConsumerState<_AboutSection> {
           child: TextButton.icon(
             onPressed: () => showLicensePage(
               context: context,
-              applicationName: 'منصة الحديث النبوي',
+              applicationName: Brand.platformName,
               applicationVersion: config.version,
             ),
             icon: const Icon(Icons.description_outlined),

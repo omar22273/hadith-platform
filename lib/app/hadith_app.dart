@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/config/brand.dart';
 import '../core/diagnostics/diagnostic_views.dart';
 import '../core/preferences/reading_preferences.dart';
 import '../core/preferences/theme_preference.dart';
@@ -21,7 +22,7 @@ class HadithApp extends ConsumerWidget {
     final ThemePreference theme = ref.watch(themePreferenceProvider);
     final ReadingPreferences reading = ref.watch(readingPreferencesProvider);
     return MaterialApp(
-      title: 'منصة الحديث النبوي',
+      title: Brand.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(reading: reading.readingTheme),
       darkTheme: AppTheme.dark(reading: reading.readingTheme),
