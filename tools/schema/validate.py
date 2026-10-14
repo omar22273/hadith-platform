@@ -18,12 +18,16 @@ hadith_files = sorted(
     os.path.relpath(path, root)
     for path in glob.glob(f"{root}/assets/data/hadith/nawawi40/nawawi40_*.json")
 )
+adhkar_files = sorted(
+    os.path.relpath(path, root)
+    for path in glob.glob(f"{root}/assets/data/adhkar/*.json")
+)
 ok = all([
     *[check(path) for path in hadith_files],
     check("assets/data/catalogs/narrators.json", "NarratorCatalog"),
     check("assets/data/catalogs/sources.json", "SourceCatalog"),
     check("assets/data/seerah_dataset.json", "SeerahDataset"),
-    check("assets/data/adhkar/adhkar_catalog.json", "AdhkarCatalog"),
+    *[check(path, "AdhkarCatalog") for path in adhkar_files],
     check("assets/data/curriculum/nawawi40_curriculum.json", "CurriculumManifest"),
     check("assets/data/catalogs/wisdom_bank.json", "WisdomCatalog"),
 ])

@@ -92,6 +92,21 @@
       }
     },
     {
+      "id": "sunan_abu_dawud",
+      "title": "سنن أبي داود",
+      "author": "سليمان بن الأشعث السجستاني",
+      "authorDeathHijri": 275,
+      "kind": "hadith_collection",
+      "edition": null,
+      "digital": {
+        "provider": "fawazahmed0/hadith-api",
+        "repository": "https://github.com/fawazahmed0/hadith-api",
+        "path": "editions/ara-abudawud.json",
+        "commit": "df57907be35291c91ad6a6691180e22ca9920784",
+        "retrievedAt": "2026-10-14"
+      }
+    },
+    {
       "id": "taqrib_tahdhib",
       "title": "تقريب التهذيب",
       "author": "ابن حجر العسقلاني",

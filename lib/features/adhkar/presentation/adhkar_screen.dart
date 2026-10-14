@@ -1,343 +1,195 @@
-// التبويب الثالث: وِرد الأذكار والسبحة النبوية الذكية، بلا زحام.
+// التبويب الثالث: مركز الأذكار الهادئ.
 //
-// ثلاثة عناصر بصرية لا غير:
-// 1. الرأس: عنوان الذكر الحالي، وشريط تقدم رفيع بموضعه («٢ / ١٢»)، وزر معلومات.
-// 2. المتن: نص الذكر المشكول كبيراً في المنتصف.
-// 3. النصف السفلي: منطقة لمس واحدة تحتسب أي نقرة، وفيها عدّاد «باقٍ N».
+// سبع بطاقات كبيرة مرتبة رأسياً، كل منها بوابة إلى شاشة تركيز مستقلة:
+// الفئات الست التي لها ملفات بيانات مشكولة (أذكار الصباح والمساء، النوم والاستيقاظ،
+// أدبار الصلوات، دخول وخروج المنزل والمسجد، السنن المهجورة، جامع الأدعية المأثورة)
+// يفتح كل منها مشغّل التركيز AdhkarPlayerScreen، والسابعة السبحة النبوية الذكية.
 //
-// الانتقال بين الأذكار بسحب الصفحة أفقياً (PageView). التخريج والفضل النبوي
-// والمصدر كلها في ورقة تُفتح من زر المعلومات، لا على الشاشة.
-//
-// عند بلوغ العدد المسنون: اهتزاز مزدوج، وقفل العدّاد، ثم ينتقل الوِرد إلى الذكر
-// التالي بـ PageView.nextPage، أو تظهر شارة إتمام الوِرد.
-//
-// الخط الأحمر: نصوص الأذكار وشواهدها وفضلها تأتي من ملف البيانات وحده.
+// المركز لا يعرض أي نص نبوي ولا تخريج؛ عناوين البطاقات وأسطرها التعريفية واجهة فقط،
+// ونصوص الأذكار وشواهدها تُقرأ من ملفات assets/data/adhkar/ داخل المشغّل وحده.
 
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/content/models/source_catalog.dart';
-import '../../../core/content/source_catalog_provider.dart';
-import '../../../core/json/json_reader.dart';
 import '../../../core/text/arabic_digits.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/ui/app_shapes.dart';
 import '../../../core/ui/smooth_surface.dart';
 import '../application/adhkar_providers.dart';
-import '../application/adhkar_wird_controller.dart';
-import '../data/models/adhkar.dart';
-import '../domain/adhkar_repository.dart';
-import 'widgets/dhikr_info_sheet.dart';
-import 'widgets/dhikr_page.dart';
+import '../application/sebha_controller.dart';
+import '../domain/adhkar_category.dart';
+import 'adhkar_player_screen.dart';
+import 'sebha_screen.dart';
 
-/// مدة انزلاق الصفحة عند الانتقال التلقائي.
-const Duration _pageSlide = Duration(milliseconds: 380);
-
-/// شاشة وِرد الأذكار.
-class AdhkarScreen extends ConsumerWidget {
+/// مركز الأذكار.
+class AdhkarScreen extends StatelessWidget {
   const AdhkarScreen({super.key});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<AdhkarCatalog> catalog = ref.watch(adhkarCatalogProvider);
-    final Widget body;
-    if (catalog.hasError) {
-      body = _ErrorView(
-        error: catalog.error!,
-        onRetry: () => ref.invalidate(adhkarCatalogProvider),
-      );
-    } else if (catalog.value == null) {
-      body = const Center(child: CircularProgressIndicator());
-    } else {
-      body = const _AdhkarBody();
-    }
-    return Scaffold(body: SafeArea(bottom: false, child: body));
-  }
-}
-
-class _AdhkarBody extends ConsumerStatefulWidget {
-  const _AdhkarBody();
-
-  @override
-  ConsumerState<_AdhkarBody> createState() => _AdhkarBodyState();
-}
-
-class _AdhkarBodyState extends ConsumerState<_AdhkarBody> {
-  late final PageController _pages;
-  Timer? _secondPulse;
-
-  /// صحيح وقت انزلاق الصفحات برمجياً؛ تمرّ الصفحات الوسيطة فلا تُعامل اختياراً.
-  bool _sliding = false;
-
-  /// رقم آخر انزلاق برمجي: انزلاق أحدث يُبطل خاتمة ما قبله.
-  int _slideToken = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    final int total = ref.read(adhkarItemsProvider).length;
-    final int start = ref.read(adhkarWirdProvider).index;
-    _pages = PageController(initialPage: total == 0 ? 0 : start.clamp(0, total - 1).toInt());
-  }
-
-  @override
-  void dispose() {
-    _secondPulse?.cancel();
-    _pages.dispose();
-    super.dispose();
-  }
-
-  /// بلوغ العدد المسنون: اهتزاز متوسط مزدوج بفاصل قصير.
-  void _doublePulse() {
-    unawaited(HapticFeedback.mediumImpact());
-    _secondPulse?.cancel();
-    _secondPulse = Timer(const Duration(milliseconds: 140), () {
-      unawaited(HapticFeedback.mediumImpact());
-    });
-  }
-
-  void _onTap() {
-    final DhikrTapResult result = ref.read(adhkarWirdProvider.notifier).tap();
-    switch (result) {
-      case DhikrTapResult.counted:
-        unawaited(HapticFeedback.selectionClick());
-      case DhikrTapResult.completed:
-        _doublePulse();
-      case DhikrTapResult.locked:
-      case DhikrTapResult.unavailable:
-        break;
-    }
-  }
-
-  /// استقرت صفحة بسحب المستخدم: الذكر المختار هو الذكر الحالي.
-  void _onPageChanged(int page) {
-    if (_sliding) {
-      return;
-    }
-    ref.read(adhkarWirdProvider.notifier).select(page);
-  }
-
-  /// تغيّر الذكر الحالي من المتحكم (انتقال تلقائي أو وِرد جديد): تتبعه الصفحة.
-  void _followIndex(int? previous, int next) {
-    if (!_pages.hasClients) {
-      return;
-    }
-    final int shown = _pages.page?.round() ?? _pages.initialPage;
-    if (shown == next && !_sliding) {
-      return;
-    }
-    final bool still = MediaQuery.disableAnimationsOf(context);
-    if (still) {
-      _slideToken++;
-      _sliding = false;
-      _pages.jumpToPage(next);
-      return;
-    }
-    final bool adjacent = !_sliding && next == shown + 1;
-    final int token = ++_slideToken;
-    _sliding = true;
-    final Future<void> slide = adjacent
-        ? _pages.nextPage(duration: _pageSlide, curve: Curves.easeInOutCubic)
-        : _pages.animateToPage(next, duration: _pageSlide, curve: Curves.easeInOutCubic);
+  void _openCategory(BuildContext context, AdhkarCategory category) {
     unawaited(
-      slide.whenComplete(() {
-        if (token == _slideToken) {
-          _sliding = false;
-        }
-      }),
+      Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(builder: (BuildContext context) => AdhkarPlayerScreen(category: category)),
+      ),
     );
   }
 
-  void _showInfo(DhikrItem item, SourceCatalog? sources) {
-    unawaited(showDhikrInfoSheet(context: context, item: item, sources: sources));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    ref.listen<int>(adhkarWirdProvider.select((AdhkarWirdState s) => s.index), _followIndex);
-    final List<DhikrItem> items = ref.watch(adhkarItemsProvider);
-    final AdhkarWirdState wird = ref.watch(adhkarWirdProvider);
-    final SourceCatalog? sources = ref.watch(sourceCatalogProvider).value;
-    if (items.isEmpty || wird.counts.length != items.length) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    final int index = wird.index.clamp(0, items.length - 1).toInt();
-    final DhikrItem item = items[index];
-    final bool complete = wird.isComplete(items);
-    return Column(
-      children: <Widget>[
-        _Header(
-          item: item,
-          position: index + 1,
-          total: items.length,
-          onInfo: () => _showInfo(item, sources),
-        ),
-        if (complete)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-            child: _WirdCompleteBadge(
-              total: items.length,
-              onRestart: ref.read(adhkarWirdProvider.notifier).restart,
-            ),
-          ),
-        Expanded(
-          child: PageView.builder(
-            key: const ValueKey<String>('adhkar-pages'),
-            controller: _pages,
-            itemCount: items.length,
-            onPageChanged: _onPageChanged,
-            itemBuilder: (BuildContext context, int i) {
-              return DhikrPage(
-                key: ValueKey<String>('dhikr-page-${items[i].id}'),
-                item: items[i],
-                count: wird.countOf(i),
-                onTap: _onTap,
-              );
-            },
-          ),
-        ),
-      ],
+  void _openSebha(BuildContext context) {
+    unawaited(
+      Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(builder: (BuildContext context) => const SebhaScreen()),
+      ),
     );
   }
-}
-
-/// الرأس: عنوان الذكر الحالي وزر المعلومات، وتحتهما شريط التقدم الرفيع بموضع الذكر.
-class _Header extends StatelessWidget {
-  const _Header({
-    required this.item,
-    required this.position,
-    required this.total,
-    required this.onInfo,
-  });
-
-  final DhikrItem item;
-
-  /// رقم الذكر الحالي من ١.
-  final int position;
-  final int total;
-  final VoidCallback onInfo;
 
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
-    final String where = '${arabicDigits(position)} / ${arabicDigits(total)}';
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  item.title,
-                  key: const ValueKey<String>('adhkar-title'),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.heritageTitle(color: palette.ink, fontSize: 26),
-                ),
-              ),
-              const SizedBox(width: 8),
-              IconButton.outlined(
-                key: const ValueKey<String>('adhkar-info'),
-                tooltip: 'التخريج والفضل والمصدر',
-                onPressed: onInfo,
-                visualDensity: VisualDensity.compact,
-                iconSize: 22,
-                color: palette.inkSoft,
-                style: IconButton.styleFrom(
-                  side: BorderSide(color: palette.line),
-                  shape: const CircleBorder(),
-                ),
-                icon: const Icon(Icons.info_outline),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Semantics(
-            label: 'الذكر ${arabicDigits(position)} من ${arabicDigits(total)}',
-            child: ExcludeSemantics(
-              child: Row(
+    return Scaffold(
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          key: const ValueKey<String>('adhkar-hub'),
+          padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(2),
-                      child: LinearProgressIndicator(
-                        key: const ValueKey<String>('adhkar-progress-bar'),
-                        value: position / total,
-                        minHeight: 3,
-                        backgroundColor: palette.line,
-                        color: palette.amber,
-                      ),
-                    ),
+                  Text(
+                    'مركز الأذكار',
+                    key: const ValueKey<String>('adhkar-hub-title'),
+                    style: AppTypography.heritageTitle(color: palette.ink, fontSize: 30),
                   ),
-                  const SizedBox(width: 10),
-                  Directionality(
-                    textDirection: TextDirection.ltr,
-                    child: Text(
-                      where,
-                      key: const ValueKey<String>('adhkar-progress'),
-                      style: text.labelMedium?.copyWith(
-                        color: palette.inkSoft,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'أذكار وسنن مشكولة، كل ذكر منها مقتطع حرفياً من شاهده الموثق.',
+                    style: text.bodyMedium?.copyWith(color: palette.inkSoft, height: 1.6),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 18),
+            for (final AdhkarCategory category in AdhkarCategories.all) ...<Widget>[
+              _CategoryCard(category: category, onTap: () => _openCategory(context, category)),
+              const SizedBox(height: 12),
+            ],
+            _SebhaCard(onTap: () => _openSebha(context)),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// شارة إتمام الوِرد.
-class _WirdCompleteBadge extends StatelessWidget {
-  const _WirdCompleteBadge({required this.total, required this.onRestart});
+/// بطاقة فئة: أيقونة، وعنوان، وسطر تعريفي، وعدد الأذكار بعد تحميل ملفها.
+class _CategoryCard extends ConsumerWidget {
+  const _CategoryCard({required this.category, required this.onTap});
 
-  final int total;
-  final VoidCallback onRestart;
+  final AdhkarCategory category;
+  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
+    final int total = ref.watch(adhkarItemsProvider(category.id)).length;
     return SmoothSurface(
-      key: const ValueKey<String>('adhkar-wird-complete'),
-      color: palette.emeraldSoft,
-      borderColor: palette.emerald.withValues(alpha: 0.5),
-      radius: AppShapes.radiusMedium,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      key: ValueKey<String>('adhkar-card-${category.id}'),
+      onTap: onTap,
+      elevated: true,
+      borderColor: palette.line,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      semanticLabel: total == 0
+          ? '${category.title}. ${category.subtitle}'
+          : '${category.title}. ${category.subtitle}. ${arabicDigits(total)} بطاقة',
       child: Row(
         children: <Widget>[
-          Icon(Icons.workspace_premium_rounded, size: 28, color: palette.emeraldText),
-          const SizedBox(width: 10),
+          _IconTile(icon: category.icon, background: palette.amberSoft, foreground: palette.amberText),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'أتممتَ وِرد الأذكار',
-                  style: text.titleSmall?.copyWith(color: palette.emeraldText, fontWeight: FontWeight.w700),
+                  category.title,
+                  style: text.titleMedium?.copyWith(color: palette.ink, fontWeight: FontWeight.w700, height: 1.4),
                 ),
+                const SizedBox(height: 4),
                 Text(
-                  'بلغتَ العدد المسنون في ${arabicDigits(total)} من ${arabicDigits(total)}.',
-                  style: text.bodySmall?.copyWith(color: palette.emeraldText),
+                  category.subtitle,
+                  style: text.bodySmall?.copyWith(color: palette.inkSoft, height: 1.5),
                 ),
               ],
             ),
           ),
-          TextButton(
-            key: const ValueKey<String>('adhkar-restart'),
-            onPressed: onRestart,
-            child: const Text('وِرد جديد'),
+          if (total > 0) ...<Widget>[
+            const SizedBox(width: 10),
+            _CountBadge(
+              labelKey: ValueKey<String>('adhkar-card-count-${category.id}'),
+              label: arabicDigits(total),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// بطاقة السبحة الذكية: تتميز بلون أخضر هادئ، وتعرض مجموع ما سبّحه المستخدم إن وُجد.
+class _SebhaCard extends ConsumerWidget {
+  const _SebhaCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppPalette palette = AppPalette.of(context);
+    final TextTheme text = Theme.of(context).textTheme;
+    final int grand = ref.watch(sebhaProvider.select((SebhaState s) => s.grandTotal));
+    final String subtitle = grand > 0
+        ? 'مجموع ما سبّحتَه: ${arabicDigits(grand)}'
+        : 'تسبيح حر بعدّاد هادئ: ٣٣ أو ١٠٠ أو بلا حد';
+    return SmoothSurface(
+      key: const ValueKey<String>('adhkar-card-sebha'),
+      onTap: onTap,
+      elevated: true,
+      color: palette.emeraldSoft,
+      borderColor: palette.emerald.withValues(alpha: 0.5),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      semanticLabel: 'السبحة النبوية الذكية. $subtitle',
+      child: Row(
+        children: <Widget>[
+          _IconTile(
+            icon: Icons.donut_large_rounded,
+            background: palette.surface,
+            foreground: palette.emeraldText,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'السبحة النبوية الذكية',
+                  style: text.titleMedium?.copyWith(
+                    color: palette.emeraldText,
+                    fontWeight: FontWeight.w700,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  key: const ValueKey<String>('adhkar-card-sebha-subtitle'),
+                  style: text.bodySmall?.copyWith(color: palette.emeraldText, height: 1.5),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -345,52 +197,52 @@ class _WirdCompleteBadge extends StatelessWidget {
   }
 }
 
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.error, required this.onRetry});
+/// مربع الأيقونة بحواف ناعمة.
+class _IconTile extends StatelessWidget {
+  const _IconTile({required this.icon, required this.background, required this.foreground});
 
-  final Object error;
-  final VoidCallback onRetry;
+  final IconData icon;
+  final Color background;
+  final Color foreground;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        color: background,
+        shape: AppShapes.rounded(AppShapes.radiusSmall),
+      ),
+      child: SizedBox.square(
+        dimension: 52,
+        child: Icon(icon, size: 28, color: foreground),
+      ),
+    );
+  }
+}
+
+/// دائرة صغيرة بعدد البطاقات.
+class _CountBadge extends StatelessWidget {
+  const _CountBadge({required this.labelKey, required this.label});
+
+  /// مفتاح نص العدد.
+  final Key labelKey;
+
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
-    final TextTheme text = Theme.of(context).textTheme;
-    final String detail = switch (error) {
-      AdhkarIntegrityException(:final List<String> issues) => issues.join('\n'),
-      JsonParseException(:final String message) => message,
-      _ => error.toString(),
-    };
-    return Center(
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        color: palette.surfaceMuted,
+        shape: AppShapes.rounded(AppShapes.radiusSmall, side: BorderSide(color: palette.line)),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Icon(Icons.spa_outlined, size: 44, color: palette.inkSoft),
-            const SizedBox(height: 12),
-            Text(
-              'تعذّر تجهيز وِرد الأذكار',
-              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'لم يُعرض شيء حتى لا يظهر ذكر بلا شاهده الموثق.',
-              textAlign: TextAlign.center,
-              style: text.bodyMedium?.copyWith(color: palette.inkSoft),
-            ),
-            const SizedBox(height: 10),
-            SelectableText(
-              detail,
-              textAlign: TextAlign.center,
-              style: text.labelSmall?.copyWith(color: palette.inkSoft),
-            ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded),
-              label: const Text('إعادة المحاولة'),
-            ),
-          ],
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        child: Text(
+          label,
+          key: labelKey,
+          style: AppTypography.ui(color: palette.inkSoft, fontSize: 14, fontWeight: FontWeight.w700),
         ),
       ),
     );

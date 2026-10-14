@@ -1,12 +1,13 @@
-// متحكم وِرد الأذكار: العدّ على الذكر الحالي بلمسة، والقفل النهائي عند بلوغ
-// العدد المسنون فلا زيادة عليه، ثم الانتقال التلقائي إلى أول ذكر لم يكتمل.
-// الحالة في الذاكرة (تبقى مع تبديل التبويبات) وتبدأ وِرداً جديداً عند فتح
-// التطبيق.
+// متحكم وِرد فئة من الأذكار: العدّ على الذكر الحالي بلمسة، والقفل النهائي عند
+// بلوغ العدد المسنون فلا زيادة عليه، ثم الانتقال التلقائي إلى أول ذكر لم يكتمل.
+// لكل فئة متحكمها (family بمعرّف الفئة)، وحالته في الذاكرة تبقى ما دام التطبيق
+// مفتوحاً وتبدأ وِرداً جديداً عند فتحه.
 
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 
 import '../data/models/adhkar.dart';
 import 'adhkar_providers.dart';
@@ -87,12 +88,17 @@ class AdhkarWirdState {
 
 /// المتحكم.
 class AdhkarWirdController extends Notifier<AdhkarWirdState> {
+  AdhkarWirdController(this.categoryId);
+
+  /// معرّف الفئة التي يعدّ عليها هذا المتحكم.
+  final String categoryId;
+
   Timer? _advanceTimer;
 
   @override
   AdhkarWirdState build() {
     ref.onDispose(() => _advanceTimer?.cancel());
-    final List<DhikrItem> items = ref.watch(adhkarItemsProvider);
+    final List<DhikrItem> items = ref.watch(adhkarItemsProvider(categoryId));
     return AdhkarWirdState(
       index: 0,
       counts: List<int>.unmodifiable(List<int>.filled(items.length, 0)),
@@ -100,7 +106,7 @@ class AdhkarWirdController extends Notifier<AdhkarWirdState> {
     );
   }
 
-  List<DhikrItem> get _items => ref.read(adhkarItemsProvider);
+  List<DhikrItem> get _items => ref.read(adhkarItemsProvider(categoryId));
 
   /// لمسة على بطاقة الذكر الحالي: ضغطة واحدة. بلوغ العدد المسنون يقفل الذكر
   /// نهائياً، وكل لمسة بعده مرفوضة هنا، لا في الواجهة وحدها.
@@ -170,6 +176,6 @@ class AdhkarWirdController extends Notifier<AdhkarWirdState> {
   }
 }
 
-/// حالة وِرد الأذكار.
-final NotifierProvider<AdhkarWirdController, AdhkarWirdState> adhkarWirdProvider =
-    NotifierProvider<AdhkarWirdController, AdhkarWirdState>(AdhkarWirdController.new);
+/// حالة وِرد فئة من الأذكار بمعرّفها.
+final NotifierProviderFamily<AdhkarWirdController, AdhkarWirdState, String> adhkarWirdProvider =
+    NotifierProvider.family<AdhkarWirdController, AdhkarWirdState, String>(AdhkarWirdController.new);

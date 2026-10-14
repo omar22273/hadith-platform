@@ -139,8 +139,8 @@ void main() {
   });
 
   for (final double width in <double>[300, 380]) {
-    testWidgets('all 42 hadiths flow right-to-left at width $width, gharib words included', (WidgetTester tester) async {
-      for (int number = 1; number <= 42; number++) {
+    testWidgets('all 50 hadiths flow right-to-left at width $width, gharib words included', (WidgetTester tester) async {
+      for (int number = 1; number <= 50; number++) {
         final HadithDailyModel hadith = _hadith(number);
         await _pump(tester, hadith.matn, width);
         final List<MatnToken> tokens = <MatnToken>[for (final MatnSegment s in hadith.matn.segments) ...s.tokens];

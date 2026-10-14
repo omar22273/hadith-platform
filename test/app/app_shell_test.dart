@@ -16,7 +16,6 @@ import 'package:hadith_platform/core/navigation/app_tab.dart';
 import 'package:hadith_platform/core/storage/key_value_store.dart';
 import 'package:hadith_platform/core/time/clock.dart';
 import 'package:hadith_platform/features/adhkar/presentation/adhkar_screen.dart';
-import 'package:hadith_platform/features/adhkar/presentation/widgets/dhikr_page.dart';
 import 'package:hadith_platform/features/admin/presentation/admin_export_screen.dart';
 import 'package:hadith_platform/features/daily_session/presentation/daily_hadith_session_screen.dart';
 import 'package:hadith_platform/features/journey/presentation/widgets/caravan_trail_view.dart';
@@ -71,9 +70,9 @@ void main() {
     expect(tester.getSize(find.byType(IndexedStack)).height, greaterThan(600));
     expect(tester.getSize(find.byType(AppBottomBar)).height, lessThan(120));
     expect(find.byType(CaravanTrailView), findsOneWidget);
-    expect(find.byType(WirdNodeView), findsNWidgets(42));
+    expect(find.byType(WirdNodeView), findsNWidgets(50));
     expect(find.text('الأعمال بالنيات'), findsWidgets);
-    // الأحاديث الاثنان والأربعون كلها معدّة: لا عقدة «قيد الإعداد» في المسار.
+    // الأحاديث الخمسون كلها معدّة: لا عقدة «قيد الإعداد» في المسار.
     expect(find.text('قيد الإعداد'), findsNothing);
     expect(find.text('يا ابن آدم إنك ما دعوتني'), findsWidgets);
 
@@ -100,7 +99,8 @@ void main() {
     await tester.tap(_navLabel('وِرد الأذكار'));
     await _settle(tester);
     expect(find.byType(AdhkarScreen), findsOneWidget);
-    expect(find.byType(DhikrPage), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('adhkar-hub')), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('adhkar-card-adhkar_morning_evening')), findsOneWidget);
 
     await tester.tap(_navLabel('ميدان المراجعة'));
     await _settle(tester);
@@ -108,7 +108,7 @@ void main() {
 
     await tester.tap(_navLabel('الإعدادات'));
     await _settle(tester);
-    final Finder version = find.text('Version 2.6.3');
+    final Finder version = find.text('Version 2.8.0');
     await tester.scrollUntilVisible(
       version,
       300,

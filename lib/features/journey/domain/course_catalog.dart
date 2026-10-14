@@ -1,5 +1,6 @@
-// منهاج المتون المتدرج: المساق الأول (الأربعون النووية) مفتوح بالكامل،
-// وتأتي بعده ثلاثة مساقات مقفلة بترتيب منهجي متدرج يمنع الملل ويدعم التنوع.
+// منهاج المتون المتدرج: المساقان الأول (الأربعون النووية) والثاني (تتمة الخمسين الرجبية)
+// مفتوحان بالكامل على مسار واحد من خمسين محطة، وتأتي بعدهما مساقان مقفلان بترتيب منهجي
+// متدرج يمنع الملل ويدعم التنوع.
 //
 // هذه بيانات عرض للمساقات فقط (العناوين والمصنفون والنبذ التعريفية)؛ لا متون فيها
 // ولا أحكام، ولا يُفتح مساق قبل أن يُعدّ محتواه ويُوثَّق بملفات JSON.
@@ -13,7 +14,7 @@ enum CourseStatus {
   /// مفتوح للتعلم.
   open,
 
-  /// مقفل حتى إتمام المساق الأول.
+  /// مقفل حتى إتمام المساق الذي يسبقه.
   locked,
 }
 
@@ -71,8 +72,17 @@ abstract final class CourseCatalog {
   /// معرّف المساق الأول.
   static const String foundationId = 'nawawi40';
 
-  /// عدد أحاديث المساق الأول، وبإتمامها تُفتح المساقات اللاحقة.
+  /// معرّف المساق الثاني (تتمة الخمسين الرجبية).
+  static const String rajabId = 'tatimmat_al_khamsin';
+
+  /// عدد أحاديث المساق الأول.
   static const int foundationHadithCount = 42;
+
+  /// عدد أحاديث المساق الثاني، وهي المحطات ٤٣–٥٠.
+  static const int rajabHadithCount = 8;
+
+  /// عدد محطات المسار كله: المساقان الأول والثاني متصلان على مسار واحد.
+  static const int pathHadithCount = foundationHadithCount + rajabHadithCount;
 
   /// المساقات بترتيبها المنهجي.
   static final List<CurriculumCourse> courses = <CurriculumCourse>[
@@ -85,18 +95,18 @@ abstract final class CourseCatalog {
       summary: 'الأصل الجامع لقواعد الدين، وهو مساقك الحالي: ${arabicDigits(foundationHadithCount)} حديثاً بوردٍ يومي.',
       volumeLabel: '${arabicDigits(foundationHadithCount)} حديثاً',
       unlockCondition: 'مفتوح',
-      motivation: 'هذا مساقك الحالي: أتمّ وِردك اليومي لتُفتح المساقات التالية.',
+      motivation: 'هذا مساقك الحالي: أتمّ وِردك اليومي لتصل إلى تتمة الخمسين.',
     ),
-    const CurriculumCourse(
-      id: 'tatimmat_al_khamsin',
+    CurriculumCourse(
+      id: rajabId,
       title: 'تتمة الخمسين الرجبية',
       author: 'الحافظ ابن رجب',
-      status: CourseStatus.locked,
+      status: CourseStatus.open,
       order: 2,
       summary: 'ثمانية أحاديث جامعة ألحقها الحافظ ابن رجب بأحاديث النووي لتكتمل بها قواعد الدين خمسين حديثاً.',
-      volumeLabel: '٨ أحاديث',
-      unlockCondition: 'تُفتح بعد إتمام مسار الأربعين النووية',
-      motivation: 'يُفتح هذا المساق تلقائياً فور ختمك للأحاديث الـ ٤٢ الحالية بالورد اليومي.',
+      volumeLabel: '${arabicDigits(rajabHadithCount)} أحاديث',
+      unlockCondition: 'مفتوح',
+      motivation: 'يتصل هذا المساق بمسارك: تأتي محطاته من ${arabicDigits(foundationHadithCount + 1)} إلى ${arabicDigits(pathHadithCount)} بعد الأحاديث الـ ${arabicDigits(foundationHadithCount)}.',
     ),
     const CurriculumCourse(
       id: 'miat_al_hady',

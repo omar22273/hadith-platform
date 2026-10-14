@@ -1,4 +1,4 @@
-// اختبارات ترتيب العبارات: تقطيع الأحاديث 1–42 إلى عبارات تامة، وتجميعها في
+// اختبارات ترتيب العبارات: تقطيع الأحاديث 1–50 إلى عبارات تامة، وتجميعها في
 // تمارين من أربع عبارات فأقل، وأن البلاطة عبارة كاملة من المتن حرفاً بحرف.
 
 import 'dart:convert';
@@ -33,7 +33,7 @@ void main() {
     });
   });
 
-  for (int number = 1; number <= 42; number++) {
+  for (int number = 1; number <= 50; number++) {
     group('hadith $number', () {
       final HadithDailyModel hadith = _hadith(number);
       final PracticeEngine engine = PracticeEngine.fromHadith(hadith, seed: 20261012);

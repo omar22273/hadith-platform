@@ -85,8 +85,8 @@ void main() {
     expect(after, isNot(before));
   });
 
-  testWidgets('every hadith from 1 to 42 offers the button and a non-empty sheet', (WidgetTester tester) async {
-    for (final int number in <int>[3, 21, 30, 41, 42]) {
+  testWidgets('every hadith from 1 to 50 offers the button and a non-empty sheet', (WidgetTester tester) async {
+    for (final int number in <int>[3, 21, 30, 41, 42, 43, 46, 48, 50]) {
       final HadithBundle bundle = _bundle(number);
       await tester.pumpWidget(
         MaterialApp(
