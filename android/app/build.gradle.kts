@@ -32,7 +32,8 @@ android {
 
     defaultConfig {
         multiDexEnabled = true
-        applicationId = "app.hadithplatform.hadith_platform"
+        // The final, official application id. (The Kotlin package above stays as the code namespace.)
+        applicationId = "app.hady.platform"
         // Flutter 3.35+ refuses to build below API 24 (Android 7.0), so 24 is the floor.
         minSdk = 24
         targetSdk = flutter.targetSdkVersion

@@ -1,113 +1,179 @@
-"""Generates the «هَدْي» launcher icon set from one set of path definitions.
+"""Builds the «هَدْي» launcher icon set from the approved master artwork.
 
-Outputs (all under android/app/src/main/res):
-  * drawable/ic_launcher_foreground.xml   adaptive foreground (vector, 108dp canvas)
-  * drawable/ic_launcher_monochrome.xml   Android 13+ themed icon layer
-  * values/ic_launcher_background.xml     royal navy background colour
-  * mipmap-anydpi-v26/ic_launcher.xml     adaptive icon (also reused as the round icon)
-  * mipmap-{mdpi..xxxhdpi}/ic_launcher.png  legacy icons for API 24-25, rendered with Chromium
-and tools/branding/hady_icon.svg (the master artwork, 1024px preview).
+Source: tools/branding/hady_icon_master.jpg (1024x1024, the official final icon).
+Outputs, all under android/app/src/main/res:
 
-Design: navy #0F172A field, a mihrab arch outlined in amber #D97706, a deeper niche,
-and an oil lamp (siraj) with a warm flame glowing inside it. Run: python3 tools/branding/make_icons.py
+  * mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/ic_launcher.png        48/72/96/144/192 px
+        legacy square icon (API 24-25): the full artwork on a rounded transparent tile
+  * mipmap-{...}/ic_launcher_round.png                             same sizes
+        legacy round icon: the adaptive composition cut to a circle
+  * drawable-{...}/ic_launcher_foreground.png                      108dp at each density
+        the golden arch + lantern extracted from the artwork on a transparent layer,
+        scaled so every visible pixel stays inside the 66dp adaptive-icon safe zone
+  * drawable-{...}/ic_launcher_monochrome.png                      Android 13+ themed layer
+        the line work only (arch, lantern frame), glow dropped, opaque shapes for tinting
+  * values/ic_launcher_background.xml                              royal navy #0A1128
+  * mipmap-anydpi-v26/ic_launcher.xml and ic_launcher_round.xml    adaptive icon definitions
+
+Run: python3 tools/branding/make_icons.py   (needs Pillow, numpy, scipy)
 """
 
 import os
 import sys
 
+import numpy as np
+from PIL import Image, ImageDraw
+from scipy import ndimage, optimize
+
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 RES = os.path.join(ROOT, 'android', 'app', 'src', 'main', 'res')
+MASTER = os.path.join(ROOT, 'tools', 'branding', 'hady_icon_master.jpg')
 
-NAVY = '#0F172A'
-NICHE = '#1E293B'
-AMBER = '#D97706'
-GLOW = '#FBBF24'
-CORE = '#FEF3C7'
+BACKGROUND = (10, 17, 40)  # #0A1128
+BACKGROUND_HEX = '#0A1128'
+# Navy of the artwork interior, used to un-premultiply the edge pixels of the gold line work.
+ARTWORK_NAVY = np.array([12.0, 24.0, 50.0])
 
-ARCH = 'M32,81 L32,58 C32,45 42,35 54,25 C66,35 76,45 76,58 L76,81'
-NICHE_FILL = 'M37.5,81 L37.5,58.5 C37.5,48.5 45,40.5 54,32.5 C63,40.5 70.5,48.5 70.5,58.5 L70.5,81 Z'
-FLAME = 'M54,41 C59,46.5 59.5,51 54,55.5 C48.5,51 49,46.5 54,41 Z'
-FLAME_CORE = 'M54,47 C56.4,49.8 56.4,52 54,54 C51.6,52 51.6,49.8 54,47 Z'
-LAMP_BODY = 'M44,62 L64,62 C64,69.5 60,74 54,74 C48,74 44,69.5 44,62 Z'
-SPOUT = 'M64,62.5 C67.5,62.5 69,60.5 69.5,58'
-BASE = 'M48.5,77.5 L59.5,77.5'
+# Region of the master that holds the arch and the lantern, excluding the outer frame lines
+# and their rounded corners.
+SYMBOL_BOX = (285, 222, 740, 780)  # left, top, right, bottom
 
-
-def foreground_svg_body(mono: bool = False) -> str:
-    amber = '#000000' if mono else AMBER
-    glow = '#000000' if mono else GLOW
-    parts = []
-    if not mono:
-        parts.append('<path d="%s" fill="%s"/>' % (NICHE_FILL, NICHE))
-    parts.append('<path d="%s" fill="none" stroke="%s" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>' % (ARCH, amber))
-    parts.append('<path d="%s" fill="%s"/>' % (FLAME, glow))
-    if not mono:
-        parts.append('<path d="%s" fill="%s"/>' % (FLAME_CORE, CORE))
-    parts.append('<path d="%s" fill="%s"/>' % (LAMP_BODY, amber))
-    parts.append('<path d="%s" fill="none" stroke="%s" stroke-width="3" stroke-linecap="round"/>' % (SPOUT, amber))
-    parts.append('<path d="%s" fill="none" stroke="%s" stroke-width="3" stroke-linecap="round"/>' % (BASE, amber))
-    return '\n  '.join(parts)
+DENSITIES = {'mdpi': 1.0, 'hdpi': 1.5, 'xhdpi': 2.0, 'xxhdpi': 3.0, 'xxxhdpi': 4.0}
+LEGACY_DP = 48
+ADAPTIVE_DP = 108
+SAFE_RADIUS_DP = 33.0  # the adaptive-icon safe zone is a 66dp circle
 
 
-def full_svg(size: int, legacy: bool) -> str:
-    # legacy square icon: rounded navy tile; the 108 canvas is scaled so the artwork fills it.
-    radius = 24 if legacy else 0
-    scale = 1.18 if legacy else 1.0
-    offset = 54 * (1 - scale)
-    return (
-        '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 108 108">\n'
-        '  <rect width="108" height="108" rx="%d" fill="%s"/>\n'
-        '  <g transform="translate(%.2f %.2f) scale(%.2f)">\n  %s\n  </g>\n</svg>\n'
-        % (size, size, radius, NAVY, offset, offset, scale, foreground_svg_body())
+def load_master() -> Image.Image:
+    image = Image.open(MASTER).convert('RGB')
+    if image.size != (1024, 1024):
+        raise SystemExit('the master artwork must be 1024x1024, got %s' % (image.size,))
+    return image
+
+
+def extract_symbol(master: Image.Image):
+    """Returns (colour, alpha, blue) of the gold/amber line work, navy pulled out as alpha.
+
+    The navy is not flat (it brightens toward the glow), so coverage is read from how far the
+    red channel rises above the blue one: navy sits near -40, gold lines near +100, amber
+    glow above +200.
+    """
+    crop = np.asarray(master.crop(SYMBOL_BOX)).astype(np.float64)
+    red_over_blue = crop[..., 0] - crop[..., 2]
+    alpha = np.clip((red_over_blue + 28.0) / 112.0, 0.0, 1.0)
+    coverage = np.clip((red_over_blue + 40.0) / 140.0, 0.05, 1.0)[..., None]
+    color = np.clip(ARTWORK_NAVY + (crop - ARTWORK_NAVY) / coverage, 0, 255)
+    return color, alpha, crop[..., 2]
+
+
+def enclosing_center(alpha: np.ndarray):
+    """Centre (x, y) of the smallest circle holding every clearly visible symbol pixel."""
+    ys, xs = np.nonzero(alpha > 0.5)
+    points = np.stack([xs, ys], axis=1).astype(np.float64)
+    start = points.mean(axis=0)
+    result = optimize.minimize(
+        lambda c: np.sqrt(((points - c) ** 2).sum(axis=1)).max(),
+        start,
+        method='Nelder-Mead',
+        options={'xatol': 0.05, 'fatol': 0.05, 'maxiter': 2000},
     )
+    center = result.x
+    radius = float(np.sqrt(((points - center) ** 2).sum(axis=1)).max())
+    return center, radius
 
 
-def vector_xml(mono: bool) -> str:
-    def path(data: str, fill: str = None, stroke: str = None, width: float = 0, cap: bool = False) -> str:
-        attrs = ['android:pathData="%s"' % data]
-        if fill:
-            attrs.append('android:fillColor="%s"' % fill)
-        if stroke:
-            attrs.append('android:strokeColor="%s"' % stroke)
-            attrs.append('android:strokeWidth="%s"' % width)
-            attrs.append('android:strokeLineCap="round"')
-            attrs.append('android:strokeLineJoin="round"')
-        return '    <path\n        ' + '\n        '.join(attrs) + '/>'
-
-    amber = '#000000' if mono else AMBER
-    glow = '#000000' if mono else GLOW
-    items = []
-    if not mono:
-        items.append(path(NICHE_FILL, fill=NICHE))
-    items.append(path(ARCH, stroke=amber, width=4.5))
-    items.append(path(FLAME, fill=glow))
-    if not mono:
-        items.append(path(FLAME_CORE, fill=CORE))
-    items.append(path(LAMP_BODY, fill=amber))
-    items.append(path(SPOUT, stroke=amber, width=3))
-    items.append(path(BASE, stroke=amber, width=3))
-    return (
-        '<?xml version="1.0" encoding="utf-8"?>\n'
-        '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
-        '    android:width="108dp"\n    android:height="108dp"\n'
-        '    android:viewportWidth="108"\n    android:viewportHeight="108">\n'
-        + '\n'.join(items)
-        + '\n</vector>\n'
-    )
+def line_mask(alpha: np.ndarray, blue: np.ndarray) -> np.ndarray:
+    """Thin line work as a 0..1 mask. The amber glow is saturated (blue channel near zero)
+    while the pale gold lines keep blue, so the blue channel's local contrast isolates the
+    lines even where they cross the glow."""
+    contrast = blue - ndimage.gaussian_filter(blue, sigma=6.0)
+    lines = np.clip(contrast / 55.0, 0.0, 1.0) * np.clip(alpha * 2.0, 0.0, 1.0)
+    lines = np.where(lines < 0.18, 0.0, lines)  # drop the faint haze around the glow
+    lines = ndimage.grey_dilation(lines, size=(5, 5))
+    return np.clip(ndimage.gaussian_filter(lines, sigma=0.8) * 1.5, 0.0, 1.0)
 
 
-def write(path: str, content: str) -> None:
+def place_layer(color, alpha, blue, center, radius, canvas_px: int, mono: bool) -> Image.Image:
+    """Scales the symbol so its enclosing circle has the safe radius, centred on the canvas."""
+    scale = (SAFE_RADIUS_DP / ADAPTIVE_DP) * canvas_px / radius
+    height, width = alpha.shape
+    mask = line_mask(alpha, blue) if mono else alpha
+    rgb = np.zeros_like(color) if mono else color
+    premult = np.dstack([rgb * mask[..., None], mask * 255.0]).astype(np.float32)
+    new_size = (max(1, round(width * scale)), max(1, round(height * scale)))
+    channels = [np.asarray(Image.fromarray(premult[..., i], 'F').resize(new_size, Image.LANCZOS)) for i in range(4)]
+    resized = np.dstack(channels).astype(np.float64)
+    a = np.clip(resized[..., 3:4], 0.0, 255.0)
+    out_rgb = np.where(a > 0.5, resized[..., :3] * 255.0 / np.maximum(a, 1e-6), 0.0)
+    symbol = Image.fromarray(np.dstack([np.clip(out_rgb, 0, 255), a]).astype(np.uint8), 'RGBA')
+    left = round(canvas_px / 2.0 - center[0] * scale)
+    top = round(canvas_px / 2.0 - center[1] * scale)
+    if left < 0 or top < 0 or left + new_size[0] > canvas_px or top + new_size[1] > canvas_px:
+        raise SystemExit('symbol does not fit the %dpx canvas (offset %d,%d)' % (canvas_px, left, top))
+    canvas = Image.new('RGBA', (canvas_px, canvas_px), (0, 0, 0, 0))
+    canvas.alpha_composite(symbol, (left, top))
+    return canvas
+
+
+def legacy_square(master: Image.Image, size: int) -> Image.Image:
+    """The full artwork (frame included) on a rounded tile with transparent corners."""
+    side = 730
+    cx, cy = 512, 510
+    crop = master.crop((cx - side // 2, cy - side // 2, cx + side // 2, cy + side // 2)).convert('RGBA')
+    big = 4
+    mask = Image.new('L', (side * big, side * big), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, side * big - 1, side * big - 1), radius=int(side * big * 0.2), fill=255)
+    crop.putalpha(mask.resize((side, side), Image.LANCZOS))
+    return crop.resize((size, size), Image.LANCZOS)
+
+
+def adaptive_composite(foreground: Image.Image) -> Image.Image:
+    base = Image.new('RGBA', foreground.size, BACKGROUND + (255,))
+    base.alpha_composite(foreground)
+    return base
+
+
+def legacy_round(foreground_108: Image.Image, size: int) -> Image.Image:
+    """The adaptive composition cut to the visible 72dp circle."""
+    composite = adaptive_composite(foreground_108)
+    visible = round(composite.size[0] * 72 / ADAPTIVE_DP)
+    start = (composite.size[0] - visible) // 2
+    cropped = composite.crop((start, start, start + visible, start + visible))
+    big = size * 4
+    cropped = cropped.resize((big, big), Image.LANCZOS)
+    mask = Image.new('L', (big, big), 0)
+    ImageDraw.Draw(mask).ellipse((0, 0, big - 1, big - 1), fill=255)
+    cropped.putalpha(mask)
+    return cropped.resize((size, size), Image.LANCZOS)
+
+
+def write_text(path: str, content: str) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w', encoding='utf-8') as handle:
         handle.write(content)
 
 
 def main() -> int:
-    write(os.path.join(RES, 'drawable', 'ic_launcher_foreground.xml'), vector_xml(False))
-    write(os.path.join(RES, 'drawable', 'ic_launcher_monochrome.xml'), vector_xml(True))
-    write(
+    master = load_master()
+    color, alpha, blue = extract_symbol(master)
+    center, radius = enclosing_center(alpha)
+    print('symbol enclosing circle: centre (%.1f, %.1f) radius %.1f px of the master' % (center[0] + SYMBOL_BOX[0], center[1] + SYMBOL_BOX[1], radius))
+
+    for density, factor in DENSITIES.items():
+        adaptive_px = round(ADAPTIVE_DP * factor)
+        legacy_px = round(LEGACY_DP * factor)
+        foreground = place_layer(color, alpha, blue, center, radius, adaptive_px, mono=False)
+        monochrome = place_layer(color, alpha, blue, center, radius, adaptive_px, mono=True)
+        os.makedirs(os.path.join(RES, 'drawable-' + density), exist_ok=True)
+        os.makedirs(os.path.join(RES, 'mipmap-' + density), exist_ok=True)
+        foreground.save(os.path.join(RES, 'drawable-' + density, 'ic_launcher_foreground.png'), optimize=True)
+        monochrome.save(os.path.join(RES, 'drawable-' + density, 'ic_launcher_monochrome.png'), optimize=True)
+        legacy_square(master, legacy_px).save(os.path.join(RES, 'mipmap-' + density, 'ic_launcher.png'), optimize=True)
+        legacy_round(foreground, legacy_px).save(os.path.join(RES, 'mipmap-' + density, 'ic_launcher_round.png'), optimize=True)
+
+    write_text(
         os.path.join(RES, 'values', 'ic_launcher_background.xml'),
-        '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">%s</color>\n</resources>\n' % NAVY,
+        '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">%s</color>\n</resources>\n' % BACKGROUND_HEX,
     )
     adaptive = (
         '<?xml version="1.0" encoding="utf-8"?>\n'
@@ -117,21 +183,8 @@ def main() -> int:
         '    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />\n'
         '</adaptive-icon>\n'
     )
-    write(os.path.join(RES, 'mipmap-anydpi-v26', 'ic_launcher.xml'), adaptive)
-    write(os.path.join(ROOT, 'tools', 'branding', 'hady_icon.svg'), full_svg(1024, True))
-
-    from playwright.sync_api import sync_playwright
-
-    sizes = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
-        for density, size in sizes.items():
-            page = browser.new_page(viewport={'width': size, 'height': size}, device_scale_factor=1)
-            page.set_content('<html><body style="margin:0;background:transparent">%s</body></html>' % full_svg(size, True))
-            target = os.path.join(RES, 'mipmap-%s' % density, 'ic_launcher.png')
-            page.screenshot(path=target, omit_background=True)
-            page.close()
-        browser.close()
+    write_text(os.path.join(RES, 'mipmap-anydpi-v26', 'ic_launcher.xml'), adaptive)
+    write_text(os.path.join(RES, 'mipmap-anydpi-v26', 'ic_launcher_round.xml'), adaptive)
     return 0
 
 

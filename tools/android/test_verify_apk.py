@@ -11,7 +11,7 @@ GOOD_TREE = """N: android=http://schemas.android.com/apk/res/android (line=2)
   E: manifest (line=2)
     A: android:versionCode(0x0101021b)=2006
     A: android:versionName(0x0101021c)="2.2.1" (Raw: "2.2.1")
-    A: package="app.hadithplatform.hadith_platform" (Raw: "app.hadithplatform.hadith_platform")
+    A: package="app.hady.platform" (Raw: "app.hady.platform")
     E: uses-sdk (line=7)
       A: android:minSdkVersion(0x0101020c)=24
       A: android:targetSdkVersion(0x01010270)=36

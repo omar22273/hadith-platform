@@ -7,7 +7,7 @@
 # Usage: bash tools/android/emulator_install_check.sh <apk>
 set -u
 APK="${1:?usage: emulator_install_check.sh <apk>}"
-PACKAGE="app.hadithplatform.hadith_platform"
+PACKAGE="app.hady.platform"
 REPORT="install-report.txt"
 : > "$REPORT"
 
