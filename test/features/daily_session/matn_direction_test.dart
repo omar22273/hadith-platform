@@ -49,7 +49,7 @@ List<Rect> _wordRects(WidgetTester tester) {
   final RenderParagraph paragraph = tester.renderObject<RenderParagraph>(
     find.descendant(of: find.byType(MatnText), matching: find.byType(RichText)).first,
   );
-  final String plain = paragraph.text.toPlainText();
+  final String plain = paragraph.text.toPlainText(includeSemanticsLabels: false);
   final List<Rect> rects = <Rect>[];
   int start = 0;
   for (final String word in plain.split(' ')) {
