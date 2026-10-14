@@ -152,13 +152,27 @@ class ResourceIntegrityTest(unittest.TestCase):
         for path in self.files('.xml'):
             ET.parse(path)
 
-    def test_launcher_icon_is_a_plain_png_set_in_every_density(self) -> None:
-        sizes = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
-        for density, size in sizes.items():
+    def test_launcher_icon_set_is_the_committed_flutter_launcher_icons_output(self) -> None:
+        legacy = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
+        for density, size in legacy.items():
             path = os.path.join(self.RES, 'mipmap-' + density, 'ic_launcher.png')
             self.assertEqual(png_size(path), (size, size), path)
-        for forbidden in ('mipmap-anydpi-v26', 'drawable-xxxhdpi'):
-            self.assertFalse(os.path.exists(os.path.join(self.RES, forbidden)), '%s was removed on purpose' % forbidden)
+            self.assertNotEqual(png_color_type(path), 3, '%s is still the palette-based Flutter default icon' % path)
+        foreground = {'mdpi': 108, 'hdpi': 162, 'xhdpi': 216, 'xxhdpi': 324, 'xxxhdpi': 432}
+        for density, size in foreground.items():
+            path = os.path.join(self.RES, 'drawable-' + density, 'ic_launcher_foreground.png')
+            self.assertEqual(png_size(path), (size, size), path)
+        adaptive = read(os.path.join(self.RES, 'mipmap-anydpi-v26', 'ic_launcher.xml'))
+        self.assertIn('<background android:drawable="@color/ic_launcher_background"', adaptive)
+        self.assertIn('@drawable/ic_launcher_foreground', adaptive)
+        self.assertIn('#0A1128', read(os.path.join(self.RES, 'values', 'ic_launcher_background.xml'))
+                      if os.path.exists(os.path.join(self.RES, 'values', 'ic_launcher_background.xml'))
+                      else read(os.path.join(self.RES, 'values', 'colors.xml')))
+
+    def test_the_official_icon_source_is_committed(self) -> None:
+        path = os.path.join(ROOT, 'assets', 'branding', 'app_icon.png')
+        self.assertEqual(png_size(path), (1024, 1024))
+        self.assertIn('flutter_launcher_icons:', read(os.path.join(ROOT, 'pubspec.yaml')))
 
     def test_manifest_icon_references_resolve(self) -> None:
         application = next(c for c in ET.parse(MANIFEST).getroot() if c.tag == 'application')
