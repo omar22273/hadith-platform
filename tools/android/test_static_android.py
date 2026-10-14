@@ -34,6 +34,22 @@ def attr(element: ET.Element, name: str):
     return element.get('{%s}%s' % (ANDROID_NS, name))
 
 
+def png_header(path: str) -> bytes:
+    with open(path, 'rb') as handle:
+        header = handle.read(32)
+    assert header[:8] == b'\x89PNG\r\n\x1a\n', path
+    return header
+
+
+def png_size(path: str):
+    header = png_header(path)
+    return int.from_bytes(header[16:20], 'big'), int.from_bytes(header[20:24], 'big')
+
+
+def png_color_type(path: str) -> int:
+    return png_header(path)[25]
+
+
 def read(path: str) -> str:
     with open(path, encoding='utf-8') as handle:
         return handle.read()
@@ -95,32 +111,39 @@ class BrandingTest(unittest.TestCase):
 
     RES = os.path.join(ROOT, 'android', 'app', 'src', 'main', 'res')
 
-    def test_application_label_is_hady(self) -> None:
+    def test_application_label_and_icons_are_hady(self) -> None:
         application = next(c for c in ET.parse(MANIFEST).getroot() if c.tag == 'application')
         self.assertEqual(attr(application, 'label'), 'هَدْي')
         self.assertEqual(attr(application, 'icon'), '@mipmap/ic_launcher')
+        self.assertEqual(attr(application, 'roundIcon'), '@mipmap/ic_launcher_round')
 
-    def test_adaptive_icon_has_navy_background_foreground_and_monochrome_layer(self) -> None:
-        adaptive = read(os.path.join(self.RES, 'mipmap-anydpi-v26', 'ic_launcher.xml'))
-        for layer in ('background', 'foreground', 'monochrome'):
-            self.assertIn('<%s android:drawable=' % layer, adaptive)
-        self.assertIn('#0F172A', read(os.path.join(self.RES, 'values', 'ic_launcher_background.xml')))
-        foreground = read(os.path.join(self.RES, 'drawable', 'ic_launcher_foreground.xml'))
-        self.assertIn('#D97706', foreground)
-        self.assertTrue(os.path.exists(os.path.join(self.RES, 'drawable', 'ic_launcher_monochrome.xml')))
+    def test_adaptive_icons_have_navy_background_png_foreground_and_monochrome_layer(self) -> None:
+        for name in ('ic_launcher.xml', 'ic_launcher_round.xml'):
+            adaptive = read(os.path.join(self.RES, 'mipmap-anydpi-v26', name))
+            for layer in ('background', 'foreground', 'monochrome'):
+                self.assertIn('<%s android:drawable=' % layer, adaptive, name)
+        self.assertIn('#0A1128', read(os.path.join(self.RES, 'values', 'ic_launcher_background.xml')))
+        sizes = {'mdpi': 108, 'hdpi': 162, 'xhdpi': 216, 'xxhdpi': 324, 'xxxhdpi': 432}
+        for density, size in sizes.items():
+            for layer in ('ic_launcher_foreground.png', 'ic_launcher_monochrome.png'):
+                path = os.path.join(self.RES, 'drawable-' + density, layer)
+                self.assertEqual(png_size(path), (size, size), path)
+                self.assertEqual(png_color_type(path), 6, '%s must be RGBA' % path)
+        self.assertFalse(os.path.exists(os.path.join(self.RES, 'drawable', 'ic_launcher_foreground.xml')),
+                         'the old vector foreground must not shadow the new PNG layers')
 
-    def test_legacy_pngs_exist_in_every_density_and_are_no_longer_the_flutter_default(self) -> None:
+    def test_legacy_square_and_round_pngs_exist_in_every_density(self) -> None:
         sizes = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
         for density, size in sizes.items():
-            path = os.path.join(self.RES, 'mipmap-' + density, 'ic_launcher.png')
-            with open(path, 'rb') as handle:
-                header = handle.read(32)
-            self.assertEqual(header[:8], b'\x89PNG\r\n\x1a\n', density)
-            width = int.from_bytes(header[16:20], 'big')
-            height = int.from_bytes(header[20:24], 'big')
-            self.assertEqual((width, height), (size, size), density)
-            color_type = header[25]
-            self.assertEqual(color_type, 6, '%s must be RGBA, not the palette-based Flutter default' % density)
+            for name in ('ic_launcher.png', 'ic_launcher_round.png'):
+                path = os.path.join(self.RES, 'mipmap-' + density, name)
+                self.assertEqual(png_size(path), (size, size), path)
+                self.assertEqual(png_color_type(path), 6, '%s must be RGBA, not the palette-based Flutter default' % path)
+
+    def test_application_id_is_the_final_hady_id(self) -> None:
+        gradle = read(GRADLE)
+        self.assertRegex(gradle, r'applicationId\s*=\s*"app\.hady\.platform"')
+        self.assertNotIn('applicationId = "app.hadithplatform', gradle)
 
 
 class SigningTest(unittest.TestCase):

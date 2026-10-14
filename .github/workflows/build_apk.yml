@@ -70,7 +70,7 @@ jobs:
               echo "######## $NAME"
               echo "== $AAPT dump badging (as built)"
               "$AAPT" dump badging "$SRC" > badging.txt
-              grep -qE "^package: name='app.hadithplatform.hadith_platform'" badging.txt
+              grep -qE "^package: name='app.hady.platform'" badging.txt
               grep -q "^launchable-activity:" badging.txt
               grep -E "^(package|sdkVersion|minSdkVersion|targetSdkVersion|application-label:|launchable-activity|native-code)" badging.txt
               "$BT/zipalign" -p -f 4 "$SRC" dist/aligned.apk
