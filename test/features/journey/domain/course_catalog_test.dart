@@ -31,13 +31,21 @@ void main() {
     expect(CourseCatalog.courses[2].volumeLabel, contains('١٠٠'));
   });
 
-  test('the lock note and motivation use the agreed wording', () {
-    expect(CourseCatalog.lockedNote, 'تُفتح بعد إتمام مسار الأربعين النووية');
-    expect(
-      CourseCatalog.motivation,
-      'يُفتح هذا المساق تلقائياً فور ختمك للأحاديث الـ ٤٢ الحالية بالورد اليومي.',
-    );
+  test('each locked course carries its own agreed unlock condition, in chain order', () {
+    final List<CurriculumCourse> locked = CourseCatalog.lockedCourses;
+    expect(locked[0].unlockCondition, 'تُفتح بعد إتمام مسار الأربعين النووية');
+    expect(locked[1].unlockCondition, 'تُفتح بعد إتمام مسار تتمة الخمسين الرجبية');
+    expect(locked[2].unlockCondition, 'تُفتح بعد إتمام مسار مائة الهَدْي');
+    expect(locked[0].motivation, 'يُفتح هذا المساق تلقائياً فور ختمك للأحاديث الـ ٤٢ الحالية بالورد اليومي.');
     expect(CourseCatalog.foundationHadithCount, 42);
+  });
+
+  test('the Mi\'at al-Hady summary is the agreed editorial text', () {
+    expect(
+      CourseCatalog.courses[2].summary,
+      'نخبة منتقاة من أصح ما ثبت عن النبي ﷺ وأوثقها إسناداً في دواوين السنة؛ مصوغة في عشر باقات حية تكسر الرتابة، '
+      'وتنتقل بالدارس بين معالم العقيدة، ومكارم الأخلاق، وفقه المعاملات، والرقائق، والسنن اليومية.',
+    );
   });
 
   test('the brand carries the Hady name and tagline', () {

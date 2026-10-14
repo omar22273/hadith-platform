@@ -64,7 +64,7 @@ class CoursePreviewSheet extends StatelessWidget {
           children: <Widget>[
             SoftChip(
               key: const ValueKey<String>('course-lock-badge'),
-              label: CourseCatalog.lockedNote,
+              label: course.unlockCondition,
               icon: Icons.lock_rounded,
               background: palette.amberSoft,
               foreground: palette.amberText,
@@ -103,7 +103,7 @@ class CoursePreviewSheet extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                CourseCatalog.motivation,
+                course.motivation,
                 key: const ValueKey<String>('course-motivation'),
                 style: text.bodyMedium?.copyWith(color: palette.inkSoft, height: 1.85),
               ),
@@ -112,8 +112,8 @@ class CoursePreviewSheet extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         WideActionButton(
-          label: 'أتابع مسار الأربعين',
-          subtitle: 'ورد كل يوم يقرّبك من فتح هذا المساق',
+          label: 'أتابع مساري',
+          subtitle: 'وِرد كل يوم يقرّبك من فتح هذا المساق',
           icon: Icons.route_rounded,
           onPressed: () => Navigator.of(context).maybePop(),
         ),

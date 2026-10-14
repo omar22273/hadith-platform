@@ -65,7 +65,9 @@ void main() {
     for (final CurriculumCourse course in CourseCatalog.lockedCourses) {
       expect(find.text(course.title), findsOneWidget);
     }
-    expect(find.text(CourseCatalog.lockedNote), findsNWidgets(3));
+    for (final CurriculumCourse course in CourseCatalog.lockedCourses) {
+      expect(find.text(course.unlockCondition), findsOneWidget, reason: course.title);
+    }
     expect(find.text('عمدة الأحكام'), findsNothing, reason: 'the later courses follow the Hady order');
   });
 
@@ -89,12 +91,11 @@ void main() {
       expect(find.descendant(of: sheet, matching: find.text(course.title)), findsOneWidget);
       expect(find.descendant(of: sheet, matching: find.text(course.author)), findsOneWidget);
       expect(find.descendant(of: sheet, matching: find.text(course.summary)), findsOneWidget);
-      expect(find.descendant(of: sheet, matching: find.text(CourseCatalog.lockedNote)), findsOneWidget);
+      expect(find.descendant(of: sheet, matching: find.text(course.unlockCondition)), findsOneWidget);
       expect(find.byKey(const ValueKey<String>('course-lock-badge')), findsOneWidget);
-      expect(find.descendant(of: sheet, matching: find.text(CourseCatalog.motivation)), findsOneWidget);
-      expect(find.textContaining('الـ ٤٢'), findsOneWidget);
+      expect(find.descendant(of: sheet, matching: find.text(course.motivation)), findsOneWidget);
 
-      await tester.tap(find.text('أتابع مسار الأربعين'));
+      await tester.tap(find.text('أتابع مساري'));
       await settle(tester);
       expect(find.byType(CoursePreviewSheet), findsNothing);
     }
