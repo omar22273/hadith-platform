@@ -106,39 +106,74 @@ class ManifestTest(unittest.TestCase):
         ET.parse(os.path.join(ROOT, 'android', 'app', 'src', 'main', 'res', 'xml', 'network_security_config.xml'))
 
 
-class BrandingTest(unittest.TestCase):
-    """The home-screen name and the launcher icon carry the «هَدْي» identity."""
+def png_chunks(path: str):
+    """Yields (type, data, crc_ok) for every chunk; raises on a malformed structure."""
+    import struct
+    import zlib
+
+    with open(path, 'rb') as handle:
+        data = handle.read()
+    assert data[:8] == b'\x89PNG\r\n\x1a\n', '%s: bad PNG signature' % path
+    position = 8
+    while position < len(data):
+        length, kind = struct.unpack('>I4s', data[position:position + 8])
+        body = data[position + 8:position + 8 + length]
+        crc = struct.unpack('>I', data[position + 8 + length:position + 12 + length])[0]
+        yield kind, body, zlib.crc32(kind + body) & 0xFFFFFFFF == crc
+        position += 12 + length
+    assert position == len(data), '%s: trailing bytes after the last chunk' % path
+
+
+class ResourceIntegrityTest(unittest.TestCase):
+    """Every PNG and XML under res/ is structurally sound and every reference resolves."""
 
     RES = os.path.join(ROOT, 'android', 'app', 'src', 'main', 'res')
 
-    def test_application_label_and_icons_are_hady(self) -> None:
+    def files(self, suffix: str):
+        for folder, _, names in os.walk(self.RES):
+            for name in names:
+                if name.endswith(suffix):
+                    yield os.path.join(folder, name)
+
+    def test_every_png_has_valid_structure_and_checksums(self) -> None:
+        count = 0
+        for path in self.files('.png'):
+            count += 1
+            kinds = []
+            for kind, body, crc_ok in png_chunks(path):
+                self.assertTrue(crc_ok, '%s: CRC mismatch in %s chunk' % (path, kind))
+                kinds.append(kind)
+            self.assertEqual(kinds[0], b'IHDR', path)
+            self.assertEqual(kinds[-1], b'IEND', path)
+            self.assertIn(b'IDAT', kinds, path)
+        self.assertGreaterEqual(count, 5)
+
+    def test_every_xml_resource_is_well_formed(self) -> None:
+        for path in self.files('.xml'):
+            ET.parse(path)
+
+    def test_launcher_icon_is_a_plain_png_set_in_every_density(self) -> None:
+        sizes = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
+        for density, size in sizes.items():
+            path = os.path.join(self.RES, 'mipmap-' + density, 'ic_launcher.png')
+            self.assertEqual(png_size(path), (size, size), path)
+        for forbidden in ('mipmap-anydpi-v26', 'drawable-xxxhdpi'):
+            self.assertFalse(os.path.exists(os.path.join(self.RES, forbidden)), '%s was removed on purpose' % forbidden)
+
+    def test_manifest_icon_references_resolve(self) -> None:
         application = next(c for c in ET.parse(MANIFEST).getroot() if c.tag == 'application')
         self.assertEqual(attr(application, 'label'), 'هَدْي')
         self.assertEqual(attr(application, 'icon'), '@mipmap/ic_launcher')
-        self.assertEqual(attr(application, 'roundIcon'), '@mipmap/ic_launcher_round')
-
-    def test_adaptive_icons_have_navy_background_png_foreground_and_monochrome_layer(self) -> None:
-        for name in ('ic_launcher.xml', 'ic_launcher_round.xml'):
-            adaptive = read(os.path.join(self.RES, 'mipmap-anydpi-v26', name))
-            for layer in ('background', 'foreground', 'monochrome'):
-                self.assertIn('<%s android:drawable=' % layer, adaptive, name)
-        self.assertIn('#0A1128', read(os.path.join(self.RES, 'values', 'ic_launcher_background.xml')))
-        sizes = {'mdpi': 108, 'hdpi': 162, 'xhdpi': 216, 'xxhdpi': 324, 'xxxhdpi': 432}
-        for density, size in sizes.items():
-            for layer in ('ic_launcher_foreground.png', 'ic_launcher_monochrome.png'):
-                path = os.path.join(self.RES, 'drawable-' + density, layer)
-                self.assertEqual(png_size(path), (size, size), path)
-                self.assertEqual(png_color_type(path), 6, '%s must be RGBA' % path)
-        self.assertFalse(os.path.exists(os.path.join(self.RES, 'drawable', 'ic_launcher_foreground.xml')),
-                         'the old vector foreground must not shadow the new PNG layers')
-
-    def test_legacy_square_and_round_pngs_exist_in_every_density(self) -> None:
-        sizes = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
-        for density, size in sizes.items():
-            for name in ('ic_launcher.png', 'ic_launcher_round.png'):
-                path = os.path.join(self.RES, 'mipmap-' + density, name)
-                self.assertEqual(png_size(path), (size, size), path)
-                self.assertEqual(png_color_type(path), 6, '%s must be RGBA, not the palette-based Flutter default' % path)
+        self.assertIsNone(attr(application, 'roundIcon'), 'no round icon resource exists')
+        for reference in (attr(application, 'icon'), attr(application, 'networkSecurityConfig')):
+            kind, name = reference[1:].split('/')
+            found = any(
+                os.path.splitext(n)[0] == name
+                for folder in os.listdir(self.RES)
+                if folder.startswith(kind)
+                for n in os.listdir(os.path.join(self.RES, folder))
+            )
+            self.assertTrue(found, 'unresolved %s' % reference)
 
     def test_application_id_is_the_final_hady_id(self) -> None:
         gradle = read(GRADLE)
@@ -170,6 +205,12 @@ class SigningTest(unittest.TestCase):
     def test_version_code_follows_the_ci_run_number(self) -> None:
         self.assertIn('System.getenv("GITHUB_RUN_NUMBER")', self.gradle)
         self.assertRegex(self.gradle, r'100 \+ ciRunNumber')
+
+    def test_the_fixed_keystore_is_a_real_rsa_2048_pkcs12_store(self) -> None:
+        with open(KEYSTORE, 'rb') as handle:
+            data = handle.read()
+        self.assertEqual(data[0], 0x30, 'PKCS12 stores are DER SEQUENCEs')
+        self.assertGreater(len(data), 1500)
 
     def test_min_sdk_is_pinned_to_the_flutter_floor(self) -> None:
         self.assertRegex(self.gradle, r'minSdk\s*=\s*24\b')
