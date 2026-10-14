@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hadith_platform/app/app_shell_screen.dart';
 import 'package:hadith_platform/app/hadith_app.dart';
+import 'package:hadith_platform/core/config/brand.dart';
 import 'package:hadith_platform/core/content/asset_json_source.dart';
 import 'package:hadith_platform/core/navigation/app_tab.dart';
 import 'package:hadith_platform/core/storage/key_value_store.dart';
@@ -107,13 +108,15 @@ void main() {
 
     await tester.tap(_navLabel('الإعدادات'));
     await _settle(tester);
-    final Finder version = find.text('Version 2.5.1');
+    final Finder version = find.text('Version 2.6.0');
     await tester.scrollUntilVisible(
       version,
       300,
       scrollable: find.descendant(of: find.byType(SettingsScreen), matching: find.byType(Scrollable)).first,
     );
     expect(version, findsOneWidget);
+    expect(find.text(Brand.platformName, skipOffstage: false), findsOneWidget);
+    expect(find.text(Brand.tagline, skipOffstage: false), findsOneWidget);
 
     await tester.tap(_navLabel('الأربعين النووية'));
     await _settle(tester);

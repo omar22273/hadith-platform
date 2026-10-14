@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/app_config.dart';
+import '../../../core/config/brand.dart';
 import '../../../core/preferences/reading_preferences.dart';
 import '../../../core/preferences/reception_mode.dart';
 import '../../../core/preferences/theme_preference.dart';
@@ -84,7 +85,7 @@ class BackupController extends Notifier<BackupState> {
             bytes: utf8.encode(json),
             fileName: BackupFormat.fileName,
             mimeType: 'application/json',
-            subject: 'نسخة احتياطية من منصة الحديث النبوي',
+            subject: 'نسخة احتياطية من ${Brand.platformName}',
           );
       if (ref.mounted) {
         state = BackupState(

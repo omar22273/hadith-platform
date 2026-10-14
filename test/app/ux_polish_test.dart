@@ -15,6 +15,7 @@ import 'package:hadith_platform/core/storage/key_value_store.dart';
 import 'package:hadith_platform/features/hadith/application/hadith_providers.dart';
 import 'package:hadith_platform/features/hadith/data/models/models.dart';
 import 'package:hadith_platform/features/journey/domain/course_catalog.dart';
+import 'package:hadith_platform/features/journey/presentation/widgets/course_preview_sheet.dart';
 import 'package:hadith_platform/features/journey/presentation/widgets/wird_node.dart';
 import 'package:hadith_platform/features/review/application/review_controllers.dart';
 import 'package:hadith_platform/features/review/domain/review_deck.dart';
@@ -56,16 +57,46 @@ void main() {
     expect(find.textContaining('المُعدّ'), findsNothing);
 
     await tester.scrollUntilVisible(
-      find.text('المتفق عليه: نخبة الصحيحين'),
+      find.text('صفوة المتفق عليه (نخبة الصحيحين)'),
       400,
       scrollable: find.byType(Scrollable).first,
     );
-    await tester.ensureVisible(find.text('المتفق عليه: نخبة الصحيحين'));
+    await tester.ensureVisible(find.text('صفوة المتفق عليه (نخبة الصحيحين)'));
     for (final CurriculumCourse course in CourseCatalog.lockedCourses) {
       expect(find.text(course.title), findsOneWidget);
     }
     expect(find.text(CourseCatalog.lockedNote), findsNWidgets(3));
-    expect(find.text('صحيح البخاري'), findsNothing, reason: 'the fourth course is now «المتفق عليه: نخبة الصحيحين»');
+    expect(find.text('عمدة الأحكام'), findsNothing, reason: 'the later courses follow the Hady order');
+  });
+
+  testWidgets('tapping a locked course opens its preview sheet with summary, lock badge and motivation', (WidgetTester tester) async {
+    await pumpApp(tester);
+
+    for (final CurriculumCourse course in CourseCatalog.lockedCourses) {
+      await tester.scrollUntilVisible(
+        find.text(course.title),
+        400,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(find.text(course.title));
+      await tester.tap(find.text(course.title));
+      await settle(tester);
+
+      final Finder sheet = find.byType(CoursePreviewSheet);
+      expect(sheet, findsOneWidget, reason: '${course.title} opens a sheet, not a snackbar');
+      expect(find.byType(SnackBar), findsNothing);
+      expect(find.descendant(of: sheet, matching: find.text(course.title)), findsOneWidget);
+      expect(find.descendant(of: sheet, matching: find.text(course.author)), findsOneWidget);
+      expect(find.descendant(of: sheet, matching: find.text(course.summary)), findsOneWidget);
+      expect(find.descendant(of: sheet, matching: find.text(CourseCatalog.lockedNote)), findsOneWidget);
+      expect(find.byKey(const ValueKey<String>('course-lock-badge')), findsOneWidget);
+      expect(find.descendant(of: sheet, matching: find.text(CourseCatalog.motivation)), findsOneWidget);
+      expect(find.textContaining('الـ ٤٢'), findsOneWidget);
+
+      await tester.tap(find.text('أتابع مسار الأربعين'));
+      await settle(tester);
+      expect(find.byType(CoursePreviewSheet), findsNothing);
+    }
   });
 
   testWidgets('hadith search finds a hadith by an unvocalized word', (WidgetTester tester) async {
