@@ -538,7 +538,7 @@
         "segmentId": "s2",
         "tokenIndex": 33,
         "before": "إنَّك",
-        "after": "إنَّكَ",
+        "after": "إِنَّكَ",
         "rule": "missing_final_vowel",
         "method": "aligned_source",
         "source": {
@@ -546,15 +546,6 @@
           "locator": "3540",
           "quote": "آدَمَ إِنَّكَ لَوْ"
         }
-      },
-      {
-        "segmentId": "s2",
-        "tokenIndex": 33,
-        "before": "إنَّكَ",
-        "after": "إِنَّكَ",
-        "rule": "hamza_below_without_kasra",
-        "method": "orthographic_rule",
-        "source": null
       },
       {
         "segmentId": "s2",

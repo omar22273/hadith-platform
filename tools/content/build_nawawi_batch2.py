@@ -399,7 +399,14 @@ def apply_edits(tokens, flags, align, corpus, number):
     for index, token in enumerate(tokens):
         if re.search("إ(?!" + KASRA + ")", token[2]):
             fixed = re.sub("إ(?!" + KASRA + ")", "إ" + KASRA, token[2])
-            log.append((index, token[2], fixed, "hamza_below_without_kasra", "orthographic_rule", None))
+            earlier = next((i for i, entry in enumerate(log) if entry[0] == index), None)
+            if earlier is None:
+                log.append((index, token[2], fixed, "hamza_below_without_kasra", "orthographic_rule", None))
+            else:
+                # كلمة عُدّل ضبطها بالمقابلة ثم احتاجت كسرة الهمزة: تعديل واحد من الأصل إلى الصورة النهائية،
+                # فيبقى كل تعديل في provenance مطابقاً للمتن المعروض.
+                index_, before, _, rule, method, source = log[earlier]
+                log[earlier] = (index_, before, fixed, rule, method, source)
             token[2] = fixed
     for token in tokens:
         token[0] = token[1] + token[2] + token[3]
