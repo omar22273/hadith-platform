@@ -9,6 +9,25 @@
     "fallbackLocalTime": "05:00",
     "completionMessage": "أتممت وِردك اليومي.. العلم يُنال باللبنة فوق اللبنة"
   },
+  "sections": [
+    {
+      "id": "arbaun_nawawiyya",
+      "title": "الأربعون النووية",
+      "author": "للإمام يحيى بن شرف النووي",
+      "firstNumber": 1,
+      "lastNumber": 42,
+      "segmentLabel": "خاتمة الأربعين النووية"
+    },
+    {
+      "id": "rajab_fifty_completion",
+      "title": "تتمة الخمسين الرجبية",
+      "author": "للحافظ ابن رجب الحنبلي",
+      "firstNumber": 43,
+      "lastNumber": 50,
+      "description": "ثمانية أحاديث جوامع ألحقها لإتمام قواعد الدين إلى خمسين حديثاً",
+      "segmentLabel": "تتمة الخمسين الرجبية"
+    }
+  ],
   "items": [
     {
       "hadithId": "nawawi40_001",

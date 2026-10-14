@@ -1,4 +1,4 @@
-// اختبارات السبحة النبوية الذكية: متحكم العدّ (جولات ٣٣ و١٠٠ والعدّ الحر والمجاميع
+// اختبارات السبحة الذكية: متحكم العدّ (جولات ٣٣ و١٠٠ والعدّ الحر والمجاميع
 // المحفوظة وقراءة الحالة التالفة) والشاشة (خمسة أذكار وثلاثة أعداد، ونصف سفلي بنقرة
 // واحدة، واهتزاز خفيف لكل تسبيحة ومزدوج عند الإتمام، وهالة خضراء، والحفظ المحلي).
 
@@ -202,6 +202,35 @@ void main() {
       expect(container.read(sebhaProvider).count, 0);
     });
 
+    test('resetAll zeroes the round and every saved total at once, keeping only the chosen dhikr and target', () {
+      final ProviderContainer container = makeContainer();
+      final SebhaController sebha = container.read(sebhaProvider.notifier);
+      sebha.selectTarget(SebhaTarget.hundred);
+      for (int i = 0; i < 4; i++) {
+        sebha.tap();
+      }
+      sebha.selectDhikr(SebhaDhikr.alhamdulillah);
+      for (int i = 0; i < 9; i++) {
+        sebha.tap();
+      }
+      expect(container.read(sebhaProvider).grandTotal, 13);
+
+      sebha.resetAll();
+      final SebhaState state = container.read(sebhaProvider);
+      expect(state.count, 0);
+      expect(state.totals, isEmpty);
+      expect(state.grandTotal, 0);
+      expect(state.dhikr, SebhaDhikr.alhamdulillah);
+      expect(state.target, SebhaTarget.hundred);
+
+      // الحالة المصفّرة هي المحفوظة محلياً، فلا تعود الأرقام بعد إعادة التشغيل.
+      final SebhaState saved = SebhaState.decode(
+        container.read(keyValueStoreProvider).readString(StorageKeys.adhkarSebha),
+      );
+      expect(saved.count, 0);
+      expect(saved.totals, isEmpty);
+    });
+
     test('encode and decode round-trip the whole state', () {
       const SebhaState state = SebhaState(
         dhikr: SebhaDhikr.istighfar,
@@ -221,7 +250,7 @@ void main() {
     testWidgets('shows the five dhikr options, the three counts, and a calm ring starting at zero',
         (WidgetTester tester) async {
       await openSebha(tester);
-      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('sebha-title'))).data, 'السبحة النبوية الذكية');
+      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('sebha-title'))).data, 'السبحة الذكية');
       for (final SebhaDhikr dhikr in SebhaDhikr.values) {
         expect(find.descendant(of: _dhikrPill(dhikr), matching: find.text(dhikr.label)), findsOneWidget,
             reason: dhikr.label);
@@ -386,6 +415,88 @@ void main() {
       expect(_dhikrTotal(tester), 'مجموع سبحان الله: ٦');
       expect(container.read(sebhaProvider).dhikrTotal, 6);
       expect(tester.widget<IconButton>(find.byKey(const ValueKey<String>('sebha-reset'))).onPressed, isNull);
+    });
+
+    testWidgets('the screen is named «السبحة الذكية» alone, with no «النبوية» in its title',
+        (WidgetTester tester) async {
+      await openSebha(tester);
+      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('sebha-title'))).data, 'السبحة الذكية');
+      expect(find.textContaining('النبوية'), findsNothing);
+    });
+
+    testWidgets('«إعادة تعيين كافة الإحصائيات» asks for confirmation, and cancelling keeps every number',
+        (WidgetTester tester) async {
+      recordHaptics(tester);
+      final ProviderContainer container = await openSebha(tester);
+      await _tapZone(tester, 5);
+      expect(find.descendant(of: find.byKey(const ValueKey<String>('sebha-reset-all')), matching: find.text('إعادة تعيين كافة الإحصائيات')),
+          findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey<String>('sebha-reset-all')));
+      await settle(tester);
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.text('إعادة تعيين كافة الإحصائيات؟'), findsOneWidget);
+      expect(container.read(sebhaProvider).count, 5, reason: 'nothing changes before confirming');
+
+      await tester.tap(find.byKey(const ValueKey<String>('sebha-reset-all-cancel')));
+      await settle(tester);
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(container.read(sebhaProvider).count, 5);
+      expect(container.read(sebhaProvider).grandTotal, 5);
+      expect(_count(tester), '٥');
+    });
+
+    testWidgets('confirming zeroes the round and all totals immediately, on screen and in local storage',
+        (WidgetTester tester) async {
+      recordHaptics(tester);
+      final ProviderContainer container = await openSebha(tester);
+      await tester.tap(_dhikrPill(SebhaDhikr.istighfar));
+      await settle(tester);
+      await _tapZone(tester, 4);
+      await tester.tap(_dhikrPill(SebhaDhikr.salawat));
+      await settle(tester);
+      await _tapZone(tester, 3);
+      expect(container.read(sebhaProvider).grandTotal, 7);
+      expect(find.byKey(const ValueKey<String>('sebha-grand-total')), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey<String>('sebha-reset-all')));
+      await settle(tester);
+      await tester.tap(find.byKey(const ValueKey<String>('sebha-reset-all-confirm')));
+      await settle(tester);
+
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(_count(tester), '٠');
+      expect(_dhikrTotal(tester), 'مجموع الصلاة على النبي ﷺ: ٠');
+      expect(find.byKey(const ValueKey<String>('sebha-grand-total')), findsNothing);
+      final SebhaState state = container.read(sebhaProvider);
+      expect(state.count, 0);
+      expect(state.totals, isEmpty);
+      final SebhaState saved = SebhaState.decode(
+        container.read(keyValueStoreProvider).readString(StorageKeys.adhkarSebha),
+      );
+      expect(saved.totals, isEmpty);
+      expect(saved.count, 0);
+      expect(saved.dhikr, SebhaDhikr.salawat, reason: 'the chosen dhikr is a preference, not a statistic');
+
+      // المركز يعود إلى سطره التعريفي الأول لأن لا مجموع محفوظاً.
+      await tester.tap(find.byKey(const ValueKey<String>('sebha-back')));
+      await settle(tester);
+      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('adhkar-card-sebha-subtitle'))).data,
+          isNot(contains('مجموع')));
+    });
+
+    testWidgets('a tap on the reset-all button is never counted as a tasbeeha', (WidgetTester tester) async {
+      recordHaptics(tester);
+      final ProviderContainer container = await openSebha(tester);
+      final Rect zone = tester.getRect(_zone());
+      final Rect button = tester.getRect(find.byKey(const ValueKey<String>('sebha-reset-all')));
+      expect(button.top, greaterThanOrEqualTo(zone.bottom - 0.5), reason: 'it sits below the tap zone');
+      await tester.tap(find.byKey(const ValueKey<String>('sebha-reset-all')));
+      await settle(tester);
+      await tester.tap(find.byKey(const ValueKey<String>('sebha-reset-all-cancel')));
+      await settle(tester);
+      expect(container.read(sebhaProvider).count, 0);
+      expect(container.read(sebhaProvider).grandTotal, 0);
     });
 
     testWidgets('the count survives leaving the screen and a full restart of the app', (WidgetTester tester) async {

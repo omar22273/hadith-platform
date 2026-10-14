@@ -277,7 +277,7 @@ class SegmentHeader extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     return Semantics(
       header: true,
-      label: '${segment.title}، ${segment.rangeLabel}، '
+      label: '${segment.fullTitle}، ${segment.rangeLabel}، '
           'المكتمل ${arabicDigits(segment.completed)} من ${arabicDigits(segment.total)}',
       child: ExcludeSemantics(
         child: SmoothSurface(
@@ -303,6 +303,20 @@ class SegmentHeader extends StatelessWidget {
                   fontSize: 23,
                 ),
               ),
+              if (segment.subtitle != null)
+                // عنوان فرعي يُظهر تمايز القسمين في الشريحة؛ ينكمش ليظهر كاملاً.
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    segment.subtitle!,
+                    key: ValueKey<String>('segment-subtitle-${segment.index}'),
+                    style: text.labelLarge?.copyWith(
+                      color: locked ? palette.inkSoft : palette.amberText,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),

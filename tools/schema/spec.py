@@ -432,6 +432,18 @@ MODELS = [
         F("plannedCount", "int", "عدد أحاديث الكتاب كاملاً؛ يرسم المسار محطاتها كلها، وما لم يُعدّ منها يبقى مقفلاً.", minimum=1),
         F("dailyCap", "DailyCapPolicy", "قفل الوِرد اليومي."),
         F("items", "List<CurriculumItem>", "الأحاديث بالترتيب.", minItems=1),
+        F("sections", "List<CurriculumSection>?",
+          "أقسام الكتاب على المسار، اختيارية: كل قسم نطاق متصل من الأرقام بكتابه ومؤلفه؛ يرسم المسار بين كل قسمين متتاليين فاصلاً بارزاً. غيابها يعني كتاباً واحداً بلا فواصل.",
+          optional=True, minItems=1),
+    ]),
+    Model("CurriculumSection", "curriculum_manifest.dart", "قسم من الكتاب على المسار: كتاب بعينه ومؤلفه ونطاق أحاديثه.", [
+        F("id", "String", "معرّف القسم.", **ID),
+        F("title", "String", "عنوان القسم، مثل «الأربعون النووية»."),
+        F("author", "String", "نسبة القسم إلى مؤلفه، مثل «للإمام يحيى بن شرف النووي»."),
+        F("firstNumber", "int", "رقم أول حديث في القسم.", minimum=1),
+        F("lastNumber", "int", "رقم آخر حديث في القسم.", minimum=1),
+        F("description", "String?", "وصف القسم يُكتب بعد النطاق في إعلان بدايته، اختياري.", optional=True, minLength=1),
+        F("segmentLabel", "String", "اسم القسم في عنوان الشريحة التي تجمع حديثين من قسمين، مثل «تتمة الخمسين الرجبية»."),
     ]),
     Model("DailyCapPolicy", "curriculum_manifest.dart", "سياسة إغلاق الوِرد اليومي.", [
         F("newHadithPerDay", "int", "عدد الأحاديث الجديدة يومياً للمستخدم الجديد؛ ترفعه الاستمرارية لاحقاً.", minimum=1),

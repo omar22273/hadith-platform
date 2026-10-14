@@ -3,7 +3,7 @@
 // سبع بطاقات كبيرة مرتبة رأسياً، كل منها بوابة إلى شاشة تركيز مستقلة:
 // الفئات الست التي لها ملفات بيانات مشكولة (أذكار الصباح والمساء، النوم والاستيقاظ،
 // أدبار الصلوات، دخول وخروج المنزل والمسجد، السنن المهجورة، جامع الأدعية المأثورة)
-// يفتح كل منها مشغّل التركيز AdhkarPlayerScreen، والسابعة السبحة النبوية الذكية.
+// يفتح كل منها مشغّل التركيز AdhkarPlayerScreen، والسابعة السبحة الذكية.
 //
 // المركز لا يعرض أي نص نبوي ولا تخريج؛ عناوين البطاقات وأسطرها التعريفية واجهة فقط،
 // ونصوص الأذكار وشواهدها تُقرأ من ملفات assets/data/adhkar/ داخل المشغّل وحده.
@@ -161,7 +161,7 @@ class _SebhaCard extends ConsumerWidget {
       color: palette.emeraldSoft,
       borderColor: palette.emerald.withValues(alpha: 0.5),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      semanticLabel: 'السبحة النبوية الذكية. $subtitle',
+      semanticLabel: 'السبحة الذكية. $subtitle',
       child: Row(
         children: <Widget>[
           _IconTile(
@@ -175,7 +175,7 @@ class _SebhaCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'السبحة النبوية الذكية',
+                  'السبحة الذكية',
                   style: text.titleMedium?.copyWith(
                     color: palette.emeraldText,
                     fontWeight: FontWeight.w700,

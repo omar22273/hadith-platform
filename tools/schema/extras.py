@@ -103,6 +103,16 @@ EXTRAS = {
     }
     return null;
   }
+
+  /// القسم الذي يضم الحديث برقمه، أو null إن لم تُعرَّف أقسام أو لم يقع الرقم في أحدها.
+  CurriculumSection? sectionOf(int number) {
+    for (final CurriculumSection section in sections ?? const <CurriculumSection>[]) {
+      if (number >= section.firstNumber && number <= section.lastNumber) {
+        return section;
+      }
+    }
+    return null;
+  }
 """,
     "SeerahDataset": """
   /// يعيد المحطة بمعرّفها، أو null إن لم توجد.

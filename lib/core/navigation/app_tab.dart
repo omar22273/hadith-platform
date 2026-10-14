@@ -15,7 +15,7 @@ enum AppTab {
   /// رحلة السيرة.
   seerah('رحلة السيرة', Icons.map_outlined, Icons.map_rounded),
 
-  /// وِرد الأذكار والسبحة النبوية.
+  /// وِرد الأذكار والسبحة الذكية.
   adhkar('وِرد الأذكار', Icons.spa_outlined, Icons.spa_rounded),
 
   /// ميدان المراجعة.

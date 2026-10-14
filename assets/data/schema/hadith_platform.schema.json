@@ -1804,6 +1804,68 @@
           },
           "minItems": 1,
           "description": "الأحاديث بالترتيب."
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CurriculumSection"
+          },
+          "minItems": 1,
+          "description": "أقسام الكتاب على المسار، اختيارية: كل قسم نطاق متصل من الأرقام بكتابه ومؤلفه؛ يرسم المسار بين كل قسمين متتاليين فاصلاً بارزاً. غيابها يعني كتاباً واحداً بلا فواصل."
+        }
+      }
+    },
+    "CurriculumSection": {
+      "type": "object",
+      "description": "قسم من الكتاب على المسار: كتاب بعينه ومؤلفه ونطاق أحاديثه.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "author",
+        "firstNumber",
+        "lastNumber",
+        "segmentLabel"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف القسم."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان القسم، مثل «الأربعون النووية»."
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1,
+          "description": "نسبة القسم إلى مؤلفه، مثل «للإمام يحيى بن شرف النووي»."
+        },
+        "firstNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "رقم أول حديث في القسم."
+        },
+        "lastNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "رقم آخر حديث في القسم."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "وصف القسم يُكتب بعد النطاق في إعلان بدايته، اختياري."
+        },
+        "segmentLabel": {
+          "type": "string",
+          "minLength": 1,
+          "description": "اسم القسم في عنوان الشريحة التي تجمع حديثين من قسمين، مثل «تتمة الخمسين الرجبية»."
         }
       }
     },

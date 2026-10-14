@@ -89,6 +89,7 @@ class PathSegment {
     required this.firstNodeIndex,
     required this.completed,
     required this.total,
+    this.subtitle,
   });
 
   /// رقم المجموعة (من صفر).
@@ -112,11 +113,55 @@ class PathSegment {
   /// عدد أحاديثها.
   final int total;
 
+  /// عنوان فرعي يُظهر تمايز الأقسام إن جمعت المجموعة أحاديث من قسمين، مثل
+  /// «خاتمة الأربعين النووية وتتمة الخمسين الرجبية»؛ وإلا null.
+  final String? subtitle;
+
+  /// العنوان الكامل: «العشرة الخامسة — خاتمة الأربعين النووية وتتمة الخمسين الرجبية».
+  String get fullTitle => subtitle == null ? title : '$title — $subtitle';
+
   /// نطاق الأرقام بالأرقام العربية.
   String get rangeLabel => 'الأحاديث ${arabicDigits(firstNumber)}–${arabicDigits(lastNumber)}';
 
   /// نسبة الإتمام.
   double get fraction => total == 0 ? 0 : completed / total;
+}
+
+/// فاصل بارز بين قسمين متتاليين من الكتاب على المسار، يقع بصرياً قبل أول عقدة
+/// من القسم التالي (بين الحديث ٤٢ والحديث ٤٣ في المنهج الحالي).
+@immutable
+class SectionDivider {
+  const SectionDivider({
+    required this.index,
+    required this.ending,
+    required this.starting,
+    required this.beforeNodeIndex,
+  });
+
+  /// رقم الفاصل (من صفر).
+  final int index;
+
+  /// القسم الذي ينتهي عند الفاصل.
+  final CurriculumSection ending;
+
+  /// القسم الذي يبدأ بعد الفاصل.
+  final CurriculumSection starting;
+
+  /// موضع أول عقدة من القسم الجديد؛ يقع الفاصل قبلها مباشرة.
+  final int beforeNodeIndex;
+
+  /// نص انتهاء القسم: «الأربعون النووية — للإمام يحيى بن شرف النووي (الأحاديث ١–٤٢)».
+  String get endingLine => _line(ending, withDescription: false);
+
+  /// نص بدء القسم: «تتمة الخمسين الرجبية — للحافظ ابن رجب الحنبلي (الأحاديث ٤٣–٥٠: …)».
+  String get startingLine => _line(starting, withDescription: true);
+
+  static String _line(CurriculumSection section, {required bool withDescription}) {
+    final String range = 'الأحاديث ${arabicDigits(section.firstNumber)}–${arabicDigits(section.lastNumber)}';
+    final String? description = section.description;
+    final String inside = withDescription && description != null ? '$range: $description' : range;
+    return '${section.title} — ${section.author} ($inside)';
+  }
 }
 
 /// لقطة المسار.
@@ -133,6 +178,7 @@ class JourneySnapshot {
     required this.todayKind,
     required this.nextItem,
     required this.completedCount,
+    required this.dividers,
   });
 
   /// عدد الأحاديث في المجموعة الواحدة على المسار.
@@ -220,10 +266,19 @@ class JourneySnapshot {
           done++;
         }
       }
+      // مجموعة تجمع حديثين من قسمين تُعنوَن بتمايز القسمين، لا بترتيبها وحده.
+      final List<String> labels = <String>[];
+      for (int number = first; number <= last; number++) {
+        final String? label = curriculum.sectionOf(number)?.segmentLabel;
+        if (label != null && !labels.contains(label)) {
+          labels.add(label);
+        }
+      }
       segments.add(
         PathSegment(
           index: segmentIndex,
           title: segmentTitle(segmentIndex, isTail: last - first + 1 < segmentSize && segmentIndex > 0),
+          subtitle: labels.length > 1 ? labels.join(' و') : null,
           firstNumber: first,
           lastNumber: last,
           firstNodeIndex: first - 1,
@@ -231,6 +286,18 @@ class JourneySnapshot {
           total: last - first + 1,
         ),
       );
+    }
+
+    // فاصل بين كل قسمين متتاليين، قبل أول عقدة من اللاحق منهما.
+    final List<CurriculumSection> sections = curriculum.sections ?? const <CurriculumSection>[];
+    final List<SectionDivider> dividers = <SectionDivider>[];
+    for (int i = 0; i + 1 < sections.length; i++) {
+      final int before = sections[i + 1].firstNumber - 1;
+      if (before > 0 && before < nodes.length) {
+        dividers.add(
+          SectionDivider(index: i, ending: sections[i], starting: sections[i + 1], beforeNodeIndex: before),
+        );
+      }
     }
 
     int indexOf(CurriculumItem? item) => item == null ? 0 : item.number - 1;
@@ -255,6 +322,7 @@ class JourneySnapshot {
       todayKind: todayKind,
       nextItem: nextItem,
       completedCount: completedCount,
+      dividers: List<SectionDivider>.unmodifiable(dividers),
     );
   }
 
@@ -317,6 +385,9 @@ class JourneySnapshot {
 
   /// عدد الأوراد المكتملة.
   final int completedCount;
+
+  /// الفواصل بين أقسام الكتاب (فارغة إن لم تُعرَّف أقسام).
+  final List<SectionDivider> dividers;
 
   /// العقدة التي تقف عندها القافلة.
   WirdNode get caravanNode => nodes[caravanIndex];

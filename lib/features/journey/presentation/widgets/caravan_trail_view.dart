@@ -10,6 +10,7 @@ import '../../../../core/theme/app_palette.dart';
 import '../../domain/journey_snapshot.dart';
 import 'caravan_marker.dart';
 import 'caravan_trail_painter.dart';
+import 'section_divider_banner.dart';
 import 'trail_geometry.dart';
 import 'wird_node.dart';
 
@@ -139,6 +140,22 @@ class _CaravanTrailViewState extends State<CaravanTrailView> with TickerProvider
             width: constraints.maxWidth,
             textScale: clampedScale,
             groupOfNode: groups,
+            dividers: <TrailDividerSpec>[
+              for (final SectionDivider divider in snapshot.dividers)
+                TrailDividerSpec(
+                  dividerIndex: divider.index,
+                  beforeNodeIndex: divider.beforeNodeIndex,
+                  height: SectionDividerBanner.estimateHeight(
+                    divider: divider,
+                    width: constraints.maxWidth,
+                    textScale: clampedScale,
+                  ),
+                ),
+            ],
+            tallHeaderGroups: <int>{
+              for (final PathSegment segment in snapshot.segments)
+                if (segment.subtitle != null) segment.index,
+            },
           );
           final List<Widget> children = <Widget>[
             Positioned.fill(
@@ -164,6 +181,14 @@ class _CaravanTrailViewState extends State<CaravanTrailView> with TickerProvider
                   segment: segment,
                   locked: header.firstNodeIndex > snapshot.caravanIndex,
                 ),
+              ),
+            );
+          }
+          for (final TrailDividerBox box in layout.dividers) {
+            children.add(
+              Positioned.fromRect(
+                rect: box.rect,
+                child: SectionDividerBanner(divider: snapshot.dividers[box.dividerIndex]),
               ),
             );
           }
