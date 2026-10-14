@@ -28,7 +28,7 @@ class AppConfig {
   );
 
   /// رقم الإصدار المعروض في الإعدادات، ويطابق version في pubspec.yaml.
-  static const String appVersion = '2.6.1';
+  static const String appVersion = '2.6.2';
 
   /// القالب التجريبي الافتراضي.
   static const String defaultAudioUrlTemplate =
