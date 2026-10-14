@@ -223,6 +223,21 @@
         "commit": "287c0cc31845e7f63afb4c0e3c776fc13b45f00f",
         "retrievedAt": "2026-10-08"
       }
+    },
+    {
+      "id": "tuhfa_rabbaniyya",
+      "title": "التحفة الربانية في شرح الأربعين النووية",
+      "author": "إسماعيل بن محمد الأنصاري",
+      "authorDeathHijri": null,
+      "kind": "sharh",
+      "edition": null,
+      "digital": {
+        "provider": "ملف نصي (OCR) أرفقه مالك المشروع",
+        "repository": "https://github.com/omar22273/hadith-platform",
+        "path": "tools/content/sources/tuhfa_rabbaniyya_ocr.txt",
+        "commit": "59f3442ddc50654429fa8dd95bc0d879c017999c",
+        "retrievedAt": "2026-10-14"
+      }
     }
   ]
 }

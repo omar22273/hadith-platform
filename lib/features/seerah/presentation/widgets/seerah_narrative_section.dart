@@ -10,15 +10,14 @@
 // لا يُضاف هنا نص من خارج ملف البيانات: لا رواية تُولَّد ولا تُستكمل من الذاكرة.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/content/models/source_catalog.dart';
 import '../../../../core/content/widgets/source_quote_tile.dart';
-import '../../../../core/preferences/reading_preferences.dart';
 import '../../../../core/text/arabic_digits.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/ui/app_shapes.dart';
+import '../../../../core/ui/reading_size_bar.dart';
 import '../../../../core/ui/smooth_surface.dart';
 import '../../data/models/seerah_station.dart';
 import 'seerah_labels.dart';
@@ -69,7 +68,7 @@ class SeerahNarrativeSection extends StatelessWidget {
           style: text.labelSmall?.copyWith(color: palette.inkSoft),
         ),
         children: <Widget>[
-          const _ReadingSizeBar(),
+          const ReadingSizeBar(),
           const SizedBox(height: 14),
           if (paragraphs.isNotEmpty)
             _NarrativeBody(paragraphs: paragraphs)
@@ -92,52 +91,6 @@ class SeerahNarrativeSection extends StatelessWidget {
                 style: text.labelSmall?.copyWith(color: palette.inkSoft, height: 1.7),
               ),
             ),
-        ],
-      ),
-    );
-  }
-}
-
-/// شريط حجم الخط: منزلق مربوط بإعدادات القراءة نفسها التي في شاشة الإعدادات.
-class _ReadingSizeBar extends ConsumerWidget {
-  const _ReadingSizeBar();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AppPalette palette = AppPalette.of(context);
-    final TextTheme text = Theme.of(context).textTheme;
-    final ReadingPreferences reading = ref.watch(readingPreferencesProvider);
-    final ReadingPreferencesController controller = ref.read(readingPreferencesProvider.notifier);
-    return SmoothSurface(
-      color: palette.surfaceMuted,
-      radius: AppShapes.radiusMedium,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      child: Row(
-        children: <Widget>[
-          Icon(Icons.text_fields_rounded, size: 20, color: palette.amberText),
-          const SizedBox(width: 8),
-          Text('حجم الخط', style: text.labelLarge?.copyWith(fontWeight: FontWeight.w600)),
-          Expanded(
-            child: Slider(
-              key: const ValueKey<String>('narrative-font-slider'),
-              value: reading.matnFontSize,
-              min: ReadingPreferences.minMatnFontSize,
-              max: ReadingPreferences.maxMatnFontSize,
-              divisions: (ReadingPreferences.maxMatnFontSize - ReadingPreferences.minMatnFontSize).round(),
-              label: arabicDigits(reading.matnFontSize.round()),
-              semanticFormatterCallback: (double value) => 'حجم خط القراءة ${arabicDigits(value.round())}',
-              onChanged: (double value) => controller.setMatnFontSize(value, persist: false),
-              onChangeEnd: controller.setMatnFontSize,
-            ),
-          ),
-          SizedBox(
-            width: 28,
-            child: Text(
-              arabicDigits(reading.matnFontSize.round()),
-              textAlign: TextAlign.center,
-              style: text.labelLarge?.copyWith(color: palette.amberText, fontWeight: FontWeight.w700),
-            ),
-          ),
         ],
       ),
     );

@@ -84,3 +84,45 @@ def split_statement(text):
         statement = match.group(3)
     rest = text[: match.start()] + " " + text[match.end():]
     return re.sub(r"\s+", " ", rest).strip(), statement
+
+
+_PLAIN_FORMS = str.maketrans({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ى": "ي"})
+
+
+def _is_mark(char):
+    return "ً" <= char <= "ٟ" or char in "ٰـ" or "ؐ" <= char <= "ؚ" or "ۖ" <= char <= "ۭ"
+
+
+def _plain_stream(text):
+    """(الحرف المعياري، موضعه في الأصل) لكل حرف باقٍ بعد حذف التشكيل والترقيم وتوحيد الألف والياء."""
+    out = []
+    for position, char in enumerate(text):
+        if _is_mark(char):
+            continue
+        if not (char.isalnum() or char == "_"):
+            char = " "
+        char = char.translate(_PLAIN_FORMS)
+        if char == " " and (not out or out[-1][0] == " "):
+            continue
+        out.append((char, position))
+    return out
+
+
+def locate_plain(haystack, query):
+    """يعيد المقطع من haystack المطابق لـ query بلا تشكيل ولا ترقيم (بحروف المصدر وحركاته)، أو None.
+
+    يُستعمل لاختيار موضع الاقتباس فقط؛ فالمعاد دائماً نص حرفي من المصدر، لا من الكاتب.
+    """
+    stream = _plain_stream(haystack)
+    target = "".join(char for char, _ in _plain_stream(query)).strip()
+    if not target:
+        return None
+    joined = "".join(char for char, _ in stream)
+    at = joined.find(target)
+    if at < 0:
+        return None
+    start = stream[at][1]
+    end = stream[at + len(target) - 1][1] + 1
+    while end < len(haystack) and _is_mark(haystack[end]):
+        end += 1
+    return haystack[start:end]

@@ -129,6 +129,138 @@
       "number": 20,
       "title": "الحياء وكلام النبوة الأولى",
       "assetPath": "assets/data/hadith/nawawi40/nawawi40_020.json"
+    },
+    {
+      "hadithId": "nawawi40_021",
+      "number": 21,
+      "title": "قل آمنت بالله ثم استقم",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_021.json"
+    },
+    {
+      "hadithId": "nawawi40_022",
+      "number": 22,
+      "title": "أأدخل الجنة؟",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_022.json"
+    },
+    {
+      "hadithId": "nawawi40_023",
+      "number": 23,
+      "title": "الطهور شطر الإيمان",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_023.json"
+    },
+    {
+      "hadithId": "nawawi40_024",
+      "number": 24,
+      "title": "يا عبادي إني حرمت الظلم على نفسي",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_024.json"
+    },
+    {
+      "hadithId": "nawawi40_025",
+      "number": 25,
+      "title": "ذهب أهل الدثور بالأجور",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_025.json"
+    },
+    {
+      "hadithId": "nawawi40_026",
+      "number": 26,
+      "title": "كل سلامى عليه صدقة",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_026.json"
+    },
+    {
+      "hadithId": "nawawi40_027",
+      "number": 27,
+      "title": "البر حسن الخلق",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_027.json"
+    },
+    {
+      "hadithId": "nawawi40_028",
+      "number": 28,
+      "title": "عليكم بسنتي وسنة الخلفاء الراشدين",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_028.json"
+    },
+    {
+      "hadithId": "nawawi40_029",
+      "number": 29,
+      "title": "ملاك ذلك كله",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_029.json"
+    },
+    {
+      "hadithId": "nawawi40_030",
+      "number": 30,
+      "title": "فرض فرائض فلا تضيعوها",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_030.json"
+    },
+    {
+      "hadithId": "nawawi40_031",
+      "number": 31,
+      "title": "ازهد في الدنيا يحبك الله",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_031.json"
+    },
+    {
+      "hadithId": "nawawi40_032",
+      "number": 32,
+      "title": "لا ضرر ولا ضرار",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_032.json"
+    },
+    {
+      "hadithId": "nawawi40_033",
+      "number": 33,
+      "title": "البينة على المدعي",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_033.json"
+    },
+    {
+      "hadithId": "nawawi40_034",
+      "number": 34,
+      "title": "من رأى منكم منكراً",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_034.json"
+    },
+    {
+      "hadithId": "nawawi40_035",
+      "number": 35,
+      "title": "المسلم أخو المسلم",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_035.json"
+    },
+    {
+      "hadithId": "nawawi40_036",
+      "number": 36,
+      "title": "من نفّس عن مؤمن كربة",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_036.json"
+    },
+    {
+      "hadithId": "nawawi40_037",
+      "number": 37,
+      "title": "كتب الله الحسنات والسيئات",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_037.json"
+    },
+    {
+      "hadithId": "nawawi40_038",
+      "number": 38,
+      "title": "من عادى لي وليّاً",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_038.json"
+    },
+    {
+      "hadithId": "nawawi40_039",
+      "number": 39,
+      "title": "تجاوز الله عن الخطأ والنسيان",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_039.json"
+    },
+    {
+      "hadithId": "nawawi40_040",
+      "number": 40,
+      "title": "كن في الدنيا كأنك غريب",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_040.json"
+    },
+    {
+      "hadithId": "nawawi40_041",
+      "number": 41,
+      "title": "هواه تبعاً لما جئت به",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_041.json"
+    },
+    {
+      "hadithId": "nawawi40_042",
+      "number": 42,
+      "title": "يا ابن آدم إنك ما دعوتني",
+      "assetPath": "assets/data/hadith/nawawi40/nawawi40_042.json"
     }
   ]
 }

@@ -1,4 +1,4 @@
-// فحص بيانات المحتوى المحقون: الأحاديث 1–20 من الأربعين النووية.
+// فحص بيانات المحتوى المحقون: الأحاديث 1–42 من الأربعين النووية.
 //
 // يتحقق من وجود كل محطة في الفهرس، وقراءة ملفها، وتطابق هويتها وعنوانها،
 // وسلامة المقاطع والغريب والتشكيل والمصادر، دون أي اعتماد على الشبكة.
@@ -33,7 +33,44 @@ const Map<int, String> _expectedTitles = <int, String>{
   18: 'اتق الله حيثما كنت',
   19: 'احفظ الله يحفظك',
   20: 'الحياء وكلام النبوة الأولى',
+  21: 'قل آمنت بالله ثم استقم',
+  22: 'أأدخل الجنة؟',
+  23: 'الطهور شطر الإيمان',
+  24: 'يا عبادي إني حرمت الظلم على نفسي',
+  25: 'ذهب أهل الدثور بالأجور',
+  26: 'كل سلامى عليه صدقة',
+  27: 'البر حسن الخلق',
+  28: 'عليكم بسنتي وسنة الخلفاء الراشدين',
+  29: 'ملاك ذلك كله',
+  30: 'فرض فرائض فلا تضيعوها',
+  31: 'ازهد في الدنيا يحبك الله',
+  32: 'لا ضرر ولا ضرار',
+  33: 'البينة على المدعي',
+  34: 'من رأى منكم منكراً',
+  35: 'المسلم أخو المسلم',
+  36: 'من نفّس عن مؤمن كربة',
+  37: 'كتب الله الحسنات والسيئات',
+  38: 'من عادى لي وليّاً',
+  39: 'تجاوز الله عن الخطأ والنسيان',
+  40: 'كن في الدنيا كأنك غريب',
+  41: 'هواه تبعاً لما جئت به',
+  42: 'يا ابن آدم إنك ما دعوتني',
 };
+
+/// آخر حديث في الأربعين النووية كما رتبها المصنف في هذا المسار.
+const int _lastHadith = 42;
+
+/// الحديثان اللذان لا نظير لهما في النسخ المثبتة من الكتب الستة؛ تخريجهما إلى نص الأربعين نفسه.
+const Set<int> _arbaunOnlyTakhrij = <int>{30, 41};
+
+const String _tuhfaSourceId = 'tuhfa_rabbaniyya';
+const List<String> _pinnedCollections = <String>[
+  'sahih_bukhari',
+  'sahih_muslim',
+  'sunan_tirmidhi',
+  'sunan_ibn_majah',
+  'sunan_nasai',
+];
 
 final RegExp _harakat = RegExp('[ً-ْٰ]');
 final RegExp _arabicLetter = RegExp('[ء-ي]');
@@ -65,8 +102,10 @@ void main() {
   }
 
   group('curriculum index', () {
-    test('hadiths 1 to 20 are registered in order', () {
-      for (int number = 1; number <= 20; number++) {
+    test('hadiths 1 to 42 are registered in order and fill the planned path', () {
+      expect(curriculum.plannedCount, _lastHadith);
+      expect(curriculum.items.length, _lastHadith);
+      for (int number = 1; number <= _lastHadith; number++) {
         final CurriculumItem? item = itemFor(_idFor(number));
         expect(item, isNotNull, reason: 'missing station $number');
         expect(item!.number, number);
@@ -80,11 +119,11 @@ void main() {
       });
     });
 
-    test('the next-station teaser chain runs through the first twenty', () {
-      for (int number = 1; number < 20; number++) {
+    test('the next-station teaser chain runs through all forty-two', () {
+      for (int number = 1; number < _lastHadith; number++) {
         expect(curriculum.itemAfter(_idFor(number))?.hadithId, _idFor(number + 1));
       }
-      expect(curriculum.itemAfter(_idFor(20)), isNull);
+      expect(curriculum.itemAfter(_idFor(_lastHadith)), isNull);
     });
 
     test('every asset lives in the registered folder', () {
@@ -97,7 +136,7 @@ void main() {
     });
   });
 
-  for (int number = 3; number <= 20; number++) {
+  for (int number = 3; number <= _lastHadith; number++) {
     final String id = _idFor(number);
     group(id, () {
       late HadithDailyModel model;
@@ -131,18 +170,18 @@ void main() {
           expect(reference.hadithNumber.trim(), isNotEmpty);
         }
         expect(model.matn.takhrij.displayLabel.trim(), isNotEmpty);
-        expect(
-          model.matn.takhrij.references.any(
-            (TakhrijReference r) => const <String>[
-              'sahih_bukhari',
-              'sahih_muslim',
-              'sunan_tirmidhi',
-              'sunan_ibn_majah',
-              'sunan_nasai',
-            ].contains(r.sourceId),
-          ),
-          isTrue,
-        );
+        if (_arbaunOnlyTakhrij.contains(number)) {
+          // لا نظير في النسخ المثبتة: التخريج إلى نص الأربعين نفسه، ولا يُختلق رقم في كتاب لم يُتحقق منه.
+          expect(
+            references.every((TakhrijReference r) => r.sourceId == 'arbaun_nawawiyya'),
+            isTrue,
+          );
+        } else {
+          expect(
+            references.any((TakhrijReference r) => _pinnedCollections.contains(r.sourceId)),
+            isTrue,
+          );
+        }
       });
 
       test('context is present and sourced', () {
@@ -232,4 +271,39 @@ void main() {
       });
     });
   }
+
+  group('concise sharh from the pinned book', () {
+    final RegExp noise = RegExp('[A-Za-z0-9<>{}\\[\\]*|~]');
+    for (int number = 1; number <= _lastHadith; number++) {
+      final String id = _idFor(number);
+      test('$id carries the book sharh and anchors its gharib to it', () {
+        final HadithDailyModel model = HadithDailyModel.fromJson(_load('$_hadithDir/$id.json'));
+        final ConciseExplanation? explanation = model.conciseExplanation;
+        expect(explanation, isNotNull, reason: 'missing concise_explanation');
+        expect(explanation!.source.sourceId, _tuhfaSourceId);
+        expect(sources.byId(_tuhfaSourceId), isNotNull);
+        expect(explanation.source.locator, 'الحديث $number');
+        expect(explanation.vocabulary, isNotEmpty);
+        expect(explanation.benefits, isNotEmpty);
+        for (final ExplanationTerm term in explanation.vocabulary) {
+          expect(term.term.trim(), isNotEmpty);
+          expect(term.explanation.trim(), isNotEmpty, reason: term.term);
+          expect(noise.hasMatch(term.term + term.explanation), isFalse, reason: '${term.term} => ${term.explanation}');
+        }
+        for (final String benefit in explanation.benefits) {
+          expect(benefit.trim(), isNotEmpty);
+          expect(noise.hasMatch(benefit), isFalse, reason: benefit);
+        }
+        // الغريب كله من مفردات الكتاب نفسه نصاً.
+        final Set<String> meanings = <String>{
+          for (final ExplanationTerm term in explanation.vocabulary) term.explanation,
+        };
+        for (final GharibEntry entry in model.matn.gharib) {
+          expect(entry.sources.first.sourceId, _tuhfaSourceId, reason: entry.id);
+          expect(entry.sources.first.quote, entry.meaning, reason: entry.id);
+          expect(meanings.contains(entry.meaning), isTrue, reason: '${entry.id}: ${entry.meaning}');
+        }
+      });
+    }
+  });
 }

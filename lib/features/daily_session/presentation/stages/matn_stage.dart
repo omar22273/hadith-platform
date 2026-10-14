@@ -9,6 +9,7 @@ import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/smooth_surface.dart';
+import '../../../../core/ui/wide_action_button.dart';
 import '../../../hadith/data/models/models.dart';
 import '../../../hadith/domain/hadith_bundle.dart';
 import '../../../recitation/application/recitation_controller.dart';
@@ -16,6 +17,7 @@ import '../../../recitation/presentation/recitation_bar.dart';
 import '../../application/session_controller.dart';
 import '../../application/session_state.dart';
 import '../widgets/matn_text.dart';
+import '../widgets/sharh_sheet.dart';
 
 /// مرحلة المتن.
 class MatnStage extends ConsumerWidget {
@@ -44,6 +46,17 @@ class MatnStage extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       children: <Widget>[
+        if (hadith.conciseExplanation != null) ...<Widget>[
+          WideActionButton(
+            key: const ValueKey<String>('sharh-button'),
+            label: sharhButtonLabel,
+            subtitle: 'مفردات الحديث وفوائده من «التحفة الربانية»',
+            icon: Icons.menu_book_rounded,
+            tone: WideActionTone.secondary,
+            onPressed: () => showHadithSharhSheet(context, bundle),
+          ),
+          const SizedBox(height: 12),
+        ],
         SmoothSurface(
           elevated: true,
           padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 18),

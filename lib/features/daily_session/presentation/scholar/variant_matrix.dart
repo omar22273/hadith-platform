@@ -11,6 +11,7 @@ import '../../../../core/ui/smooth_surface.dart';
 import '../../../hadith/data/models/models.dart';
 import '../../../hadith/domain/hadith_bundle.dart';
 import '../../domain/variant_diff.dart';
+import 'scholar_deferred_notice.dart';
 
 /// مصفوفة الروايات.
 class VariantMatrix extends StatelessWidget {
@@ -25,9 +26,7 @@ class VariantMatrix extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final List<NarrationVariant> variants = bundle.hadith.scholar.variants;
     if (variants.isEmpty) {
-      return Center(
-        child: Text('لا روايات مقارنة لهذا الحديث بعد.', style: text.bodyMedium),
-      );
+      return const ScholarDeferredNotice();
     }
     final String base = bundle.hadith.matn.fullText;
     return ListView(

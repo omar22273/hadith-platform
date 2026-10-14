@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import '../../../../core/content/models/source_catalog.dart';
 import '../../../../core/content/models/source_ref.dart';
 import 'audio_sync.dart';
+import 'concise_explanation.dart';
 import 'hadith_daily_model.dart';
 import 'matn.dart';
 import 'matn_tokenizer.dart';
@@ -216,6 +217,23 @@ class HadithIntegrityChecker {
         takhrij.gradings[index].source,
         'matn.takhrij.gradings[$index].source',
       );
+    }
+
+    // ------------------------------------------------------------ concise explanation
+    final ConciseExplanation? concise = hadith.conciseExplanation;
+    if (concise != null) {
+      checkSourceRef(concise.source, 'concise_explanation.source');
+      for (int index = 0; index < concise.vocabulary.length; index++) {
+        final ExplanationTerm term = concise.vocabulary[index];
+        if (term.term.trim().isEmpty || term.explanation.trim().isEmpty) {
+          report('concise_explanation.vocabulary[$index]', 'Empty term or explanation.');
+        }
+      }
+      for (int index = 0; index < concise.benefits.length; index++) {
+        if (concise.benefits[index].trim().isEmpty) {
+          report('concise_explanation.benefits[$index]', 'Empty benefit.');
+        }
+      }
     }
 
     // ------------------------------------------------------------ practice

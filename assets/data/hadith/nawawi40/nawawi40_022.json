@@ -1,0 +1,490 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_022",
+  "sequence": 22,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 22
+  },
+  "title": "أأدخل الجنة؟",
+  "teaser": {
+    "text": "غداً: رجلٌ يسأل: إن أدّيتُ الفرائض واجتنبتُ المحرمات ولم أزد على ذلك… فهل أدخل الجنة؟"
+  },
+  "milestone": "أصل النجاة: الواجبات وترك المحرمات",
+  "context": {
+    "narrative": "جاء النعمان بن قوقل رضي الله عنه إلى النبي ﷺ فقال له: أرأيتَ إذا صليتُ المكتوبة وحرّمتُ الحرام وأحللتُ الحلال أأدخل الجنة؟ فقال ﷺ: «نعم»؛ وفي رواية لمسلم أن الرجل قال بعدها: والله لا أزيد على ذلك شيئاً.",
+    "humanMotive": "سؤال عن أدنى ما يُنجي: هل تكفي الواجبات وترك المحرمات لدخول الجنة؟",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "15",
+        "quote": "النُّعْمَانُ بْنُ قَوْقَلٍ فَقَالَ يَا رَسُولَ اللَّهِ أَرَأَيْتَ إِذَا صَلَّيْتُ الْمَكْتُوبَةَ"
+      },
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "15",
+        "quote": "قَالَ وَاللَّهِ لاَ أَزِيدُ عَلَى ذَلِكَ شَيْئًا"
+      },
+      {
+        "sourceId": "tuhfa_rabbaniyya",
+        "locator": "الحديث 22",
+        "quote": "هو النعمان بن قوقل"
+      }
+    ],
+    "cautions": [
+      {
+        "text": "جواز ترك التطوعات على الجملة لا يعني التهاون بها؛ فالكتاب ينبّه إلى أن تاركها فوّت على نفسه ربحاً عظيماً.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 22",
+            "quote": "ولا ينافي ذلك أن تاركها فوت نفسه ربحا عظيما"
+          }
+        ]
+      }
+    ]
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَبِي عَبْدِ اللَّهِ جَابِرِ بْنِ عَبْدِ اللَّهِ الْأَنْصَارِيِّ رَضِيَ اللَّهُ عَنْهُمَا: أَنَّ رَجُلًا سَأَلَ رَسُولَ اللَّهِ ﷺ فَقَالَ:"
+      },
+      {
+        "id": "s2",
+        "voice": "interlocutor",
+        "text": "أَرَأَيْتَ إِذَا صَلَّيْتُ الْمَكْتُوبَاتِ، وَصُمْتُ رَمَضَانَ، وَأَحْلَلْتُ الْحَلَالَ، وَحَرَّمْتُ الْحَرَامَ، وَلَمْ أَزِدْ عَلَى ذَلِكَ شَيْئًا؛ أَأَدْخُلُ الْجَنَّةَ؟"
+      },
+      {
+        "id": "s3",
+        "voice": "narration",
+        "text": "قَالَ:"
+      },
+      {
+        "id": "s4",
+        "voice": "prophet",
+        "text": "نَعَمْ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g1",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 0,
+          "length": 1,
+          "surface": "أَرَأَيْتَ"
+        },
+        "headword": "أَرَأَيْتَ",
+        "meaning": "أخبرنى.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 22",
+            "quote": "أخبرنى."
+          }
+        ]
+      },
+      {
+        "id": "g2",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 3,
+          "length": 1,
+          "surface": "الْمَكْتُوبَاتِ"
+        },
+        "headword": "الْمَكْتُوبَاتِ",
+        "meaning": "المفروضات الخمس",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 22",
+            "quote": "المفروضات الخمس"
+          }
+        ]
+      },
+      {
+        "id": "g3",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 6,
+          "length": 2,
+          "surface": "وَأَحْلَلْتُ الْحَلَالَ"
+        },
+        "headword": "وَأَحْلَلْتُ الْحَلَالَ",
+        "meaning": "فعلته معتقداً حله.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 22",
+            "quote": "فعلته معتقداً حله."
+          }
+        ]
+      },
+      {
+        "id": "g4",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 8,
+          "length": 2,
+          "surface": "وَحَرَّمْتُ الْحَرَامَ"
+        },
+        "headword": "وَحَرَّمْتُ الْحَرَامَ",
+        "meaning": "اجتنبته.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 22",
+            "quote": "اجتنبته."
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح مسلم، رقم 15",
+      "references": [
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "15",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 15.01–15.03"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ مُسْلِمٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "concise_explanation": {
+    "source": {
+      "sourceId": "tuhfa_rabbaniyya",
+      "locator": "الحديث 22",
+      "quote": null
+    },
+    "vocabulary": [
+      {
+        "term": "أن رجلا",
+        "explanation": "هو النعمان بن قوقل."
+      },
+      {
+        "term": "أرأيت",
+        "explanation": "أخبرنى."
+      },
+      {
+        "term": "المكتوبات",
+        "explanation": "المفروضات الخمس"
+      },
+      {
+        "term": "وصمت رمضان",
+        "explanation": "أمسكت نهاره عن المفطرات بنية."
+      },
+      {
+        "term": "وأحللت الحلال",
+        "explanation": "فعلته معتقداً حله."
+      },
+      {
+        "term": "وحرمت الحرام",
+        "explanation": "اجتنبته."
+      },
+      {
+        "term": "ولم أزد على ذلك شيئاً",
+        "explanation": "من التطوع."
+      },
+      {
+        "term": "أأدخل الجنة",
+        "explanation": "ابتداء من غير عقاب، لأن مطلق الدخول يتوقفه على التوحيد."
+      },
+      {
+        "term": "نعم",
+        "explanation": "تدخل الجنة."
+      }
+    ],
+    "benefits": [
+      "أن من قام بالواجبات، وانتهى عن المحرمات دخل الجنة. وقد تواترت النصوص بهذا المعنى.",
+      "جواز ترك التطوعات على الجملة إذا لم يكن من قبيل التهاون، ولا ينافي ذلك أن تاركها فوت نفسه ربحا عظيما. وقد كان الصحابة ومن بعدهم يثابرون على فعل السنن والفضائل مثابرتهم على الفرائض، ولم يكونوا يفرقون بينهما في اغتنام الثواب. وإنما احتاج الفقهاء إلى ذكر الفرق لما يترتب عليه من وجوب الإعادة وتركها وخوف العقاب على الترك، ونفيه إن حصل ترك بوجه ما. وقد قيل: إنما ترك النبي صلى الله عليه وسلم تنبيه هذا السائل على السنن والفضائل تسهيلا وتيسيراً لقرب عهده بالإسلام لئلا يكون الإكثار من ذلك تنفيراً له. وعلم أنه إذا تمكن فى الإسلام، وشرح الله صدره، رغب فيما رغب فيه غيره أو لئلا يعتقد أن السنن والتطوعات واجبة."
+    ]
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s1",
+        "startToken": 0,
+        "endToken": 11,
+        "label": "الراوي: جابر بن عبد الله"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s1",
+        "startToken": 12,
+        "endToken": 18,
+        "label": "رجل يسأل رسول الله ﷺ"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 3,
+        "label": "أرأيت إذا صليت المكتوبات"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 4,
+        "endToken": 5,
+        "label": "وصمت رمضان"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s2",
+        "startToken": 6,
+        "endToken": 9,
+        "label": "وأحللت الحلال وحرمت الحرام"
+      },
+      {
+        "id": "c6",
+        "segmentId": "s2",
+        "startToken": 10,
+        "endToken": 14,
+        "label": "ولم أزد على ذلك شيئاً"
+      },
+      {
+        "id": "c7",
+        "segmentId": "s2",
+        "startToken": 15,
+        "endToken": 16,
+        "label": "أأدخل الجنة؟"
+      },
+      {
+        "id": "c8",
+        "segmentId": "s4",
+        "startToken": 0,
+        "endToken": 0,
+        "label": "نعم"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5",
+        "c6",
+        "c7",
+        "c8"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 6,
+          "length": 4,
+          "surface": "وَأَحْلَلْتُ الْحَلَالَ وَحَرَّمْتُ الْحَرَامَ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 15,
+          "length": 2,
+          "surface": "أَأَدْخُلُ الْجَنَّةَ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "قال لك صديق: أؤدي الفرائض وأجتنب المحرمات ولا أرى حاجة إلى شيء بعد ذلك؛ فما جوابك؟",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أبيّن له أن القيام بالواجبات وترك المحرمات أصل دخول الجنة، ثم أحثّه برفق على النوافل لأن تركها يفوّت ربحاً عظيماً.",
+          "feedback": "أحسنت؛ هذا جمعٌ بين ما قرره الحديث وبين التنبيه الذي ذكره الكتاب في فوائده."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أقول له إن النوافل لا قيمة لها فيكفيه ما فعل.",
+          "feedback": "جواز ترك التطوعات على الجملة لا يعني التقليل من شأنها؛ فتاركها فوّت نفسه ربحاً عظيماً."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "أقول له إن الواجبات وحدها لا تكفي ولا بد من كل النوافل حتى يدخل الجنة.",
+          "feedback": "الحديث يقرر أن من قام بالواجبات وانتهى عن المحرمات دخل الجنة؛ فلا تُجعل النوافل شرطاً للدخول."
+        }
+      ],
+      "takeaway": "الواجبات وترك المحرمات أصل النجاة، والنوافل ربحٌ عظيم لا يُفرَّط فيه تهاوناً.",
+      "basis": [
+        {
+          "sourceId": "tuhfa_rabbaniyya",
+          "locator": "الحديث 22",
+          "quote": "أن من قام بالواجبات، وانتهى عن المحرمات دخل الجنة"
+        },
+        {
+          "sourceId": "tuhfa_rabbaniyya",
+          "locator": "الحديث 22",
+          "quote": "ولا ينافي ذلك أن تاركها فوت نفسه ربحا عظيما"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "ابدأ بالفرائض واجتنب المحرمات قبل أي زيادة؛ فهما الأصل الذي تنجو به.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 22",
+            "quote": "أن من قام بالواجبات، وانتهى عن المحرمات دخل الجنة"
+          }
+        ]
+      },
+      {
+        "text": "لا تجعل الزهد في النوافل تهاوناً؛ فقد كان الصحابة يثابرون على السنن مثابرتهم على الفرائض.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 22",
+            "quote": "وقد كان الصحابة ومن بعدهم يثابرون على فعل السنن والفضائل مثابرتهم على الفرائض"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 22",
+      "quote": null
+    },
+    "normalizations": [
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s2",
+        "tokenIndex": 0,
+        "before": "أَرَأَيْت",
+        "after": "أَرَأَيْتَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "15",
+          "quote": "اللَّهِ أَرَأَيْتَ إِذَا"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 1,
+        "before": "إذَا",
+        "after": "إِذَا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 2,
+        "before": "صَلَّيْت",
+        "after": "صَلَّيْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "15",
+          "quote": "إِذَا صَلَّيْتُ الْمَكْتُوبَةَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 4,
+        "before": "وَصُمْت",
+        "after": "وَصُمْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "15",
+          "quote": "الْمَكْتُوبَاتِ وَصُمْتُ رَمَضَانَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 6,
+        "before": "وَأَحْلَلْت",
+        "after": "وَأَحْلَلْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "15",
+          "quote": "الْحَرَامَ وَأَحْلَلْتُ الْحَلاَلَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 8,
+        "before": "وَحَرَّمْت",
+        "after": "وَحَرَّمْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "15",
+          "quote": "الْحَلاَلَ وَحَرَّمْتُ الْحَرَامَ"
+        }
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "غريب الألفاظ والشرح الميسر (concise_explanation) منقولان نصاً من «التحفة الربانية في شرح الأربعين النووية» للشيخ إسماعيل الأنصاري، من ملف نصي ناتج عن مسح ضوئي (OCR) أرفقه مالك المشروع؛ صُحّحت أخطاء المسح الظاهرة بتعديلات مسمّاة في tools/content/tuhfa_fixes.py، وقد يبقى سهو لم يُكتشف فيُراجَع على المطبوع.",
+      "الكتاب لا يضع عنواناً باسم «المعنى الإجمالي»؛ فحقل concise_explanation يجمع مفردات الحديث ثم «يستفاد منه» كما وردا في الكتاب، كلٌّ في بابه.",
+      "لفظ الأربعين «أَأَدْخُلُ الْجَنَّةَ» كما في صحيح مسلم (15)؛ وفي الملف الممسوح للكتاب «أدخل الجنة» بهمزة واحدة، فاستُبقي اللفظ الموافق لمسلم مع احتمال أنه سقط من المسح.",
+      "صُحّح ضبط بعض الكلمات بمطابقتها رسماً في المتن المشكول للحديث نفسه من مصدره المثبّت، ولم يُغيَّر إلا ما سقط من الحركات؛ وهو مسجّل في provenance.vocalizationEdits وتُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

@@ -1,0 +1,392 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_021",
+  "sequence": 21,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 21
+  },
+  "title": "قل آمنت بالله ثم استقم",
+  "teaser": {
+    "text": "غداً: صحابيٌّ يطلب كلمةً جامعة في الإسلام لا يسأل عنها أحداً بعدها… فبماذا أوصاه النبي ﷺ؟"
+  },
+  "milestone": "الإيمان والاستقامة",
+  "context": {
+    "narrative": "سأل سفيان بن عبد الله الثقفي رضي الله عنه رسولَ الله ﷺ أن يقول له في الإسلام قولاً جامعاً لا يحتاج بعده أن يسأل عنه أحداً غيره، فأمره النبي ﷺ أن يقول: آمنتُ بالله، ثم يستقيم.",
+    "humanMotive": "طلب كلمة جامعة في الدين يكتفي بها السائل ولا يحتاج بعدها إلى سؤال أحد.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "38",
+        "quote": "قُلْتُ يَا رَسُولَ اللَّهِ قُلْ لِي فِي الإِسْلاَمِ قَوْلاً لاَ أَسْأَلُ عَنْهُ أَحَدًا بَعْدَكَ"
+      },
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "38",
+        "quote": "سُفْيَانَ بْنِ عَبْدِ اللَّهِ الثَّقَفِيِّ"
+      }
+    ],
+    "cautions": []
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَبِي عَمْرٍو وَقِيلَ: أَبِي عَمْرَةَ سُفْيَانَ بْنِ عَبْدِ اللَّهِ رَضِيَ اللهُ عَنْهُ قَالَ: قُلْتُ:"
+      },
+      {
+        "id": "s2",
+        "voice": "interlocutor",
+        "text": "يَا رَسُولَ اللَّهِ! قُلْ لِي فِي الْإِسْلَامِ قَوْلًا لَا أَسْأَلُ عَنْهُ أَحَدًا غَيْرَكَ؛"
+      },
+      {
+        "id": "s3",
+        "voice": "narration",
+        "text": "قَالَ:"
+      },
+      {
+        "id": "s4",
+        "voice": "prophet",
+        "text": "قُلْ: آمَنْتُ بِاللَّهِ ثُمَّ اسْتَقِمْ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g1",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 3,
+          "length": 4,
+          "surface": "قُلْ لِي فِي الْإِسْلَامِ"
+        },
+        "headword": "قُلْ لِي فِي الْإِسْلَامِ",
+        "meaning": "في دينه وشريعته.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 21",
+            "quote": "في دينه وشريعته."
+          }
+        ]
+      },
+      {
+        "id": "g2",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 7,
+          "length": 1,
+          "surface": "قَوْلًا"
+        },
+        "headword": "قَوْلًا",
+        "meaning": "جامعاً لمعانى الدين، واضحاً فى نفسه، اكتفى به واعمل عليه.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 21",
+            "quote": "جامعاً لمعانى الدين، واضحاً فى نفسه، اكتفى به واعمل عليه."
+          }
+        ]
+      },
+      {
+        "id": "g3",
+        "anchor": {
+          "segmentId": "s4",
+          "tokenIndex": 4,
+          "length": 1,
+          "surface": "اسْتَقِمْ"
+        },
+        "headword": "اسْتَقِمْ",
+        "meaning": "الزم عمل الطاعات، وانته عن جميع المخالفات",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 21",
+            "quote": "الزم عمل الطاعات، وانته عن جميع المخالفات"
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح مسلم، رقم 38",
+      "references": [
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "38",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 38"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ مُسْلِمٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "concise_explanation": {
+    "source": {
+      "sourceId": "tuhfa_rabbaniyya",
+      "locator": "الحديث 21",
+      "quote": null
+    },
+    "vocabulary": [
+      {
+        "term": "قل لي في الإسلام",
+        "explanation": "في دينه وشريعته."
+      },
+      {
+        "term": "قولا",
+        "explanation": "جامعاً لمعانى الدين، واضحاً فى نفسه، اكتفى به واعمل عليه."
+      },
+      {
+        "term": "استقم",
+        "explanation": "الزم عمل الطاعات، وانته عن جميع المخالفات"
+      }
+    ],
+    "benefits": [
+      "الأمر بالاستقامة، وهى الإصابة في جميع الأقوال والأفعال والمقاصد. وأصلها استقامة القلب على التوحيد التي فسربها أبو بكر الصديق قوله تعالى: إن الذين قالوا ربنا الله ثم استقاموا، فمتى استقام القلب على معرفة الله وخشيته، وإجلاله، ومهابته، ومحبته، وإرادته، ورجائه، ودعائه، والتوكل عليه، والإعراض عما سواه - استقامت الجوارح كلها على طاعته، فإن القلب ملك الأعضاء وهى جنوده، فإذا استقام الملك استقامت جنوده"
+    ]
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s1",
+        "startToken": 0,
+        "endToken": 9,
+        "label": "الراوي: سفيان بن عبد الله"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s1",
+        "startToken": 10,
+        "endToken": 14,
+        "label": "رضي الله عنه قال قلت"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 7,
+        "label": "يا رسول الله قل لي في الإسلام قولاً"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 8,
+        "endToken": 12,
+        "label": "لا أسأل عنه أحداً غيرك"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s4",
+        "startToken": 0,
+        "endToken": 2,
+        "label": "قل آمنت بالله"
+      },
+      {
+        "id": "c6",
+        "segmentId": "s4",
+        "startToken": 3,
+        "endToken": 4,
+        "label": "ثم استقم"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5",
+        "c6"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s4",
+          "tokenIndex": 1,
+          "length": 2,
+          "surface": "آمَنْتُ بِاللَّهِ"
+        },
+        {
+          "segmentId": "s4",
+          "tokenIndex": 3,
+          "length": 2,
+          "surface": "ثُمَّ اسْتَقِمْ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "بدأتَ عملاً صالحاً بحماسة، ثم فترتَ بعد أسابيع وصرتَ تقول لنفسك: ما دام قلبي مؤمناً فلا يضرني التقصير في العمل.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أجدّد إيماني وتوحيدي في قلبي وأعود إلى العمل مستقيماً في أقوالي وأفعالي ومقاصدي.",
+          "feedback": "أحسنت؛ الحديث إيمانٌ ثم استقامة، وإذا استقام القلب استقامت الجوارح كلها."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أكتفي باستقامة قلبي وأؤجل استقامة جوارحي إلى أن تتيسر الظروف.",
+          "feedback": "الاستقامة إصابة في جميع الأقوال والأفعال والمقاصد، وصلاح القلب تظهر ثمرته على الجوارح."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "أترك الأمر كله؛ فالاستقامة أكبر من طاقتي.",
+          "feedback": "الحديث يأمر بالاستقامة بعد الإيمان، وأصلها استقامة القلب على التوحيد فتتبعه الجوارح."
+        }
+      ],
+      "takeaway": "آمن بالله ثم استقم: استقامة القلب على التوحيد تستتبع استقامة الجوارح كلها.",
+      "basis": [
+        {
+          "sourceId": "tuhfa_rabbaniyya",
+          "locator": "الحديث 21",
+          "quote": "الأمر بالاستقامة، وهى الإصابة في جميع الأقوال والأفعال والمقاصد"
+        },
+        {
+          "sourceId": "tuhfa_rabbaniyya",
+          "locator": "الحديث 21",
+          "quote": "فإن القلب ملك الأعضاء وهى جنوده، فإذا استقام الملك استقامت جنوده"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "اجعل استقامتك شاملة: في القول والفعل والنية، فلا يكفي صلاح الظاهر دون القلب ولا العكس.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 21",
+            "quote": "وهى الإصابة في جميع الأقوال والأفعال والمقاصد"
+          }
+        ]
+      },
+      {
+        "text": "ابدأ من القلب: معرفة الله وخشيته ومحبته والتوكل عليه؛ فمنه تستقيم الجوارح على الطاعة.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 21",
+            "quote": "فمتى استقام القلب على معرفة الله وخشيته، وإجلاله، ومهابته، ومحبته، وإرادته، ورجائه، ودعائه، والتوكل عليه، والإعراض عما سواه - استقامت الجوارح كلها على طاعته"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 21",
+      "quote": null
+    },
+    "normalizations": [
+      "نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s1",
+        "tokenIndex": 14,
+        "before": "قُلْت",
+        "after": "قُلْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "38",
+          "quote": "قَالَ قُلْتُ يَا"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 12,
+        "before": "غَيْرَك",
+        "after": "غَيْرَكَ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "38",
+          "quote": "أُسَامَةَ غَيْرَكَ - قَالَ"
+        }
+      },
+      {
+        "segmentId": "s4",
+        "tokenIndex": 1,
+        "before": "آمَنْت",
+        "after": "آمَنْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "38",
+          "quote": "قُلْ آمَنْتُ بِاللَّهِ"
+        }
+      },
+      {
+        "segmentId": "s4",
+        "tokenIndex": 2,
+        "before": "بِاَللَّهِ",
+        "after": "بِاللَّهِ",
+        "rule": "fatha_on_wasl_alif",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "38",
+          "quote": "آمَنْتُ بِاللَّهِ فَاسْتَقِمْ"
+        }
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "غريب الألفاظ والشرح الميسر (concise_explanation) منقولان نصاً من «التحفة الربانية في شرح الأربعين النووية» للشيخ إسماعيل الأنصاري، من ملف نصي ناتج عن مسح ضوئي (OCR) أرفقه مالك المشروع؛ صُحّحت أخطاء المسح الظاهرة بتعديلات مسمّاة في tools/content/tuhfa_fixes.py، وقد يبقى سهو لم يُكتشف فيُراجَع على المطبوع.",
+      "الكتاب لا يضع عنواناً باسم «المعنى الإجمالي»؛ فحقل concise_explanation يجمع مفردات الحديث ثم «يستفاد منه» كما وردا في الكتاب، كلٌّ في بابه.",
+      "في صحيح مسلم (38) «قُلْ آمَنْتُ بِاللَّهِ فَاسْتَقِمْ»، والمتن المعروض «ثُمَّ اسْتَقِمْ» كما في الأربعين والكتاب؛ ولم يُغيَّر.",
+      "صُحّح ضبط بعض الكلمات بمطابقتها رسماً في المتن المشكول للحديث نفسه من مصدره المثبّت، ولم يُغيَّر إلا ما سقط من الحركات؛ وهو مسجّل في provenance.vocalizationEdits وتُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}
