@@ -90,7 +90,8 @@ class _MatnTextState extends State<MatnText> {
     for (final MatnSegment segment in matn.segments) {
       final TextStyle voice = _voiceStyle(segment.voice, base, palette);
       for (final MatnToken token in segment.tokens) {
-        final GharibEntry? gharib = tappable ? anchors[segment.id]?[token.index] : null;
+        final GharibEntry? anchored = anchors[segment.id]?[token.index];
+        final GharibEntry? gharib = tappable ? anchored : null;
         final bool active = widget.activeSegmentId == segment.id && widget.activeTokenIndex == token.index;
         if (!first) {
           // المسافة بين كلمتين من لفظة واحدة تُظلَّل معهما فيبدو التظليل متصلاً.
