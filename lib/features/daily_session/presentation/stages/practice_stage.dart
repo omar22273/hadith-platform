@@ -10,6 +10,7 @@
 
 import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +22,6 @@ import '../../../../core/ui/app_shapes.dart';
 import '../../../../core/ui/completion_flash.dart';
 import '../../../../core/ui/gated_next_button.dart';
 import '../../../../core/ui/hint_glow.dart';
-import '../../../../core/ui/rtl_inline.dart';
 import '../../../../core/ui/smooth_surface.dart';
 import '../../../../core/ui/testing_skip_button.dart';
 import '../../../hadith/domain/practice_engine.dart';
@@ -442,7 +442,7 @@ class _Tile extends StatelessWidget {
   }
 }
 
-class _VanishingBoard extends StatelessWidget {
+class _VanishingBoard extends StatefulWidget {
   const _VanishingBoard({
     required this.engine,
     required this.state,
@@ -454,7 +454,38 @@ class _VanishingBoard extends StatelessWidget {
   final SessionController controller;
 
   @override
+  State<_VanishingBoard> createState() => _VanishingBoardState();
+}
+
+class _VanishingBoardState extends State<_VanishingBoard> {
+  /// مستمع لمس لكل كلمة مخفية (بموضعها في المتن).
+  final Map<int, TapGestureRecognizer> _recognizers = <int, TapGestureRecognizer>{};
+
+  TapGestureRecognizer _recognizerFor(int word) {
+    return _recognizers.putIfAbsent(
+      word,
+      () => TapGestureRecognizer()
+        ..onTap = () {
+          HapticFeedback.selectionClick();
+          widget.controller.reveal(word);
+        },
+    );
+  }
+
+  @override
+  void dispose() {
+    for (final TapGestureRecognizer recognizer in _recognizers.values) {
+      recognizer.dispose();
+    }
+    _recognizers.clear();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final PracticeEngine engine = widget.engine;
+    final SessionState state = widget.state;
+    final SessionController controller = widget.controller;
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
     if (engine.levels.isEmpty || engine.words.isEmpty) {
@@ -472,34 +503,21 @@ class _VanishingBoard extends StatelessWidget {
         spans.add(TextSpan(text: ' ', style: style));
       }
       if (hidden.contains(w) && !state.revealed.contains(w)) {
-        addRtlSafePlaceholder(
-          spans,
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: Semantics(
-              button: true,
-              label: 'كلمة مخفية، المس بعد استحضارها لتظهر',
-              child: GestureDetector(
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  controller.reveal(w);
-                },
-                child: Container(
-                  width: math.max(36, word.token.core.length * 11.0),
-                  height: 30,
-                  margin: const EdgeInsets.symmetric(vertical: 6),
-                  decoration: ShapeDecoration(
-                    color: palette.amberSoft,
-                    shape: AppShapes.rounded(
-                      AppShapes.radiusSmall,
-                      side: BorderSide(color: palette.amber.withValues(alpha: 0.45)),
-                    ),
-                  ),
-                ),
-              ),
+        // الكلمة المخفية نص صريح (مسافات ثابتة بخلفية كهرمانية) لا WidgetSpan؛ فالعناصر المضمّنة
+        // المتجاورة تُرسم من اليسار إلى اليمين وتنعكس، أما النص فيلتزم ترتيب القراءة العربي.
+        final int letters = word.token.core.runes.where((int r) => r >= 0x0621 && r <= 0x064A).length;
+        spans.add(
+          TextSpan(
+            text: '\u00A0' * math.max(5, letters * 2),
+            style: style.copyWith(
+              backgroundColor: palette.amberSoft,
+              decoration: TextDecoration.underline,
+              decorationColor: palette.amber.withValues(alpha: 0.6),
+              decorationThickness: 1.6,
             ),
+            recognizer: _recognizerFor(w),
+            semanticsLabel: 'كلمة مخفية، المس بعد استحضارها لتظهر',
           ),
-          style: style,
         );
       } else {
         final bool recalledWord = hidden.contains(w);
