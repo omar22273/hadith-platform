@@ -75,7 +75,7 @@ jobs:
               grep -E "^(package|sdkVersion|minSdkVersion|targetSdkVersion|application-label:|launchable-activity|native-code)" badging.txt
               "$BT/zipalign" -p -f 4 "$SRC" dist/aligned.apk
               "$BT/apksigner" sign \
-                --ks tools/android/hadith-stable.keystore \
+                --ks android/app/fixed-debug.keystore \
                 --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey \
                 --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
                 --out "dist/$NAME" dist/aligned.apk

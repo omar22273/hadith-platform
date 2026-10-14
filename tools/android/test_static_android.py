@@ -8,8 +8,9 @@ These tests fail the build early if the manifest or the signing setup drifts:
   <manifest>;
 * every <activity>, <receiver> and <service> declares android:exported explicitly
   (Android 12+), and the launcher activity is exported;
-* the release build type is signed with the debug signing config, which uses the
-  committed stable keystore with the v1, v2 and v3 schemes all enabled;
+* the release build type is signed with its own `release` signing config, bound only to the
+  committed fixed keystore (android/app/fixed-debug.keystore) with v1, v2 and v3 all enabled;
+* versionCode follows GITHUB_RUN_NUMBER so every CI build is strictly newer than the last;
 * the workflow no longer generates or patches the Android scaffold dynamically.
 """
 
@@ -23,7 +24,7 @@ ANDROID_NS = 'http://schemas.android.com/apk/res/android'
 MANIFEST = os.path.join(ROOT, 'android', 'app', 'src', 'main', 'AndroidManifest.xml')
 GRADLE = os.path.join(ROOT, 'android', 'app', 'build.gradle.kts')
 WORKFLOW = os.path.join(ROOT, '.github', 'workflows', 'build_apk.yml')
-KEYSTORE = os.path.join(ROOT, 'tools', 'android', 'hadith-stable.keystore')
+KEYSTORE = os.path.join(ROOT, 'android', 'app', 'fixed-debug.keystore')
 TOP_LEVEL = ('uses-permission', 'uses-permission-sdk-23', 'uses-feature', 'uses-sdk', 'queries', 'permission')
 COMPONENTS = ('activity', 'activity-alias', 'service', 'receiver', 'provider')
 EXPLICIT_EXPORT = ('activity', 'activity-alias', 'service', 'receiver')
@@ -94,16 +95,25 @@ class SigningTest(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.gradle = read(GRADLE)
 
-    def test_debug_config_uses_the_stable_keystore_with_all_schemes(self) -> None:
+    def test_release_config_uses_the_fixed_keystore_with_all_schemes(self) -> None:
         self.assertTrue(os.path.exists(KEYSTORE))
-        self.assertIn('tools/android/hadith-stable.keystore', self.gradle)
+        config = re.search(r'create\("release"\)\s*\{(.*?)\n        \}', self.gradle, flags=re.DOTALL)
+        self.assertIsNotNone(config)
+        self.assertIn('storeFile = file("fixed-debug.keystore")', config.group(1))
+        self.assertIn('keyAlias = "androiddebugkey"', config.group(1))
         for flag in ('enableV1Signing', 'enableV2Signing', 'enableV3Signing'):
-            self.assertRegex(self.gradle, flag + r'\s*=\s*true')
+            self.assertRegex(config.group(1), flag + r'\s*=\s*true')
+        self.assertNotIn('hadith-stable', self.gradle)
 
-    def test_release_is_signed_with_the_debug_config(self) -> None:
-        release = re.search(r'release\s*\{(.*?)\n        \}', self.gradle, flags=re.DOTALL)
+    def test_release_is_signed_with_the_release_config_only(self) -> None:
+        release = re.search(r'release\s*\{(.*?)\n        \}', self.gradle[self.gradle.index('buildTypes'):], flags=re.DOTALL)
         self.assertIsNotNone(release)
-        self.assertIn('signingConfig = signingConfigs.getByName("debug")', release.group(1))
+        self.assertIn('signingConfig = signingConfigs.getByName("release")', release.group(1))
+        self.assertNotIn('getByName("debug")', self.gradle)
+
+    def test_version_code_follows_the_ci_run_number(self) -> None:
+        self.assertIn('System.getenv("GITHUB_RUN_NUMBER")', self.gradle)
+        self.assertRegex(self.gradle, r'100 \+ ciRunNumber')
 
     def test_min_sdk_is_pinned_to_the_flutter_floor(self) -> None:
         self.assertRegex(self.gradle, r'minSdk\s*=\s*24\b')
@@ -125,6 +135,8 @@ class WorkflowTest(unittest.TestCase):
     def test_the_apk_is_split_inspected_and_signed_before_upload(self) -> None:
         for needle in ('flutter build apk --release --split-per-abi', 'aapt dump badging', 'apksigner', 'verify_apk.py'):
             self.assertIn(needle, self.workflow)
+        self.assertIn('android/app/fixed-debug.keystore', self.workflow)
+        self.assertNotIn('hadith-stable', self.workflow)
         self.assertLess(self.workflow.index('verify_apk.py'), self.workflow.index('upload-artifact'))
         self.assertLess(self.workflow.index('dump badging'), self.workflow.index('upload-artifact'))
 
