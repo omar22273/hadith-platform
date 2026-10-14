@@ -18,7 +18,13 @@ HadithDailyModel _hadith(int number) {
   return HadithDailyModel.fromJson(asJsonMap(jsonDecode(File(path).readAsStringSync()), path));
 }
 
-Future<void> _pump(WidgetTester tester, Matn matn, double width, {bool withGharib = true}) {
+Future<void> _pump(
+  WidgetTester tester,
+  Matn matn,
+  double width, {
+  bool withGharib = true,
+  ValueChanged<String>? onTap,
+}) {
   return tester.pumpWidget(
     MaterialApp(
       theme: AppTheme.light(),
@@ -30,7 +36,7 @@ Future<void> _pump(WidgetTester tester, Matn matn, double width, {bool withGhari
           alignment: Alignment.topCenter,
           child: SizedBox(
             width: width,
-            child: MatnText(matn: matn, onGharibTap: withGharib ? (String id) {} : null),
+            child: MatnText(matn: matn, onGharibTap: withGharib ? (onTap ?? (String id) {}) : null),
           ),
         ),
       ),
@@ -71,11 +77,15 @@ void main() {
     final List<Rect> rects = _wordRects(tester);
     expect(rects.length, tokens.length);
     // دَعْ مَا يَرِيبُكَ إِلَى مَا لَا يَرِيبُكَ
-    expect(tokens[1].core, 'مَا');
-    expect(tokens[2].core, 'يَرِيبُكَ');
-    expect(_sameLine(rects[1], rects[2]), isTrue);
-    expect(rects[1].left, greaterThan(rects[2].left), reason: '«مَا» must be right of «يَرِيبُكَ»');
-    expect(rects[0].left, greaterThan(rects[1].left), reason: '«دَعْ» opens the line on the far right');
+    final int ma = tokens.indexWhere((MatnToken t) => t.core == 'مَا');
+    expect(ma, greaterThanOrEqualTo(1));
+    expect(tokens[ma - 1].core, 'دَعْ');
+    expect(tokens[ma + 1].core, 'يَرِيبُكَ');
+    expect(_sameLine(rects[ma], rects[ma + 1]), isTrue);
+    expect(rects[ma].left, greaterThan(rects[ma + 1].left), reason: '«مَا» must be right of «يَرِيبُكَ»');
+    if (_sameLine(rects[ma - 1], rects[ma])) {
+      expect(rects[ma - 1].left, greaterThan(rects[ma].left), reason: '«دَعْ» is right of «مَا»');
+    }
     for (int i = 0; i + 1 < rects.length; i++) {
       if (_sameLine(rects[i], rects[i + 1])) {
         expect(rects[i].left, greaterThan(rects[i + 1].left), reason: 'word $i (${tokens[i].core}) must be right of word ${i + 1}');
@@ -96,6 +106,30 @@ void main() {
     if (_sameLine(rects[first], rects[first + 1])) {
       expect(rects[first].left, greaterThan(rects[first + 1].left));
     }
+  });
+
+  testWidgets('touching a highlighted gharib word, including the joining space, reports that word', (WidgetTester tester) async {
+    final HadithDailyModel hadith = _hadith(11);
+    final List<String> taps = <String>[];
+    await _pump(tester, hadith.matn, 380, onTap: taps.add);
+    final List<Rect> rects = _wordRects(tester);
+    final Offset origin = tester.getTopLeft(
+      find.descendant(of: find.byType(MatnText), matching: find.byType(RichText)).first,
+    );
+    for (final GharibEntry entry in hadith.matn.gharib) {
+      int offset = 0;
+      for (final MatnSegment segment in hadith.matn.segments) {
+        if (segment.id == entry.anchor.segmentId) {
+          break;
+        }
+        offset += segment.tokens.length;
+      }
+      final Rect word = rects[offset + entry.anchor.tokenIndex];
+      await tester.tapAt(origin + word.center);
+      await tester.pump();
+      expect(taps.last, entry.id, reason: entry.headword);
+    }
+    expect(taps.length, hadith.matn.gharib.length);
   });
 
   for (final double width in <double>[300, 380]) {

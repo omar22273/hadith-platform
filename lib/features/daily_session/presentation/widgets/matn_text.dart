@@ -2,7 +2,13 @@
 // يميز صاحب الكلام في كل مقطع، ويظلل غريب الألفاظ بظل كهرماني دافئ قابل
 // للمس، ويضيء الكلمة الجارية عند توفر تلاوة متزامنة.
 // النص يُعرض كما هو في الملف الموثق، كلمةً كلمة بعقد التقسيم المشترك.
+//
+// الاتجاه: الفقرة كلها نص واحد من TextSpan بـ TextDirection.rtl، والغريب المظلل نص
+// بخلفية ومستمع لمس لا WidgetSpan. فالعناصر المضمّنة (WidgetSpan) المتجاورة تُعامَل في
+// خوارزمية الاتجاه كأحرف محايدة فتُرسم متتابعاتها من اليسار إلى اليمين (فتنعكس
+// «ما يريبك» و«فأنى يستجاب له»)؛ أما النص الصريح فيلتزم ترتيب القراءة العربي دائماً.
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_palette.dart';
@@ -10,7 +16,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../hadith/data/models/models.dart';
 
 /// المتن مع الغريب اللمسي.
-class MatnText extends StatelessWidget {
+class MatnText extends StatefulWidget {
   const MatnText({
     super.key,
     required this.matn,
@@ -40,8 +46,33 @@ class MatnText extends StatelessWidget {
   final double fontSize;
 
   @override
+  State<MatnText> createState() => _MatnTextState();
+}
+
+class _MatnTextState extends State<MatnText> {
+  /// مستمع لمس لكل لفظة غريبة، تشترك فيه كلماتها المتتابعة.
+  final Map<String, TapGestureRecognizer> _recognizers = <String, TapGestureRecognizer>{};
+
+  TapGestureRecognizer _recognizerFor(String gharibId) {
+    return _recognizers.putIfAbsent(
+      gharibId,
+      () => TapGestureRecognizer()..onTap = () => widget.onGharibTap?.call(gharibId),
+    );
+  }
+
+  @override
+  void dispose() {
+    for (final TapGestureRecognizer recognizer in _recognizers.values) {
+      recognizer.dispose();
+    }
+    _recognizers.clear();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
+    final Matn matn = widget.matn;
     final Map<String, Map<int, GharibEntry>> anchors = <String, Map<int, GharibEntry>>{};
     for (final GharibEntry entry in matn.gharib) {
       final Map<int, GharibEntry> bySegment =
@@ -51,33 +82,38 @@ class MatnText extends StatelessWidget {
       }
     }
 
-    final TextStyle base = AppTypography.matnOf(context, color: palette.ink, fontSize: fontSize);
+    final TextStyle base = AppTypography.matnOf(context, color: palette.ink, fontSize: widget.fontSize);
     final List<InlineSpan> spans = <InlineSpan>[];
+    final bool tappable = widget.onGharibTap != null;
     bool first = true;
+    GharibEntry? previousGharib;
     for (final MatnSegment segment in matn.segments) {
       final TextStyle voice = _voiceStyle(segment.voice, base, palette);
       for (final MatnToken token in segment.tokens) {
+        final GharibEntry? gharib = tappable ? anchors[segment.id]?[token.index] : null;
+        final bool active = widget.activeSegmentId == segment.id && widget.activeTokenIndex == token.index;
         if (!first) {
-          spans.add(TextSpan(text: ' ', style: voice));
+          // المسافة بين كلمتين من لفظة واحدة تُظلَّل معهما فيبدو التظليل متصلاً.
+          final GharibEntry? joinedWith = gharib != null && identical(gharib, previousGharib) ? gharib : null;
+          spans.add(
+            TextSpan(
+              text: ' ',
+              style: joinedWith == null ? voice : _gharibStyle(voice, palette, joinedWith, active: false),
+              recognizer: joinedWith == null ? null : _recognizerFor(joinedWith.id),
+            ),
+          );
         }
         first = false;
         if (token.leading.isNotEmpty) {
           spans.add(TextSpan(text: token.leading, style: voice));
         }
-        final GharibEntry? gharib = anchors[segment.id]?[token.index];
-        final bool active = activeSegmentId == segment.id && activeTokenIndex == token.index;
-        if (gharib != null && onGharibTap != null) {
+        if (gharib != null) {
           spans.add(
-            WidgetSpan(
-              alignment: PlaceholderAlignment.baseline,
-              baseline: TextBaseline.alphabetic,
-              child: _GharibWord(
-                word: token.core,
-                style: voice,
-                selected: gharib.id == selectedGharibId,
-                active: active,
-                onTap: () => onGharibTap!(gharib.id),
-              ),
+            TextSpan(
+              text: token.core,
+              style: _gharibStyle(voice, palette, gharib, active: active),
+              recognizer: _recognizerFor(gharib.id),
+              semanticsLabel: '${token.core}، لفظة غريبة، المس لبيانها',
             ),
           );
         } else {
@@ -91,12 +127,34 @@ class MatnText extends StatelessWidget {
         if (token.trailing.isNotEmpty) {
           spans.add(TextSpan(text: token.trailing, style: voice));
         }
+        previousGharib = gharib;
       }
     }
     return Text.rich(
       TextSpan(children: spans),
       textAlign: TextAlign.justify,
       textDirection: TextDirection.rtl,
+    );
+  }
+
+  /// نمط الكلمة الغريبة: خلفية كهرمانية دافئة وخط منقّط سفلي، وأوضح عند الاختيار.
+  TextStyle _gharibStyle(
+    TextStyle voice,
+    AppPalette palette,
+    GharibEntry gharib, {
+    required bool active,
+  }) {
+    final bool selected = gharib.id == widget.selectedGharibId;
+    return voice.copyWith(
+      backgroundColor: active
+          ? palette.emeraldSoft
+          : selected
+              ? palette.amber.withValues(alpha: 0.32)
+              : palette.amberSoft,
+      decoration: TextDecoration.underline,
+      decorationStyle: selected ? TextDecorationStyle.solid : TextDecorationStyle.dotted,
+      decorationColor: selected ? palette.amber : palette.amber.withValues(alpha: 0.7),
+      decorationThickness: selected ? 2 : 1.4,
     );
   }
 
@@ -109,57 +167,5 @@ class MatnText extends StatelessWidget {
       case SegmentVoice.interlocutor:
         return base.copyWith(color: palette.amberText);
     }
-  }
-}
-
-class _GharibWord extends StatelessWidget {
-  const _GharibWord({
-    required this.word,
-    required this.style,
-    required this.selected,
-    required this.active,
-    required this.onTap,
-  });
-
-  final String word;
-  final TextStyle style;
-  final bool selected;
-  final bool active;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: '$word، لفظة غريبة، المس لبيانها',
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: ExcludeSemantics(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: active
-                  ? palette.emeraldSoft
-                  : selected
-                      ? palette.amber.withValues(alpha: 0.32)
-                      : palette.amberSoft,
-              borderRadius: BorderRadius.circular(10),
-              border: Border(
-                bottom: BorderSide(
-                  color: selected ? palette.amber : palette.amber.withValues(alpha: 0.55),
-                  width: selected ? 2 : 1.4,
-                ),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Text(word, style: style.copyWith(height: 1.75)),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
