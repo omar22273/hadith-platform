@@ -40,6 +40,9 @@ abstract final class StorageKeys {
   /// سجل المراجعة المحلي: حصة اليوم وآخر ظهور لكل بطاقة. لا يدخل النسخة الاحتياطية.
   static const String reviewLedger = 'review.ledger.v1';
 
+  /// السبحة النبوية الذكية: الذكر المختار والعدد المستهدف وعدّاد الجولة ومجاميع الأذكار.
+  static const String adhkarSebha = 'adhkar.sebha.v1';
+
   /// كل المفاتيح.
   static const Set<String> all = <String>{
     journeyProgress,
@@ -53,6 +56,7 @@ abstract final class StorageKeys {
     seerahVisited,
     reminder,
     reviewLedger,
+    adhkarSebha,
   };
 }
 
