@@ -72,27 +72,33 @@ bool _sameLine(Rect a, Rect b) => (a.center.dy - b.center.dy).abs() < a.height /
 void main() {
   testWidgets('hadith 11: «مَا» sits to the right of «يُرِيبُكَ», as an Arabic reader expects', (WidgetTester tester) async {
     final HadithDailyModel hadith = _hadith(11);
-    await _pump(tester, hadith.matn, 380);
     final List<MatnToken> tokens = <MatnToken>[for (final MatnSegment s in hadith.matn.segments) ...s.tokens];
-    final List<Rect> rects = _wordRects(tester);
-    expect(rects.length, tokens.length);
     // دَعْ مَا يُرِيبُكَ إِلَى مَا لَا يُرِيبُكَ
     final int ma = tokens.indexWhere((MatnToken t) => t.core == 'مَا');
     expect(ma, greaterThanOrEqualTo(1));
     expect(tokens[ma - 1].core, 'دَعْ');
     expect(tokens[ma + 1].core, 'يُرِيبُكَ');
-    expect(_sameLine(rects[ma], rects[ma + 1]), isTrue);
-    expect(rects[ma].left, greaterThan(rects[ma + 1].left), reason: '«مَا» must be right of «يُرِيبُكَ»');
-    if (_sameLine(rects[ma - 1], rects[ma])) {
-      expect(rects[ma - 1].left, greaterThan(rects[ma].left), reason: '«دَعْ» is right of «مَا»');
-    }
-    for (int i = 0; i + 1 < rects.length; i++) {
-      if (_sameLine(rects[i], rects[i + 1])) {
-        expect(rects[i].left, greaterThan(rects[i + 1].left), reason: 'word $i (${tokens[i].core}) must be right of word ${i + 1}');
-      } else {
-        expect(rects[i + 1].top, greaterThan(rects[i].top), reason: 'word ${i + 1} wraps below word $i');
+    int sameLineWidths = 0;
+    for (final double width in <double>[300, 340, 380, 420, 480, 600, 800]) {
+      await _pump(tester, hadith.matn, width);
+      final List<Rect> rects = _wordRects(tester);
+      expect(rects.length, tokens.length);
+      if (_sameLine(rects[ma], rects[ma + 1])) {
+        sameLineWidths++;
+        expect(rects[ma].left, greaterThan(rects[ma + 1].left), reason: 'width $width: «مَا» must be right of «يُرِيبُكَ»');
+      }
+      if (_sameLine(rects[ma - 1], rects[ma])) {
+        expect(rects[ma - 1].left, greaterThan(rects[ma].left), reason: 'width $width: «دَعْ» is right of «مَا»');
+      }
+      for (int i = 0; i + 1 < rects.length; i++) {
+        if (_sameLine(rects[i], rects[i + 1])) {
+          expect(rects[i].left, greaterThan(rects[i + 1].left), reason: 'width $width: word $i (${tokens[i].core}) must be right of word ${i + 1}');
+        } else {
+          expect(rects[i + 1].top, greaterThan(rects[i].top), reason: 'width $width: word ${i + 1} wraps below word $i');
+        }
       }
     }
+    expect(sameLineWidths, greaterThan(0), reason: 'the pair must share a line at some width');
   });
 
   testWidgets('hadith 10: «فَأَنَّى» is right of «يُسْتَجَابُ»', (WidgetTester tester) async {
