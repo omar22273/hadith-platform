@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../../core/content/models/review_info.dart';
 import '../../../../core/json/json_reader.dart';
+import 'concise_explanation.dart';
 import 'historical_context.dart';
 import 'matn.dart';
 import 'practice.dart';
@@ -26,6 +27,7 @@ class HadithDailyModel {
     required this.milestone,
     required this.context,
     required this.matn,
+    this.conciseExplanation,
     required this.practice,
     required this.reflection,
     required this.scholar,
@@ -45,6 +47,7 @@ class HadithDailyModel {
       milestone: readString(json, 'milestone'),
       context: readModel(json, 'context', HistoricalContext.fromJson),
       matn: readModel(json, 'matn', Matn.fromJson),
+      conciseExplanation: readModelOrNull(json, 'concise_explanation', ConciseExplanation.fromJson),
       practice: readModel(json, 'practice', PracticeConfig.fromJson),
       reflection: readModel(json, 'reflection', Reflection.fromJson),
       scholar: readModel(json, 'scholar', ScholarLayer.fromJson),
@@ -80,6 +83,9 @@ class HadithDailyModel {
   /// المرحلة الثانية: المتن والبيان اللغوي والتخريج.
   final Matn matn;
 
+  /// الشرح الميسر للحديث منقولاً من «التحفة الربانية» (المفردات ثم «يستفاد منه») ويُعرض بزر «شرح الحديث» في مرحلة المتن؛ اختياري فغيابه يُخفي الزر.
+  final ConciseExplanation? conciseExplanation;
+
   /// المرحلة الثالثة: التثبيت والحفظ التراكمي.
   final PracticeConfig practice;
 
@@ -107,6 +113,7 @@ class HadithDailyModel {
       'milestone': milestone,
       'context': context.toJson(),
       'matn': matn.toJson(),
+      if (conciseExplanation != null) 'concise_explanation': conciseExplanation?.toJson(),
       'practice': practice.toJson(),
       'reflection': reflection.toJson(),
       'scholar': scholar.toJson(),
@@ -130,6 +137,7 @@ class HadithDailyModel {
         milestone == other.milestone &&
         context == other.context &&
         matn == other.matn &&
+        conciseExplanation == other.conciseExplanation &&
         practice == other.practice &&
         reflection == other.reflection &&
         scholar == other.scholar &&
@@ -149,6 +157,7 @@ class HadithDailyModel {
       milestone,
       context,
       matn,
+      conciseExplanation,
       practice,
       reflection,
       scholar,

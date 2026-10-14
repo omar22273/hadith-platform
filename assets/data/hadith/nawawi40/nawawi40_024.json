@@ -1,0 +1,768 @@
+{
+  "schemaVersion": "2.0.0",
+  "id": "nawawi40_024",
+  "sequence": 24,
+  "collection": {
+    "id": "arbaun_nawawiyya",
+    "title": "الأربعون النووية",
+    "numberInCollection": 24
+  },
+  "title": "يا عبادي إني حرمت الظلم على نفسي",
+  "teaser": {
+    "text": "غداً: حديثٌ قدسيٌّ يفتح أبواب الهداية والرزق والمغفرة… وخزائنُ لا تنفد."
+  },
+  "milestone": "الحديث القدسي: الظلم والهداية والمغفرة",
+  "context": {
+    "narrative": "لم يرد في المصادر المثبّتة سبب لورود هذا الحديث؛ يرويه أبو ذر الغفاري رضي الله عنه عن النبي ﷺ فيما يرويه عن ربه عز وجل، وهو حديث قدسي يتضمن تحريم الظلم، والحاجة إلى الله في الهداية والرزق والكسوة والمغفرة، وكمال غناه، ثم إحصاء الأعمال وتوفيتها.",
+    "humanMotive": "تعريف العبد بحقيقة افتقاره إلى ربه وغنى ربه عنه، وبمسؤوليته عن عمله.",
+    "place": null,
+    "sources": [
+      {
+        "sourceId": "sahih_muslim",
+        "locator": "2577",
+        "quote": "يَا عِبَادِي إِنِّي حَرَّمْتُ الظُّلْمَ عَلَى نَفْسِي وَجَعَلْتُهُ بَيْنَكُمْ مُحَرَّمًا فَلاَ تَظَالَمُوا"
+      },
+      {
+        "sourceId": "tuhfa_rabbaniyya",
+        "locator": "الحديث 24",
+        "quote": "تحريم الظلم، وذلك متفق عليه فى كل ملة"
+      }
+    ],
+    "cautions": []
+  },
+  "matn": {
+    "segments": [
+      {
+        "id": "s1",
+        "voice": "narration",
+        "text": "عَنْ أَبِي ذَرٍّ الْغِفَارِيِّ رَضِيَ اللهُ عَنْهُ عَنِ النَّبِيِّ ﷺ فِيمَا يَرْوِيهِ عَنْ رَبِّهِ عَزَّ وَجَلَّ، أَنَّهُ قَالَ:"
+      },
+      {
+        "id": "s2",
+        "voice": "prophet",
+        "text": "يَا عِبَادِي: إِنِّي حَرَّمْتُ الظُّلْمَ عَلَى نَفْسِي، وَجَعَلْتُهُ بَيْنَكُمْ مُحَرَّمًا؛ فَلَا تَظَالَمُوا. يَا عِبَادِي! كُلُّكُمْ ضَالٌّ إِلَّا مَنْ هَدَيْتُهُ، فَاسْتَهْدُونِي أَهْدِكُمْ. يَا عِبَادِي! كُلُّكُمْ جَائِعٌ إِلَّا مَنْ أَطْعَمْتُهُ، فَاسْتَطْعِمُونِي أُطْعِمْكُمْ. يَا عِبَادِي! كُلُّكُمْ عَارٍ إِلَّا مَنْ كَسَوْتُهُ، فَاسْتَكْسُونِي أَكْسُكُمْ. يَا عِبَادِي! إِنَّكُمْ تُخْطِئُونَ بِاللَّيْلِ وَالنَّهَارِ، وَأَنَا أَغْفِرُ الذُّنُوبَ جَمِيعًا؛ فَاسْتَغْفِرُونِي أَغْفِرْ لَكُمْ. يَا عِبَادِي! إِنَّكُمْ لَنْ تَبْلُغُوا ضُرِّي فَتَضُرُّونِي، وَلَنْ تَبْلُغُوا نَفْعِي فَتَنْفَعُونِي. يَا عِبَادِي! لَوْ أَنَّ أَوَّلَكُمْ وَآخِرَكُمْ وَإِنْسَكُمْ وَجِنَّكُمْ كَانُوا عَلَى أَتْقَى قَلْبِ رَجُلٍ وَاحِدٍ مِنْكُمْ، مَا زَادَ ذَلِكَ فِي مُلْكِي شَيْئًا. يَا عِبَادِي! لَوْ أَنَّ أَوَّلَكُمْ وَآخِرَكُمْ وَإِنْسَكُمْ وَجِنَّكُمْ كَانُوا عَلَى أَفْجَرِ قَلْبِ رَجُلٍ وَاحِدٍ مِنْكُمْ، مَا نَقَصَ ذَلِكَ مِنْ مُلْكِي شَيْئًا. يَا عِبَادِي! لَوْ أَنَّ أَوَّلَكُمْ وَآخِرَكُمْ وَإِنْسَكُمْ وَجِنَّكُمْ قَامُوا فِي صَعِيدٍ وَاحِدٍ، فَسَأَلُونِي، فَأَعْطَيْتُ كُلَّ وَاحِدٍ مَسْأَلَتَهُ، مَا نَقَصَ ذَلِكَ مِمَّا عِنْدِي إِلَّا كَمَا يَنْقُصُ الْمِخْيَطُ إِذَا أُدْخِلَ الْبَحْرَ. يَا عِبَادِي! إِنَّمَا هِيَ أَعْمَالُكُمْ أُحْصِيهَا لَكُمْ، ثُمَّ أُوَفِّيكُمْ إِيَّاهَا؛ فَمَنْ وَجَدَ خَيْرًا فَلْيَحْمَدِ اللَّهَ، وَمَنْ وَجَدَ غَيْرَ ذَلِكَ فَلَا يَلُومَنَّ إِلَّا نَفْسَهُ."
+      }
+    ],
+    "gharib": [
+      {
+        "id": "g1",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 10,
+          "length": 2,
+          "surface": "فَلَا تَظَالَمُوا"
+        },
+        "headword": "فَلَا تَظَالَمُوا",
+        "meaning": "بتشديد الظاء وبتخفيفها أصله تتظالموا، لا يظلم بعضكم بعضاً.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 24",
+            "quote": "بتشديد الظاء وبتخفيفها أصله تتظالموا، لا يظلم بعضكم بعضاً."
+          }
+        ]
+      },
+      {
+        "id": "g2",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 113,
+          "length": 4,
+          "surface": "قَامُوا فِي صَعِيدٍ وَاحِدٍ"
+        },
+        "headword": "قَامُوا فِي صَعِيدٍ وَاحِدٍ",
+        "meaning": "في أرض واحدة، ومقام واحد.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 24",
+            "quote": "في أرض واحدة، ومقام واحد."
+          }
+        ]
+      },
+      {
+        "id": "g3",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 130,
+          "length": 1,
+          "surface": "الْمِخْيَطُ"
+        },
+        "headword": "الْمِخْيَطُ",
+        "meaning": "بكسر الميم وسكون المعجمة وفتح الياء - الإبرة.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 24",
+            "quote": "بكسر الميم وسكون المعجمة وفتح الياء - الإبرة."
+          }
+        ]
+      },
+      {
+        "id": "g4",
+        "anchor": {
+          "segmentId": "s2",
+          "tokenIndex": 139,
+          "length": 1,
+          "surface": "أُحْصِيهَا"
+        },
+        "headword": "أُحْصِيهَا",
+        "meaning": "أضبطها وأحفظها بعلمى وملائكتي.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 24",
+            "quote": "أضبطها وأحفظها بعلمى وملائكتي."
+          }
+        ]
+      }
+    ],
+    "audio": {
+      "status": "not_recorded",
+      "remoteUrl": null,
+      "reciter": null,
+      "durationMs": null,
+      "timings": []
+    },
+    "takhrij": {
+      "displayLabel": "صحيح مسلم، رقم 2577",
+      "references": [
+        {
+          "sourceId": "sahih_muslim",
+          "hadithNumber": "2577",
+          "numberingSystem": "fuad_abdul_baqi",
+          "digitalLocator": "editions/ara-muslim.json → arabicnumber 2577.01"
+        }
+      ],
+      "compilerStatement": {
+        "text": "رَوَاهُ مُسْلِمٌ",
+        "sourceId": "arbaun_nawawiyya"
+      },
+      "gradings": []
+    }
+  },
+  "concise_explanation": {
+    "source": {
+      "sourceId": "tuhfa_rabbaniyya",
+      "locator": "الحديث 24",
+      "quote": null
+    },
+    "vocabulary": [
+      {
+        "term": "حرمت",
+        "explanation": "منعت"
+      },
+      {
+        "term": "الظالم",
+        "explanation": "وهو لغة وضع الشيء في غير موضعه."
+      },
+      {
+        "term": "على نفسى",
+        "explanation": "فضلا منى، وجوداً وإحساناً إلى عبادي، فلا أعاقب البرىء على ما لم يفعل من السيئات، ولا أعاقب أحداً بذنب غيره، ولا أنقص المحسن شيئاً من جزاء حسناته، ولا أحكم بين الناس إلا بالعدل والقسط."
+      },
+      {
+        "term": "وجعلته بينكم محرماً",
+        "explanation": "حكمت بتحريمه عليكم."
+      },
+      {
+        "term": "فلا تظالموا",
+        "explanation": "بتشديد الظاء وبتخفيفها أصله تتظالموا، لا يظلم بعضكم بعضاً."
+      },
+      {
+        "term": "كلكم ضال",
+        "explanation": "عن الحق لو ترك، وما يدعو له الطبع من الراحة وإهمال الشرع."
+      },
+      {
+        "term": "إلا من هديته",
+        "explanation": "وفقته لامتثال الأمر واجتناب النهي."
+      },
+      {
+        "term": "فاستهدوني",
+        "explanation": "اطلبوا منى الدلالة على طريق الحق والإيصال إليها."
+      },
+      {
+        "term": "أهدكم",
+        "explanation": "أنصب لكم أدلة ذلك الواضحة، وأوفقكم لها."
+      },
+      {
+        "term": "فاستطعموني",
+        "explanation": "اطلبوا منى الطعام."
+      },
+      {
+        "term": "تخطئون",
+        "explanation": "بضم التاء على الرواية المشهورة، وروى بفتحها وفتح الطاء: تأئمون."
+      },
+      {
+        "term": "وأنا أغفر الذنوب جميعاً",
+        "explanation": "غير الشرك وما لا يشاء مغفرته، لقوله تعالى: إن الله لا يغفر أن يشرك به ويغفر ما دون ذلك لمن يشاء."
+      },
+      {
+        "term": "فاستغفروني",
+        "explanation": "سلونى المغفرة، وهى ستر الذنب ومحو أثره وأمن عاقبته."
+      },
+      {
+        "term": "قاموا في صعيد واحد",
+        "explanation": "في أرض واحدة، ومقام واحد."
+      },
+      {
+        "term": "المخيط",
+        "explanation": "بكسر الميم وسكون المعجمة وفتح الياء - الإبرة."
+      },
+      {
+        "term": "أحصيها",
+        "explanation": "أضبطها وأحفظها بعلمى وملائكتي."
+      },
+      {
+        "term": "أوفيكم إياها",
+        "explanation": "أعطيكم جزاءها وافياً تاماً."
+      },
+      {
+        "term": "فمن وجد خيراً",
+        "explanation": "ثواباً ونعيما بأن وفق لأسبابهما. أو حياة طيبة هنيئة"
+      },
+      {
+        "term": "فليحمد الله",
+        "explanation": "على توفيقه للطاعات التي ترتب عليها ذلك الخير والثواب، فضلا منه ورحمة"
+      },
+      {
+        "term": "غير ذلك",
+        "explanation": "شراً."
+      },
+      {
+        "term": "فلا يلومن إلا نفسه",
+        "explanation": "فإنها آثرت شهواتها على رضا رازقها، فكفرت بأنعمه، ولم تذعن لأحكامه."
+      }
+    ],
+    "benefits": [
+      "تحريم الظلم، وذلك متفق عليه فى كل ملة، لاتفاق سائر الملل على مراعاة حفظ النفوس والأنساب والأعراض والعقول والأموال: و الظلم يقع في هذه أو بعضها. وأعظم الظلم الشرك، قال تعالى: إن الشرك لظلم عظيم",
+      "وجوب الإقبال على المولى فى جميع ما ينزل بالإنسان لافتقار سائر الخلق إليه وعجزهم عن جلب منافعهم ودفع مضارهم إلا بتيسيره. فيجب إفراده بأنواع العبادة: من السؤال والتضرع والاستعانة وغيرها، فإنه المتفرد بخلق العبد وبهدايته و برزقه، وإحيائه وأمانته، ومغفرة ذنوبه.",
+      "كمال فعله تعالى لتنزيهه عن الظلم وكمال ملكه فلا يزاد بالطاعة ولا ينقص بالمعاصي، وكمال غناه فإن خزائنه لا تنفد ولا تنقص بالعطاء. وكمال إحسانه إلى عباده فإنه يجب أن يسألوه جميع مصالحهم الدينية والدنيوية كما يسألونه الهداية والمغفرة. فله تعالى الكمال المطلق في ذاته وصفاته وأفعاله.",
+      "أن الأصل فى التقوى والفجور هو القلوب، فإذا بر القلب واتقى برت الجوارح. وإذا فجر القلب فجرت الجوارح.",
+      "إن الخير كله من فضل الله تعالى على عباده من غير استحقاق. والشر كله من عند ابن آدم من اتباع هوى نفسه"
+    ]
+  },
+  "practice": {
+    "chunks": [
+      {
+        "id": "c1",
+        "segmentId": "s1",
+        "startToken": 0,
+        "endToken": 17,
+        "label": "الراوي أبو ذر عن النبي ﷺ عن ربه"
+      },
+      {
+        "id": "c2",
+        "segmentId": "s2",
+        "startToken": 0,
+        "endToken": 13,
+        "label": "إني حرمت الظلم فلا تظالموا"
+      },
+      {
+        "id": "c3",
+        "segmentId": "s2",
+        "startToken": 14,
+        "endToken": 22,
+        "label": "كلكم ضال إلا من هديته"
+      },
+      {
+        "id": "c4",
+        "segmentId": "s2",
+        "startToken": 23,
+        "endToken": 31,
+        "label": "كلكم جائع إلا من أطعمته"
+      },
+      {
+        "id": "c5",
+        "segmentId": "s2",
+        "startToken": 32,
+        "endToken": 40,
+        "label": "كلكم عار إلا من كسوته"
+      },
+      {
+        "id": "c6",
+        "segmentId": "s2",
+        "startToken": 41,
+        "endToken": 53,
+        "label": "إنكم تخطئون فاستغفروني"
+      },
+      {
+        "id": "c7",
+        "segmentId": "s2",
+        "startToken": 54,
+        "endToken": 64,
+        "label": "لن تبلغوا ضري ولا نفعي"
+      },
+      {
+        "id": "c8",
+        "segmentId": "s2",
+        "startToken": 65,
+        "endToken": 77,
+        "label": "لو كانوا على أتقى قلب"
+      },
+      {
+        "id": "c9",
+        "segmentId": "s2",
+        "startToken": 78,
+        "endToken": 85,
+        "label": "ما زاد ذلك في ملكي شيئاً"
+      },
+      {
+        "id": "c10",
+        "segmentId": "s2",
+        "startToken": 86,
+        "endToken": 98,
+        "label": "لو كانوا على أفجر قلب"
+      },
+      {
+        "id": "c11",
+        "segmentId": "s2",
+        "startToken": 99,
+        "endToken": 106,
+        "label": "ما نقص ذلك من ملكي شيئاً"
+      },
+      {
+        "id": "c12",
+        "segmentId": "s2",
+        "startToken": 107,
+        "endToken": 121,
+        "label": "قاموا في صعيد واحد فسألوني"
+      },
+      {
+        "id": "c13",
+        "segmentId": "s2",
+        "startToken": 122,
+        "endToken": 135,
+        "label": "ما نقص مما عندي إلا كالمخيط"
+      },
+      {
+        "id": "c14",
+        "segmentId": "s2",
+        "startToken": 136,
+        "endToken": 143,
+        "label": "إنما هي أعمالكم أحصيها لكم"
+      },
+      {
+        "id": "c15",
+        "segmentId": "s2",
+        "startToken": 144,
+        "endToken": 148,
+        "label": "فمن وجد خيراً فليحمد الله"
+      },
+      {
+        "id": "c16",
+        "segmentId": "s2",
+        "startToken": 149,
+        "endToken": 156,
+        "label": "ومن وجد غير ذلك فلا يلومن إلا نفسه"
+      }
+    ],
+    "reconstruction": {
+      "chunkIds": [
+        "c1",
+        "c2",
+        "c3",
+        "c4",
+        "c5",
+        "c6",
+        "c7",
+        "c8",
+        "c9",
+        "c10",
+        "c11",
+        "c12",
+        "c13",
+        "c14",
+        "c15",
+        "c16"
+      ],
+      "shuffleStrategy": "per_user_per_day"
+    },
+    "vanishing": {
+      "levels": [
+        {
+          "level": 1,
+          "hidePercent": 25
+        },
+        {
+          "level": 2,
+          "hidePercent": 50
+        },
+        {
+          "level": 3,
+          "hidePercent": 80
+        }
+      ],
+      "priorityAnchors": [
+        {
+          "segmentId": "s2",
+          "tokenIndex": 3,
+          "length": 4,
+          "surface": "حَرَّمْتُ الظُّلْمَ عَلَى نَفْسِي"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 49,
+          "length": 3,
+          "surface": "فَاسْتَغْفِرُونِي أَغْفِرْ لَكُمْ"
+        },
+        {
+          "segmentId": "s2",
+          "tokenIndex": 144,
+          "length": 5,
+          "surface": "فَمَنْ وَجَدَ خَيْرًا فَلْيَحْمَدِ اللَّهَ"
+        }
+      ]
+    }
+  },
+  "reflection": {
+    "scenario": {
+      "situation": "وقع بينك وبين زميل خلاف في العمل، وبين يديك فرصة أن تُضعف موقفه بأسلوب غير عادل دون أن يعلم أحد.",
+      "question": "ما الموقف الأقرب إلى هدي الحديث؟",
+      "options": [
+        {
+          "id": "o1",
+          "alignment": "aligned",
+          "text": "أمتنع عن الظلم؛ فالله حرّمه على نفسه وجعله بين عباده محرماً، وأتوجه إليه بسؤال الهداية والتوفيق.",
+          "feedback": "أحسنت؛ تحريم الظلم متفق عليه في كل ملة، وإفراد الله بالسؤال والاستعانة من لوازم الافتقار إليه."
+        },
+        {
+          "id": "o2",
+          "alignment": "partial",
+          "text": "أمتنع عن الظلم خوفاً من افتضاح أمري فقط.",
+          "feedback": "الحديث يربط ترك الظلم بتحريم الله له، وبأن الأعمال محصاة توفّى لصاحبها؛ فالمنع الصادق منبعه التقوى لا الخوف من الناس."
+        },
+        {
+          "id": "o3",
+          "alignment": "misaligned",
+          "text": "أمضي فيه؛ فالمنافسة تبرر ما أفعل ما دمتُ لا أُفتضح.",
+          "feedback": "الظلم محرم، والأعمال محصاة، ومن وجد غير الخير فلا يلومن إلا نفسه."
+        }
+      ],
+      "takeaway": "الظلم محرَّم، والخير كله من فضل الله، والشر من هوى النفس؛ فاسأل الله الهداية وأحسن عملك.",
+      "basis": [
+        {
+          "sourceId": "tuhfa_rabbaniyya",
+          "locator": "الحديث 24",
+          "quote": "تحريم الظلم، وذلك متفق عليه فى كل ملة"
+        },
+        {
+          "sourceId": "tuhfa_rabbaniyya",
+          "locator": "الحديث 24",
+          "quote": "إن الخير كله من فضل الله تعالى على عباده من غير استحقاق"
+        }
+      ]
+    },
+    "impacts": [
+      {
+        "text": "لا تظلم أحداً في نفسه ولا ماله ولا عرضه؛ فالظلم يقع في هذه الأصول، وأعظمه الشرك.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 24",
+            "quote": "و الظلم يقع في هذه أو بعضها. وأعظم الظلم الشرك"
+          }
+        ]
+      },
+      {
+        "text": "إذا أصبت خيراً فاحمد الله، وإن وجدت غيره فارجع إلى نفسك؛ فالشر من اتباع الهوى.",
+        "sources": [
+          {
+            "sourceId": "tuhfa_rabbaniyya",
+            "locator": "الحديث 24",
+            "quote": "والشر كله من عند ابن آدم من اتباع هوى نفسه"
+          }
+        ]
+      }
+    ]
+  },
+  "scholar": {
+    "chains": [],
+    "variants": []
+  },
+  "provenance": {
+    "matnSource": {
+      "sourceId": "arbaun_nawawiyya",
+      "locator": "الحديث 24",
+      "quote": null
+    },
+    "normalizations": [
+      "توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.",
+      "اعتُمد لفظ كتاب «التحفة الربانية» عند اختلافه عن المصدر الرقمي للأربعين، وكُتبت الكلمة المختلفة بلا تشكيل فأُكملت حركاتها من الصحيحين أو من الكتاب نفسه بالمقابلة، وسُجّل ذلك في provenance. (الموضع: «عَنْ رَبِّهِ عَزَّ وَجَلَّ» بدل «تَبَارَكَ وَتَعَالَى»).",
+      "نقل عبارة العزو («رواه …») إلى takhrij.compilerStatement دون المعقوفين ولا أرقام التعليق «[رقم: …]».",
+      "ضبط المسافات قبل علامات الترقيم."
+    ],
+    "vocalizationEdits": [
+      {
+        "segmentId": "s1",
+        "tokenIndex": 7,
+        "before": "عَنْ",
+        "after": "عَنِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "2577",
+          "quote": "ذَرٍّ، عَنِ النَّبِيِّ"
+        }
+      },
+      {
+        "segmentId": "s1",
+        "tokenIndex": 14,
+        "before": "عز",
+        "after": "عَزَّ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "tuhfa_rabbaniyya",
+          "locator": "24",
+          "quote": "رَبِّهِ عَزَّ وَجَلَّ"
+        }
+      },
+      {
+        "segmentId": "s1",
+        "tokenIndex": 15,
+        "before": "وجل",
+        "after": "وَجَلَّ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "tuhfa_rabbaniyya",
+          "locator": "24",
+          "quote": "عَزَّ وَجَلَّ أَنَّهُ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 2,
+        "before": "إنِّي",
+        "after": "إِنِّي",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 3,
+        "before": "حَرَّمْت",
+        "after": "حَرَّمْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "2577",
+          "quote": "إِنِّي حَرَّمْتُ الظُّلْمَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 7,
+        "before": "وَجَعَلْته",
+        "after": "وَجَعَلْتُهُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "2577",
+          "quote": "نَفْسِي وَجَعَلْتُهُ بَيْنَكُمْ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 16,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 18,
+        "before": "هَدَيْته",
+        "after": "هَدَيْتُهُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "2577",
+          "quote": "مَنْ هَدَيْتُهُ فَاسْتَهْدُونِي"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 25,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 27,
+        "before": "أَطْعَمْته",
+        "after": "أَطْعَمْتُهُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "2577",
+          "quote": "مَنْ أَطْعَمْتُهُ فَاسْتَطْعِمُونِي"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 34,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 36,
+        "before": "كَسَوْته",
+        "after": "كَسَوْتُهُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "2577",
+          "quote": "مَنْ كَسَوْتُهُ فَاسْتَكْسُونِي"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 41,
+        "before": "إنَّكُمْ",
+        "after": "إِنَّكُمْ",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 54,
+        "before": "إنَّكُمْ",
+        "after": "إِنَّكُمْ",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 118,
+        "before": "فَأَعْطَيْت",
+        "after": "فَأَعْطَيْتُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "2577",
+          "quote": "فَسَأَلُونِي فَأَعْطَيْتُ كُلَّ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 121,
+        "before": "مَسْأَلَته",
+        "after": "مَسْأَلَتَهُ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "2577",
+          "quote": "إِنْسَانٍ مَسْأَلَتَهُ مَا"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 127,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 131,
+        "before": "إذَا",
+        "after": "إِذَا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 136,
+        "before": "إنَّمَا",
+        "after": "إِنَّمَا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 143,
+        "before": "إيَّاهَا",
+        "after": "إِيَّاهَا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 147,
+        "before": "فَلْيَحْمَدْ",
+        "after": "فَلْيَحْمَدِ",
+        "rule": "sukun_before_wasl",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "2577",
+          "quote": "خَيْرًا فَلْيَحْمَدِ اللَّهَ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 154,
+        "before": "يَلُومَن",
+        "after": "يَلُومَنَّ",
+        "rule": "missing_final_vowel",
+        "method": "aligned_source",
+        "source": {
+          "sourceId": "sahih_muslim",
+          "locator": "2577",
+          "quote": "فَلاَ يَلُومَنَّ إِلاَّ"
+        }
+      },
+      {
+        "segmentId": "s2",
+        "tokenIndex": 155,
+        "before": "إلَّا",
+        "after": "إِلَّا",
+        "rule": "hamza_below_without_kasra",
+        "method": "orthographic_rule",
+        "source": null
+      }
+    ]
+  },
+  "review": {
+    "status": "pending_scholarly_review",
+    "reviewer": null,
+    "reviewedAt": null,
+    "notes": [
+      "نص الأربعين في المصدر الرقمي غير منسوب إلى طبعة ورقية بعينها؛ يُقابَل المتن المعروض بطبعة محققة.",
+      "غريب الألفاظ والشرح الميسر (concise_explanation) منقولان نصاً من «التحفة الربانية في شرح الأربعين النووية» للشيخ إسماعيل الأنصاري، من ملف نصي ناتج عن مسح ضوئي (OCR) أرفقه مالك المشروع؛ صُحّحت أخطاء المسح الظاهرة بتعديلات مسمّاة في tools/content/tuhfa_fixes.py، وقد يبقى سهو لم يُكتشف فيُراجَع على المطبوع.",
+      "الكتاب لا يضع عنواناً باسم «المعنى الإجمالي»؛ فحقل concise_explanation يجمع مفردات الحديث ثم «يستفاد منه» كما وردا في الكتاب، كلٌّ في بابه.",
+      "اختلف ضبط بعض ألفاظ الحديث بين النص الرقمي والكتاب: اعتُمد لفظ الكتاب «عَنْ رَبِّهِ عَزَّ وَجَلَّ»، وبقي ما سواه كما في الأربعين، وهو يوافق صحيح مسلم (2577) فيما قوبل.",
+      "الحديث طويل (نحو 180 كلمة)؛ قُسّم تدريبه إلى 16 عبارة تامة المعنى.",
+      "صُحّح ضبط بعض الكلمات بمطابقتها رسماً في المتن المشكول للحديث نفسه من مصدره المثبّت، ولم يُغيَّر إلا ما سقط من الحركات؛ وهو مسجّل في provenance.vocalizationEdits وتُراجع على طبعة محققة.",
+      "الموقف السلوكي والخلاصة والآثار صياغة تحريرية مستندة إلى الشروح المذكورة في حقول المصادر.",
+      "طبقة طالب العلم (الأسانيد ومقارنة الروايات) لم تُملأ بعد لهذا الحديث؛ تُضاف مع تراجم رواته في دفعة لاحقة.",
+      "التلاوة الصوتية لم تُسجَّل بعد."
+    ]
+  }
+}

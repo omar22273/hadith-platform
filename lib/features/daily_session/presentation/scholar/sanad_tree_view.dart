@@ -13,6 +13,7 @@ import '../../../hadith/data/models/models.dart';
 import '../../../hadith/domain/hadith_bundle.dart';
 import '../../domain/sanad_tree.dart';
 import 'narrator_card.dart';
+import 'scholar_deferred_notice.dart';
 
 /// عرض الشجرة.
 class SanadTreeView extends StatelessWidget {
@@ -32,17 +33,7 @@ class SanadTreeView extends StatelessWidget {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
     if (bundle.hadith.scholar.chains.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Text(
-            'لم تُضَف أسانيد هذا الحديث وتراجم رواته إلى الفهرس بعد؛ '
-            'وهي قيد التوثيق من المصادر.',
-            textAlign: TextAlign.center,
-            style: text.bodyMedium?.copyWith(color: palette.inkSoft, height: 1.7),
-          ),
-        ),
-      );
+      return const ScholarDeferredNotice();
     }
     final SanadTree tree = SanadTree.build(bundle.hadith.scholar.chains);
     final double width = _padding * 2 + tree.columns * (_nodeWidth + _columnGap) - _columnGap;

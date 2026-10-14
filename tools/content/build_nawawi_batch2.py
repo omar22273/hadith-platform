@@ -14,6 +14,10 @@
 
 الاستعمال:
   python3 tools/content/build_nawawi_batch2.py --editions DIR --jami FILE [--root .] [--only 11,12]
+  python3 tools/content/build_nawawi_batch3.py ...   (الأحاديث ٢١–٤٢، ويستعمل هذه الآلة نفسها)
+
+يُضاف كتاب «التحفة الربانية» مصدراً رابعاً (النوع "k")، فتُتحقق اقتباساته حرفياً من ملفه النصي،
+ويُستعمل متنه المشكول لإكمال الحركات المفقودة بالقواعد نفسها (لا يُغيَّر حرف ولا حركة موجودة).
 حيث DIR فيه ara-nawawi/bukhari/muslim/tirmidhi/ibnmajah/nasai.json بالإصدار المثبّت
 في assets/data/catalogs/sources.json، وFILE ملف OpenITI لجامع العلوم والحكم.
 """
@@ -30,8 +34,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_nawawi_batch1 as b1  # noqa: E402
 import nawawi_batch2_a  # noqa: E402
 import nawawi_batch2_b  # noqa: E402
+import tuhfa_book  # noqa: E402
+import tuhfa_integration  # noqa: E402
 from nawawi_text import (  # noqa: E402
-    BIDI, DIACRITICS, FATHA, KASRA, SUKUN, base_clean, cores, lint_candidates, plain, tokenize,
+    BIDI, DIACRITICS, FATHA, KASRA, SUKUN, base_clean, cores, lint_candidates, locate_plain, plain, tokenize,
 )
 
 _find_phrase = b1.find_phrase
@@ -56,8 +62,10 @@ SOURCE_IDS = {
     "t": "sunan_tirmidhi",
     "i": "sunan_ibn_majah",
     "n": "sunan_nasai",
+    "k": "tuhfa_rabbaniyya",
 }
 KIND_OF = {value: key for key, value in SOURCE_IDS.items()}
+KIND_OF[MATN_SOURCE] = "a"
 SHORT_VOWELS = "َُِ"
 ID_RE = b1.ID_RE
 MIN_CHUNKS, MAX_CHUNKS = 3, 16
@@ -82,11 +90,15 @@ class Corpus(b1.Corpus):
             "i": {str(h["hadithnumber"]): h["text"] for h in load("ara-ibnmajah.json")},
             "n": {str(h["hadithnumber"]): h["text"] for h in load("ara-nasai.json")},
         }
+        self.tuhfa = tuhfa_book.load_sections()
 
     def parts(self, kind, locator):
         """نصوص الحديث في المصدر (قد تتعدد في مسلم: 1676.01 ...)."""
         number = str(locator)
-        if kind == "b":
+        if kind == "k":
+            section = self.tuhfa.get(int(number))
+            texts = [section.matn_raw + " " + section.takhrij_raw] if section else []
+        elif kind == "b":
             texts = [self.bukhari.get(number, "")]
         elif kind == "m":
             texts = [text for key, text in self.muslim.items() if key == number or key.startswith(number + ".")]
@@ -96,24 +108,65 @@ class Corpus(b1.Corpus):
             raise BuildError(f"نوع مصدر مجهول: {kind}")
         return [squash(BIDI.sub("", text)) for text in texts if text]
 
+    def book_texts(self, number):
+        """نصوص الكتاب التي يجوز الاقتباس منها: المتن والعزو والمفردات والفوائد."""
+        section = self.tuhfa.get(int(number))
+        if section is None:
+            return []
+        texts = [section.matn_raw + " " + section.takhrij_raw]
+        texts += [meaning for _, meaning in section.vocabulary]
+        texts += list(section.benefits)
+        return [squash(BIDI.sub("", text)) for text in texts if text]
+
     def has_number(self, kind, number):
+        if kind == "a":
+            return int(number) in self.nawawi
         return bool(self.parts(kind, number))
 
     def verify(self, kind, locator, quote):
+        """يتحقق أن الاقتباس نص حرفي في موضعه، ويعيده بحروف المصدر وحركاته.
+
+        المطابقة أولاً حرفية (مع حركات الكاتب)، فإن لم تقع طُوبق بلا تشكيل ولا ترقيم؛
+        والمعاد في الحالتين مقطع المصدر نفسه، فلا يدخل المتن شيء من كتابة الكاتب.
+        """
         if kind == "j":
-            return super().verify(kind, locator, quote)
+            try:
+                return super().verify(kind, locator, quote)
+            except BuildError:
+                page = self.pages.get(int(locator))
+                found = locate_plain(page, quote) if page else None
+                if found is None:
+                    raise
+                return found
         needle = squash(BIDI.sub("", quote))
-        for haystack in self.parts(kind, locator):
+        haystacks = self.book_texts(locator) if kind == "k" else self.parts(kind, locator)
+        for haystack in haystacks:
             found = b1.locate_verbatim(haystack, needle)
             if found is not None:
                 return found
+        for haystack in haystacks:
+            found = locate_plain(haystack, needle)
+            if found is not None:
+                return squash(found)
         raise BuildError(f"اقتباس غير حرفي ({kind} {locator}): {quote}")
+
+    def verify_exact(self, kind, locator, quote):
+        """مطابقة حرفية بالحركات فقط (دون المطابقة المجرّدة)؛ تُستعمل لإثبات ضبط ما يُدخل في المتن."""
+        needle = squash(BIDI.sub("", quote))
+        haystacks = self.book_texts(locator) if kind == "k" else self.parts(kind, locator)
+        for haystack in haystacks:
+            found = b1.locate_verbatim(haystack, needle)
+            if found is not None:
+                return found
+        raise BuildError(f"ضبط غير حرفي في المصدر ({kind} {locator}): {quote}")
 
     def ref(self, spec):
         kind, locator, quote = spec
         found = self.verify(kind, locator, quote)
         if kind == "j":
             return {"sourceId": JAMI, "locator": f"ج1 ص{locator}", "quote": found}
+        if kind == "k":
+            return tuhfa_integration.source_ref(int(locator), found)
         return {"sourceId": SOURCE_IDS[kind], "locator": str(locator), "quote": found}
 
     def edit_source(self, spec):
@@ -127,14 +180,17 @@ class Corpus(b1.Corpus):
 # ----------------------------------------------------------------------------
 def clean_statement(raw):
     text = re.sub(r"\[رقم:\s*\d*\]", "", raw)
+    text = re.sub(r"\[[^\[\]]*[\d٠-٩][^\[\]]*\]", "", text)
     text = text.replace("[", "").replace("]", "")
+    text = re.sub(r"\s+[ً-ٰٟ]+", "", text)  # حركة شاردة بعد مسافة (خطأ في المصدر الرقمي)
+    text = re.sub(r'"([^"]*)"', r"«\1»", text).replace('"', "")
     text = re.sub(r"\s+([،.:])", r"\1", text)
     text = re.sub(r"([،:])\s*([،:])", r"\1", text)
     text = squash(text).rstrip(".").strip()
     return text
 
 
-def normalise(raw, data):
+def normalise(raw, data, corpus=None):
     """يعيد (المتن المنظّف، عبارة المصنف، التطبيعات المطبّقة)."""
     applied = []
     text = raw
@@ -145,9 +201,22 @@ def normalise(raw, data):
     text = base_clean(text)
     if "ﷺ" in text:
         applied.append("توحيد صيغة الصلاة على النبي إلى الرمز ﷺ.")
-    for old, new, note in data.get("pre", []):
+    for entry in data.get("pre", []):
+        old, new, note = entry[:3]
         if old not in text:
-            raise BuildError(f"تعديل تمهيدي غير مطابق: «{old}»")
+            # المصدر الرقمي يرتّب الشدة والحركة ترتيباً مغايراً أحياناً؛ فتُطابَق الصورة المعيارية ويُستبدل المقطع الأصلي.
+            canonical, spans = b1.canon_map(text)
+            wanted = canon(old)
+            at = canonical.find(wanted)
+            if at < 0 or not wanted:
+                raise BuildError(f"تعديل تمهيدي غير مطابق: «{old}»")
+            old = text[spans[at][0]:spans[at + len(wanted) - 1][1]]
+        if len(entry) > 3:
+            # ضبط الكلمات الداخلة في المتن يُثبَت حرفياً بحركاته في مصدر مثبّت.
+            kind, locator, quote = entry[3]
+            corpus.verify_exact(kind, locator, quote)
+            if canon(quote) not in canon(new):
+                raise BuildError(f"إثبات التعديل التمهيدي لا يوافق النص الجديد: «{quote}»")
         text = text.replace(old, new, 1)
         applied.append(note)
     start_marker, end_marker = data["statement"]
@@ -228,13 +297,37 @@ def lam_alif(core):
     return LAM_ALIF_MARKS.sub(r"\1\3\2", core)
 
 
+def _letters_and_marks(text):
+    """[(حرف، مجموعة حركاته)] لنص معياري تتقدم فيه الشدة."""
+    pairs = []
+    for char in canon(text):
+        if ANY_MARK.match(char):
+            if not pairs:
+                return None
+            pairs[-1][1].add(char)
+        else:
+            pairs.append((char, set()))
+    return pairs
+
+
+def only_missing_marks(before, src_core):
+    """src_core إن لم يزد على before إلا بحركات ناقصة (الحروف نفسها، وحركات before كلها باقية)."""
+    left, right = _letters_and_marks(before), _letters_and_marks(src_core)
+    if left is None or right is None or len(left) != len(right):
+        return None
+    for (letter, marks), (other, source_marks) in zip(left, right):
+        if letter != other or not marks <= source_marks:
+            return None
+    return src_core if canon(before) != canon(src_core) else None
+
+
 def propose(before, rule, src_core):
     """يعيد الكلمة المصحّحة إن كان الفرق هو الحركة المفقودة فقط، وإلا None."""
     if canon(before) == canon(src_core):
         return None
     if rule == "missing_final_vowel":
         if not ANY_MARK.search(before):
-            return src_core
+            return src_core if ANY_MARK.search(src_core) else None
         if canon(src_core).startswith(canon(before)) and len(canon(src_core)) - len(canon(before)) == 1:
             vowel = canon(src_core)[-1]
             if vowel in SHORT_VOWELS:
@@ -243,7 +336,7 @@ def propose(before, rule, src_core):
         if before.endswith("ك") and len(tail) == 2 and tail[0] == "ك" and tail[1] in SHORT_VOWELS:
             # كاف الخطاب: حركتها الأخيرة في المصدر تُستكمل، ولو اختلف ضبط ما قبلها بين الروايتين.
             return before + tail[1]
-        return None
+        return only_missing_marks(before, src_core)
     if rule == "sukun_before_wasl":
         if before.endswith(SUKUN) and canon(src_core) == canon(before[:-1]) + canon(src_core)[-1] \
                 and canon(src_core)[-1] in SHORT_VOWELS:
@@ -274,6 +367,9 @@ def align_edits(tokens, flags, align, corpus, number):
                         continue
                     after = propose(tokens[index][2], wanted[index], lam_alif(src[other][2]))
                     if after is None:
+                        continue
+                    if kind == "k" and canon(after).endswith("ك" + KASRA) and not canon(tokens[index][2]).endswith(KASRA):
+                        # كسر كاف الخطاب في ملف الكتاب الممسوح خطأ مسح محتمل في خطاب المذكر؛ لا يُنقل.
                         continue
                     source = None
                     for low, high in ((max(0, other - 1), min(len(src), other + 2)), (other, other + 1)):
@@ -329,7 +425,9 @@ def build_hadith(number, data, corpus):
     raw = corpus.nawawi.get(number)
     if raw is None:
         raise BuildError(f"لا حديث {number} في الأربعين الرقمي")
-    body, statement, normalizations = normalise(raw, data)
+    for spec in data.get("pre_sources", []):
+        corpus.verify(*spec)
+    body, statement, normalizations = normalise(raw, data, corpus)
     tokens = tokenize(body)
     flags = flagged(tokens)
     tokens, edit_log, unresolved = apply_edits(tokens, flags, data["align"], corpus, number)
@@ -377,7 +475,7 @@ def build_hadith(number, data, corpus):
             "meaning": entry["meaning"],
             "sources": [corpus.ref(spec) for spec in entry["sources"]],
         })
-    if not 2 <= len(gharib) <= 4:
+    if data["gharib"] and not 2 <= len(gharib) <= 4:
         raise BuildError(f"الحديث {number}: الغريب يجب أن يكون بين 2 و4")
 
     takhrij = data["takhrij"]
@@ -478,7 +576,7 @@ def build_hadith(number, data, corpus):
         )
     notes += COMMON_NOTES[1:]
 
-    return {
+    hadith = {
         "schemaVersion": "2.0.0",
         "id": f"nawawi40_{number:03d}",
         "sequence": number,
@@ -498,6 +596,11 @@ def build_hadith(number, data, corpus):
         },
         "review": {"status": "pending_scholarly_review", "reviewer": None, "reviewedAt": None, "notes": notes},
     }
+    # الغريب والشرح الميسر من «التحفة الربانية» (يحلّان محل غريب المواصفات إن وُجد).
+    try:
+        return tuhfa_integration.apply_to_hadith(hadith, corpus.tuhfa[number])
+    except (KeyError, ValueError) as error:
+        raise BuildError(f"الحديث {number}: {error}") from None
 
 
 def lint_strict(tokens):
@@ -551,7 +654,7 @@ def write_json(path, data):
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def main():
+def main(catalog=None, first=FIRST, last=LAST):
     parser = argparse.ArgumentParser()
     parser.add_argument("--editions", required=True)
     parser.add_argument("--jami", required=True)
@@ -560,10 +663,11 @@ def main():
     args = parser.parse_args()
     root = Path(args.root)
     corpus = Corpus(args.editions, args.jami)
-    catalog = {**nawawi_batch2_a.HADITHS, **nawawi_batch2_b.HADITHS}
-    wanted = [int(n) for n in args.only.split(",") if n] or list(range(FIRST, LAST + 1))
+    if catalog is None:
+        catalog = {**nawawi_batch2_a.HADITHS, **nawawi_batch2_b.HADITHS}
+    wanted = [int(n) for n in args.only.split(",") if n] or list(range(first, last + 1))
     full = not args.only
-    if full and sorted(catalog) != list(range(FIRST, LAST + 1)):
+    if full and sorted(catalog) != list(range(first, last + 1)):
         raise BuildError(f"الأحاديث المعرّفة: {sorted(catalog)}")
     out_dir = root / "assets/data/hadith/nawawi40"
     sources = json.loads((root / "assets/data/catalogs/sources.json").read_text(encoding="utf-8"))
@@ -590,7 +694,7 @@ def main():
     if full:
         curriculum_path = root / "assets/data/curriculum/nawawi40_curriculum.json"
         curriculum = json.loads(curriculum_path.read_text(encoding="utf-8"))
-        kept = [item for item in curriculum["items"] if item["number"] < FIRST]
+        kept = [item for item in curriculum["items"] if item["number"] < first]
         curriculum["items"] = kept + items
         write_json(curriculum_path, curriculum)
         print(f"OK  {curriculum_path}  items={len(curriculum['items'])}")

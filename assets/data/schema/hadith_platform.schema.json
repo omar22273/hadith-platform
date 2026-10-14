@@ -135,6 +135,17 @@
           "$ref": "#/$defs/Matn",
           "description": "المرحلة الثانية: المتن والبيان اللغوي والتخريج."
         },
+        "concise_explanation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ConciseExplanation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "الشرح الميسر للحديث منقولاً من «التحفة الربانية» (المفردات ثم «يستفاد منه») ويُعرض بزر «شرح الحديث» في مرحلة المتن؛ اختياري فغيابه يُخفي الزر."
+        },
         "practice": {
           "$ref": "#/$defs/PracticeConfig",
           "description": "المرحلة الثالثة: التثبيت والحفظ التراكمي."
@@ -154,6 +165,59 @@
         "review": {
           "$ref": "#/$defs/ReviewInfo",
           "description": "حالة المراجعة العلمية قبل النشر."
+        }
+      }
+    },
+    "ConciseExplanation": {
+      "type": "object",
+      "description": "الشرح الميسر للحديث: مفردات الحديث ثم فوائده، منقولة من كتاب معتمد بنصها.",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "vocabulary",
+        "benefits"
+      ],
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/SourceRef",
+          "description": "موضع الشرح في الكتاب المعتمد."
+        },
+        "vocabulary": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExplanationTerm"
+          },
+          "description": "مفردات الحديث بترتيب ورودها في الكتاب."
+        },
+        "benefits": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "description": "فوائد الحديث («يستفاد منه») كل فائدة على حدة."
+        }
+      }
+    },
+    "ExplanationTerm": {
+      "type": "object",
+      "description": "لفظة من الحديث وبيانها في الشرح الميسر.",
+      "additionalProperties": false,
+      "required": [
+        "term",
+        "explanation"
+      ],
+      "properties": {
+        "term": {
+          "type": "string",
+          "minLength": 1,
+          "description": "اللفظة أو العبارة كما في الكتاب."
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "بيانها كما في الكتاب."
         }
       }
     },

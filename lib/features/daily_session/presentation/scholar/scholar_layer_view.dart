@@ -10,6 +10,7 @@ import '../../../hadith/data/models/models.dart';
 import '../../../hadith/domain/hadith_bundle.dart';
 import 'narrator_card.dart';
 import 'sanad_tree_view.dart';
+import 'scholar_deferred_notice.dart';
 import 'takhrij_panel.dart';
 import 'variant_matrix.dart';
 
@@ -76,16 +77,7 @@ class _NarratorsList extends StatelessWidget {
       }
     }
     if (ids.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Text(
-            'تراجم رواة هذا الحديث قيد التوثيق ولم تُضَف بعد.',
-            textAlign: TextAlign.center,
-            style: text.bodyMedium?.copyWith(color: palette.inkSoft, height: 1.7),
-          ),
-        ),
-      );
+      return const ScholarDeferredNotice();
     }
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),

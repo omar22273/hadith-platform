@@ -8,6 +8,7 @@
 export '../../../../core/content/models/content_models.dart';
 export '../../../../core/json/json_reader.dart';
 export 'audio_sync.dart';
+export 'concise_explanation.dart';
 export 'curriculum_manifest.dart';
 export 'hadith_daily_model.dart';
 export 'hadith_integrity.dart';

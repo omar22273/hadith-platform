@@ -72,7 +72,9 @@ void main() {
     expect(find.byType(CaravanTrailView), findsOneWidget);
     expect(find.byType(WirdNodeView), findsNWidgets(42));
     expect(find.text('الأعمال بالنيات'), findsWidgets);
-    expect(find.text('قيد الإعداد'), findsWidgets);
+    // الأحاديث الاثنان والأربعون كلها معدّة: لا عقدة «قيد الإعداد» في المسار.
+    expect(find.text('قيد الإعداد'), findsNothing);
+    expect(find.text('يا ابن آدم إنك ما دعوتني'), findsWidgets);
 
     // خمسة ألسنة متناسقة بالترتيب المطلوب، من اليمين إلى اليسار.
     final List<String> labels = <String>[
@@ -105,7 +107,7 @@ void main() {
 
     await tester.tap(_navLabel('الإعدادات'));
     await _settle(tester);
-    final Finder version = find.text('Version 2.4.0');
+    final Finder version = find.text('Version 2.5.0');
     await tester.scrollUntilVisible(
       version,
       300,

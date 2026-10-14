@@ -201,7 +201,7 @@ void main() {
   });
 
   group('snapshot', () {
-    test('the path draws the whole collection; unprepared hadiths stay in preparation', () {
+    test('the path draws the whole collection and every one of the forty-two stations is prepared', () {
       final JourneySnapshot snapshot = snapshotAt(DateTime(2026, 10, 9, 10), JourneyProgress.empty);
       expect(snapshot.nodes.length, 42);
       expect(snapshot.segments.length, 5);
@@ -209,13 +209,15 @@ void main() {
       expect(snapshot.segments.last.title, 'تتمة الأربعين');
       expect(snapshot.nodes[0].status, WirdNodeStatus.today);
       expect(snapshot.nodes[1].status, WirdNodeStatus.upcoming);
-      for (int index = 1; index < 20; index++) {
+      for (int index = 1; index < 42; index++) {
         expect(snapshot.nodes[index].status, WirdNodeStatus.upcoming, reason: 'node $index');
         expect(snapshot.nodes[index].item, isNotNull, reason: 'node $index');
       }
-      expect(snapshot.preparedCount, 20);
-      expect(snapshot.nodes[20].status, WirdNodeStatus.inPreparation);
-      expect(snapshot.nodes[20].item, isNull);
+      expect(snapshot.preparedCount, 42);
+      expect(
+        snapshot.nodes.any((WirdNode node) => node.status == WirdNodeStatus.inPreparation),
+        isFalse,
+      );
       expect(snapshot.todayKind, TodayKind.available);
       expect(snapshot.caravanIndex, 0);
     });
@@ -252,21 +254,22 @@ void main() {
       expect(snapshot.nextItem?.hadithId, 'nawawi40_002');
     });
 
-    test('completing every prepared wird finishes this edition of the curriculum', () {
+    test('completing all forty-two wirds finishes the curriculum', () {
       JourneyProgress progress = JourneyProgress.empty;
-      for (int number = 1; number <= 20; number++) {
+      for (int number = 1; number <= 42; number++) {
         progress = progress.withCompletion(
           'nawawi40_${number.toString().padLeft(3, '0')}',
           DateTime(2026, 10, number, 7),
         );
       }
-      final JourneySnapshot snapshot = snapshotAt(DateTime(2026, 10, 21, 7, 5), progress);
+      final JourneySnapshot snapshot = snapshotAt(DateTime(2026, 12, 1, 7, 5), progress);
       expect(snapshot.todayKind, TodayKind.curriculumFinished);
-      expect(snapshot.completedCount, 20);
-      expect(snapshot.caravanIndex, 19);
-      expect(snapshot.progressFraction, closeTo(20 / 42, 1e-9));
+      expect(snapshot.completedCount, 42);
+      expect(snapshot.caravanIndex, 41);
+      expect(snapshot.progressFraction, closeTo(1, 1e-9));
       expect(snapshot.segments.first.completed, 10);
       expect(snapshot.segments[1].completed, 10);
+      expect(snapshot.segments.last.completed, 2);
     });
   });
 
