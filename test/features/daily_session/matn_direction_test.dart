@@ -70,19 +70,19 @@ List<Rect> _wordRects(WidgetTester tester) {
 bool _sameLine(Rect a, Rect b) => (a.center.dy - b.center.dy).abs() < a.height / 2;
 
 void main() {
-  testWidgets('hadith 11: «مَا» sits to the right of «يَرِيبُكَ», as an Arabic reader expects', (WidgetTester tester) async {
+  testWidgets('hadith 11: «مَا» sits to the right of «يُرِيبُكَ», as an Arabic reader expects', (WidgetTester tester) async {
     final HadithDailyModel hadith = _hadith(11);
     await _pump(tester, hadith.matn, 380);
     final List<MatnToken> tokens = <MatnToken>[for (final MatnSegment s in hadith.matn.segments) ...s.tokens];
     final List<Rect> rects = _wordRects(tester);
     expect(rects.length, tokens.length);
-    // دَعْ مَا يَرِيبُكَ إِلَى مَا لَا يَرِيبُكَ
+    // دَعْ مَا يُرِيبُكَ إِلَى مَا لَا يُرِيبُكَ
     final int ma = tokens.indexWhere((MatnToken t) => t.core == 'مَا');
     expect(ma, greaterThanOrEqualTo(1));
     expect(tokens[ma - 1].core, 'دَعْ');
-    expect(tokens[ma + 1].core, 'يَرِيبُكَ');
+    expect(tokens[ma + 1].core, 'يُرِيبُكَ');
     expect(_sameLine(rects[ma], rects[ma + 1]), isTrue);
-    expect(rects[ma].left, greaterThan(rects[ma + 1].left), reason: '«مَا» must be right of «يَرِيبُكَ»');
+    expect(rects[ma].left, greaterThan(rects[ma + 1].left), reason: '«مَا» must be right of «يُرِيبُكَ»');
     if (_sameLine(rects[ma - 1], rects[ma])) {
       expect(rects[ma - 1].left, greaterThan(rects[ma].left), reason: '«دَعْ» is right of «مَا»');
     }
