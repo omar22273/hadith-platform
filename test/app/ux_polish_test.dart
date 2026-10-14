@@ -73,12 +73,13 @@ void main() {
     await pumpApp(tester);
 
     for (final CurriculumCourse course in CourseCatalog.lockedCourses) {
-      await tester.scrollUntilVisible(
-        find.text(course.title),
-        400,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.ensureVisible(find.text(course.title));
+      final Finder scrollable = find.byType(Scrollable).first;
+      await tester.scrollUntilVisible(find.text(course.title), 300, scrollable: scrollable);
+      // يرفع القائمة قليلاً كي لا تبقى البطاقة تحت الشريط السفلي فيصيب اللمس البطاقة.
+      await tester.drag(scrollable, const Offset(0, -160));
+      await settle(tester);
+      final double visibleBottom = tester.view.physicalSize.height / tester.view.devicePixelRatio - tester.getSize(find.byType(AppBottomBar)).height;
+      expect(tester.getRect(find.text(course.title)).bottom, lessThanOrEqualTo(visibleBottom), reason: '${course.title} is above the bottom bar');
       await tester.tap(find.text(course.title));
       await settle(tester);
 
