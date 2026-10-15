@@ -84,6 +84,16 @@ class CurriculumManifest {
     return null;
   }
 
+  /// القسم الذي يضم الحديث برقمه، أو null إن لم تُعرَّف أقسام أو لم يقع الرقم في أحدها.
+  CurriculumSection? sectionOf(int number) {
+    for (final CurriculumSection section in sections ?? const <CurriculumSection>[]) {
+      if (number >= section.firstNumber && number <= section.lastNumber) {
+        return section;
+      }
+    }
+    return null;
+  }
+
   /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
   JsonMap toJson() {
     return <String, dynamic>{
