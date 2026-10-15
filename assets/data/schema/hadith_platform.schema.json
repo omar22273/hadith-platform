@@ -1663,7 +1663,10 @@
             "gharib",
             "rijal",
             "history",
-            "geography"
+            "geography",
+            "adhkar_collection",
+            "quran_text",
+            "owner_text"
           ],
           "description": "النوع."
         },
@@ -1804,6 +1807,68 @@
           },
           "minItems": 1,
           "description": "الأحاديث بالترتيب."
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CurriculumSection"
+          },
+          "minItems": 1,
+          "description": "أقسام الكتاب على المسار، اختيارية: كل قسم نطاق متصل من الأرقام بكتابه ومؤلفه؛ يرسم المسار بين كل قسمين متتاليين فاصلاً بارزاً. غيابها يعني كتاباً واحداً بلا فواصل."
+        }
+      }
+    },
+    "CurriculumSection": {
+      "type": "object",
+      "description": "قسم من الكتاب على المسار: كتاب بعينه ومؤلفه ونطاق أحاديثه.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "author",
+        "firstNumber",
+        "lastNumber",
+        "segmentLabel"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف القسم."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان القسم، مثل «الأربعون النووية»."
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1,
+          "description": "نسبة القسم إلى مؤلفه، مثل «للإمام يحيى بن شرف النووي»."
+        },
+        "firstNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "رقم أول حديث في القسم."
+        },
+        "lastNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "رقم آخر حديث في القسم."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "وصف القسم يُكتب بعد النطاق في إعلان بدايته، اختياري."
+        },
+        "segmentLabel": {
+          "type": "string",
+          "minLength": 1,
+          "description": "اسم القسم في عنوان الشريحة التي تجمع حديثين من قسمين، مثل «تتمة الخمسين الرجبية»."
         }
       }
     },
@@ -1878,12 +1943,13 @@
     },
     "SeerahDataset": {
       "type": "object",
-      "description": "ملف محطات رحلة السيرة النبوية.",
+      "description": "ملف محطات رحلة السيرة النبوية مقسّمة إلى أطوار تاريخية كبرى.",
       "additionalProperties": false,
       "required": [
         "schemaVersion",
         "id",
         "title",
+        "epochs",
         "stations"
       ],
       "properties": {
@@ -1904,6 +1970,15 @@
           "minLength": 1,
           "description": "العنوان."
         },
+        "epochs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SeerahEpochInfo"
+          },
+          "minItems": 8,
+          "maxItems": 10,
+          "description": "الأطوار التاريخية الكبرى بترتيبها الزمني (من ثمانية إلى عشرة)؛ بعضها قد لا تكون له محطات بعد."
+        },
         "stations": {
           "type": "array",
           "items": {
@@ -1914,22 +1989,81 @@
         }
       }
     },
+    "SeerahEpochInfo": {
+      "type": "object",
+      "description": "طور تاريخي كبير من أطوار السيرة (إرهاصات النبوة، البعثة، الهجرة…) تنتظم تحته محطات الرحلة.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "number",
+        "title"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الطور."
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "رقم الطور في المنهج (١ إلى ١٠)."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان الطور."
+        }
+      }
+    },
+    "SeerahChapter": {
+      "type": "object",
+      "description": "فصل قرائي في الرواية المطولة للمحطة: مقاطع منقولة حرفياً من الكتب المثبتة، لكل مقطع مصدره وصفحته.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "passages"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الفصل داخل المحطة."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان الفصل."
+        },
+        "passages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "مقاطع الفصل بترتيبها؛ quote فيها نص الكتاب حرفياً بعد إزالة علامات بنية الملف فقط، وlocator الجزء والصفحة أو رقم الحديث."
+        }
+      }
+    },
     "SeerahStationModel": {
       "type": "object",
-      "description": "محطة في رحلة السيرة بمشاهدها الثلاثة: المشهد الزماني، والمأزق، والقرار النبوي.",
+      "description": "محطة في رحلة السيرة بطبقتين: طبقة المعايشة والموقف (تمهيد ومشهد ومأزق وقرار نبوي)، وطبقة الرواية المطولة (فصول حرفية موثقة).",
       "additionalProperties": false,
       "required": [
         "id",
         "order",
         "title",
-        "epoch",
+        "epoch_id",
+        "covenant",
         "timeLabel",
         "place",
         "onRoute",
-        "sceneDescription",
-        "challenge",
-        "propheticDecision",
         "evidence",
+        "chapters",
         "review"
       ],
       "properties": {
@@ -1949,13 +2083,19 @@
           "minLength": 1,
           "description": "عنوان الحدث."
         },
-        "epoch": {
+        "epoch_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الطور التاريخي الكبير الذي تنتمي إليه المحطة، من epochs في الملف نفسه."
+        },
+        "covenant": {
           "enum": [
             "pre_mission",
             "meccan",
             "medinan"
           ],
-          "description": "الحقبة."
+          "description": "العهد: قبل البعثة أو المكي أو المدني."
         },
         "timeLabel": {
           "type": [
@@ -1963,6 +2103,30 @@
             "null"
           ],
           "description": "وسم زمني مختصر مستخلص من الشواهد، أو null إن لم تذكره."
+        },
+        "year_label": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "السنة كما تنص عليها الشواهد (شريط البوصلة)، تغيب إن لم تنص عليها؛ يلزمها compass_basis."
+        },
+        "age_label": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "عمر النبي ﷺ كما تنص عليه الشواهد (شريط البوصلة)، يغيب إن لم تنص عليه؛ يلزمه compass_basis."
+        },
+        "compass_basis": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "الشواهد الحرفية التي تستند إليها السنة والعمر في شريط البوصلة، تُعرض في ورقة مستند البوصلة."
         },
         "place": {
           "$ref": "#/$defs/SeerahPlace",
@@ -1972,28 +2136,61 @@
           "type": "boolean",
           "description": "هل يدخل الموضع في خط سير النبي ﷺ على الخريطة؛ false إذا كان المشهد عن غيره، كهجرة الصحابة إلى الحبشة."
         },
-        "sceneDescription": {
-          "type": "string",
-          "minLength": 1,
-          "description": "الوصف البصري والزماني للمشهد، مصوغاً من الشواهد وحدها."
-        },
-        "challenge": {
-          "type": "string",
-          "minLength": 1,
-          "description": "المأزق أو الحدث الواقعي، مصوغاً من الشواهد وحدها."
-        },
-        "propheticDecision": {
-          "type": "string",
-          "minLength": 1,
-          "description": "القرار النبوي ونتيجته، مصوغاً من الشواهد وحدها."
-        },
-        "detailed_narrative": {
+        "previous_link": {
           "type": [
             "string",
             "null"
           ],
           "minLength": 1,
-          "description": "الرواية الكاملة وتفاصيل الحدث، اختيارية: فقرات تفصل بينها سطور فارغة، تُنقل من المصادر الموثقة في evidence وحدها وتخضع لمراجعة review. غيابها يعرض نصوص المشاهد الموثقة كاملة."
+          "description": "ربط المحطة بما سبقها: جملة تحريرية مقتصرة على شواهد المحطتين؛ تغيب في أول محطة، أو حين لم تُكتب."
+        },
+        "next_hook": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "تمهيد مشوق للمحطة التالية: جملة تحريرية مقتصرة على شواهد المحطتين؛ تغيب في آخر محطة، أو حين لم تُكتب."
+        },
+        "hook": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "التمهيد السردي المشوق لطبقة المعايشة والموقف: صياغة تحريرية مقتصرة على الشواهد، تغيب إن لم تُكتب طبقة المعايشة."
+        },
+        "shura_question": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "سؤال الشورى الذي يوجَّه للقارئ قبل كشف القرار النبوي: صياغة تحريرية مقتصرة على الشواهد."
+        },
+        "sceneDescription": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "الوصف البصري والزماني للمشهد، مصوغاً من الشواهد وحدها؛ يغيب مع المأزق والقرار معاً حين لا تُكتب طبقة المعايشة للمحطة."
+        },
+        "challenge": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "المأزق أو الحدث الواقعي، مصوغاً من الشواهد وحدها."
+        },
+        "propheticDecision": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "القرار النبوي ونتيجته، مصوغاً من الشواهد وحدها."
         },
         "dilemma_options": {
           "type": "array",
@@ -2009,8 +2206,15 @@
           "items": {
             "$ref": "#/$defs/SeerahEvidence"
           },
+          "description": "النصوص المصدرية الموثقة لمشاهد طبقة المعايشة منقولة بنصها؛ فارغة حين لا توجد هذه الطبقة."
+        },
+        "chapters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SeerahChapter"
+          },
           "minItems": 1,
-          "description": "النصوص المصدرية الموثقة منقولة بنصها."
+          "description": "فصول الرواية المطولة بترتيبها: المقاطع الحرفية الموثقة."
         },
         "review": {
           "$ref": "#/$defs/ReviewInfo",
@@ -2173,6 +2377,190 @@
         "review": {
           "$ref": "#/$defs/ReviewInfo",
           "description": "حالة المراجعة العلمية."
+        },
+        "tracks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "description": "المسارات التي يظهر فيها الذكر داخل الفئة ذات التبديل (صباح/مساء، نوم/استيقاظ، منزل/مسجد)؛ غيابها يعني أن الفئة بلا تبديل."
+        },
+        "grading": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "درجة الحديث كما سُجّلت في الإصدار المعتمد نفسه (أسطر مفصولة بسطر جديد، سطر لكل حديث)، تُعرض في نافذة المعلومات؛ لا يكتبها المحرر بيده."
+        },
+        "caution": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "تنبيه قصير يظهر على بطاقة الذكر حين تكون درجته دون الصحيح أو لا أصل له في الكتب الستة المثبتة؛ يُحسب آلياً من الدرجة المسجلة."
+        },
+        "derivation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TextDerivation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "اشتقاق النص إن لم يكن قصاً حرفياً واحداً: إبدال كلمة بأخرى منقولة من الشاهد نفسه، تنفيذاً لتحديد المالك وبدلالة الشاهد؛ يغيب في سائر الأذكار."
+        }
+      }
+    },
+    "TextDerivation": {
+      "type": "object",
+      "description": "إبدال كلمة في نص ذكر مقتطع حرفياً من شاهده، مع بيان سببه.",
+      "additionalProperties": false,
+      "required": [
+        "fromWord",
+        "toWord",
+        "note"
+      ],
+      "properties": {
+        "fromWord": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الكلمة كما في الشاهد (مجرّدة من التشكيل)."
+        },
+        "toWord": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الكلمة البديلة المنقولة بتشكيلها من الشاهد نفسه (مجرّدة هنا)."
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "description": "سبب الإبدال ودلالة الشاهد عليه."
+        }
+      }
+    },
+    "SunanCatalog": {
+      "type": "object",
+      "description": "ملف السنن النبوية المهجورة: بطاقات مرجعية تُقرأ وتُطبَّق، ليست أذكاراً للعدّ.",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "title",
+        "items"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "إصدار المخطط."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الملف."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "العنوان."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SunnahItem"
+          },
+          "minItems": 1,
+          "description": "السنن بترتيب عرضها."
+        }
+      }
+    },
+    "SunnahItem": {
+      "type": "object",
+      "description": "سنة نبوية ثابتة بدليلها المشكول ومصدره.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "order",
+        "title",
+        "bab",
+        "text",
+        "evidence",
+        "review"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف السنة."
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "الترتيب في الشاشة."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان السنة."
+        },
+        "bab": {
+          "enum": [
+            "purity_prayer",
+            "food_drink",
+            "home_going_out",
+            "sleep_clothing",
+            "gatherings_manners"
+          ],
+          "description": "الباب الذي تُصفّى به السنة في الشريط العلوي."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "وقتها وكيفية العمل بها: عبارة مشكولة منقولة حرفياً من لفظ الحديث، وهي جزء من نص أحد الشواهد."
+        },
+        "virtue": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "الفضل النبوي: عبارة منقولة حرفياً، وهي جزء من نص أحد الشواهد؛ تغيب إن لم يكن للسنة فضل منصوص في شواهدها."
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "الدليل: نص الحديث حرفياً من المصدر المعتمد مع موضعه."
+        },
+        "review": {
+          "$ref": "#/$defs/ReviewInfo",
+          "description": "حالة المراجعة العلمية."
+        },
+        "grading": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "درجة الحديث كما سُجّلت في الإصدار المعتمد نفسه (سطر لكل حديث)، تُعرض على البطاقة؛ لا يكتبها المحرر بيده."
+        },
+        "caution": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "تنبيه قصير يظهر على البطاقة حين تكون درجة الحديث دون الصحيح؛ يُحسب آلياً من الدرجة المسجلة."
         }
       }
     },

@@ -31,6 +31,13 @@ class SourceQuoteTile extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final String? quote = reference.quote;
     final bool fromHadithCollection = source?.kind == SourceKind.hadithCollection;
+    final String caption = switch (source?.kind) {
+      SourceKind.hadithCollection => 'نص الرواية بضبط المصدر',
+      SourceKind.quranText => 'نص الآية كما أدخله مالك المشروع',
+      SourceKind.ownerText => 'نص أدخله مالك المشروع بتشكيله',
+      SourceKind.adhkarCollection => 'نص حصن المسلم كما في الملف المرفق',
+      _ => 'نص المصدر',
+    };
     return SmoothSurface(
       color: palette.surfaceMuted,
       borderColor: palette.line,
@@ -54,7 +61,7 @@ class SourceQuoteTile extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
               Text(
-                fromHadithCollection ? 'نص الرواية بضبط المصدر' : 'نص المصدر',
+                caption,
                 style: text.labelSmall?.copyWith(
                   color: palette.amberText,
                   fontWeight: FontWeight.w600,

@@ -1,4 +1,4 @@
-// اختبارات مركز الأذكار: سبع بطاقات كبيرة (ست فئات والسبحة الذكية) بحواف Squircle،
+// اختبارات مركز الأذكار: سبع بطاقات كبيرة (خمس فئات أذكار والسنن المهجورة والسبحة الذكية) بحواف Squircle،
 // تفتح كل منها شاشتها، ويعود منها زر الرجوع إلى المركز، ولا يظهر في المركز أي نص نبوي
 // ولا عبارة داخلية.
 
@@ -13,6 +13,9 @@ import 'package:hadith_platform/features/adhkar/domain/adhkar_category.dart';
 import 'package:hadith_platform/features/adhkar/presentation/adhkar_player_screen.dart';
 import 'package:hadith_platform/features/adhkar/presentation/adhkar_screen.dart';
 import 'package:hadith_platform/features/adhkar/presentation/sebha_screen.dart';
+import 'package:hadith_platform/features/sunan/data/models/sunan.dart';
+import 'package:hadith_platform/features/sunan/domain/sunan_info.dart';
+import 'package:hadith_platform/features/sunan/presentation/sunan_screen.dart';
 import 'package:smooth_corner/smooth_corner.dart';
 
 import '../../support/adhkar_support.dart';
@@ -26,7 +29,7 @@ const List<String> _cardTitles = <String>[
   'أذكار دخول وخروج المنزل والمسجد',
   'السنن النبوية المهجورة',
   'جامع الأدعية المأثورة',
-  'السبحة النبوية الذكية',
+  'السبحة الذكية',
 ];
 
 void main() {
@@ -41,7 +44,12 @@ void main() {
       expect(find.byType(SebhaScreen), findsNothing);
 
       final List<Finder> cards = <Finder>[
-        for (final AdhkarCategory category in AdhkarCategories.all) find.byKey(cardKey(category)),
+        find.byKey(cardKey(AdhkarCategories.morningEvening)),
+        find.byKey(cardKey(AdhkarCategories.sleep)),
+        find.byKey(cardKey(AdhkarCategories.afterPrayer)),
+        find.byKey(cardKey(AdhkarCategories.homeMasjid)),
+        find.byKey(sunanCardKey),
+        find.byKey(cardKey(AdhkarCategories.duas)),
         find.byKey(sebhaCardKey),
       ];
       expect(cards, hasLength(7));
@@ -53,7 +61,7 @@ void main() {
         expect(top, greaterThan(previousTop), reason: 'cards are stacked in order: ${_cardTitles[i]}');
         previousTop = top;
       }
-      // لا بطاقة ثامنة: ست فئات والسبحة فقط.
+      // لا بطاقة ثامنة: خمس فئات أذكار والسنن والسبحة فقط.
       expect(find.byType(SmoothSurface), findsNWidgets(7));
     });
 
@@ -81,6 +89,24 @@ void main() {
       expect(find.byKey(sebhaCardKey), findsOneWidget);
     });
 
+    testWidgets('the sunan card carries its subtitle and the number of its cards, and is a squircle',
+        (WidgetTester tester) async {
+      await openHub(tester);
+      final Finder card = find.byKey(sunanCardKey);
+      expect(find.descendant(of: card, matching: find.text(SunanInfo.subtitle)), findsOneWidget);
+      expect(
+        tester.widget<Text>(find.byKey(const ValueKey<String>('adhkar-card-count-${SunanInfo.id}'))).data,
+        arabicDigits(loadSunan().items.length),
+      );
+      final Iterable<DecoratedBox> boxes = tester.widgetList<DecoratedBox>(
+        find.descendant(of: card, matching: find.byType(DecoratedBox)),
+      );
+      expect(
+        boxes.any((DecoratedBox b) => b.decoration is ShapeDecoration && (b.decoration as ShapeDecoration).shape is SmoothRectangleBorder),
+        isTrue,
+      );
+    });
+
     testWidgets('the subtitles name the requested subjects: abandoned sunan and the supplications',
         (WidgetTester tester) async {
       await openHub(tester);
@@ -101,6 +127,9 @@ void main() {
           expect(find.textContaining(item.text), findsNothing, reason: item.id);
         }
       }
+      for (final SunnahItem item in loadSunan().items) {
+        expect(find.textContaining(item.text), findsNothing, reason: item.id);
+      }
       expect(find.textContaining('بانتظار المراجعة'), findsNothing);
       expect(find.textContaining('pending'), findsNothing);
       expect(find.textContaining('[?]'), findsNothing);
@@ -110,16 +139,33 @@ void main() {
     testWidgets('a category card opens its player, and the back button returns to the hub with the tab bar',
         (WidgetTester tester) async {
       await openHub(tester);
-      await tester.tap(find.byKey(cardKey(AdhkarCategories.sunan)));
+      await tester.tap(find.byKey(cardKey(AdhkarCategories.duas)));
       await settle(tester);
       expect(find.byType(AdhkarPlayerScreen), findsOneWidget);
       expect(find.byKey(const ValueKey<String>('adhkar-hub')), findsNothing);
       expect(tester.widget<Text>(find.byKey(const ValueKey<String>('adhkar-category-title'))).data,
-          AdhkarCategories.sunan.title);
+          AdhkarCategories.duas.title);
 
       await tester.tap(find.byKey(const ValueKey<String>('adhkar-back')));
       await settle(tester);
       expect(find.byType(AdhkarPlayerScreen), findsNothing);
+      expect(find.byKey(const ValueKey<String>('adhkar-hub')), findsOneWidget);
+      expect(navLabel('وِرد الأذكار'), findsOneWidget);
+    });
+
+    testWidgets('the sunan card opens the dedicated sunan screen, not the focus player, and back returns',
+        (WidgetTester tester) async {
+      await openHub(tester);
+      await tester.tap(find.byKey(sunanCardKey));
+      await settle(tester);
+      expect(find.byType(SunanScreen), findsOneWidget);
+      expect(find.byType(AdhkarPlayerScreen), findsNothing);
+      expect(find.byKey(const ValueKey<String>('adhkar-hub')), findsNothing);
+      expect(tester.widget<Text>(find.byKey(const ValueKey<String>('sunan-title'))).data, SunanInfo.title);
+
+      await tester.tap(find.byKey(const ValueKey<String>('sunan-back')));
+      await settle(tester);
+      expect(find.byType(SunanScreen), findsNothing);
       expect(find.byKey(const ValueKey<String>('adhkar-hub')), findsOneWidget);
       expect(navLabel('وِرد الأذكار'), findsOneWidget);
     });
@@ -162,6 +208,9 @@ void main() {
         expect(rect.left, greaterThanOrEqualTo(0));
         expect(rect.right, lessThanOrEqualTo(360));
       }
+      await revealCard(tester, find.byKey(sunanCardKey));
+      expect(tester.getRect(find.byKey(sunanCardKey)).left, greaterThanOrEqualTo(0));
+      expect(tester.getRect(find.byKey(sunanCardKey)).right, lessThanOrEqualTo(360));
       await revealCard(tester, find.byKey(sebhaCardKey));
       expect(tester.getRect(find.byKey(sebhaCardKey)).right, lessThanOrEqualTo(360));
       expect(tester.takeException(), isNull);

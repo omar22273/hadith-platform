@@ -10,9 +10,10 @@ error message and the first frames of its stack trace. Load failures
 import json
 import sys
 
-STACK_LINES = 12
-PRINT_LIMIT = 3
-PRINT_CHARS = 600
+STACK_LINES = 5
+PRINT_LIMIT = 2
+PRINT_CHARS = 260
+ERROR_CHARS = 700
 
 
 def main(argv: list) -> int:
@@ -67,7 +68,7 @@ def main(argv: list) -> int:
         for message in prints.get(test_id, [])[:PRINT_LIMIT]:
             lines.append('  print: %s' % message[:PRINT_CHARS])
         for error, stack in errors.get(test_id, []):
-            lines.append('  error: %s' % error.strip())
+            lines.append('  error: %s' % error.strip()[:ERROR_CHARS])
             frames = [f for f in stack.splitlines() if f.strip()][:STACK_LINES]
             lines.extend('    %s' % f for f in frames)
     if other:

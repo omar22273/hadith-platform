@@ -5,8 +5,11 @@
 // 2. المتن: نص الذكر المشكول كبيراً في المنتصف، يتمرر داخلياً بنعومة إن طال.
 // 3. النصف السفلي: منطقة لمس واحدة تحتسب أي نقرة، وفيها عدّاد دائري هادئ «باقٍ N».
 //
-// الانتقال بين الأذكار بسحب الصفحة أفقياً (PageView). التخريج والفضل النبوي
+// الانتقال بين الأذكار بسحب الصفحة أفقياً (PageView). التخريج والدرجة والفضل النبوي
 // والمصدر كلها في ورقة تُفتح من زر المعلومات، لا على الشاشة.
+//
+// الفئات ذات التبديل (الصباح|المساء، النوم|الاستيقاظ، المنزل|المسجد) يظهر تحت الرأس
+// شريط تبديل بين مسارَيها؛ لكل مسار قائمته ووِرده وعدّاده المستقل (AdhkarScope).
 //
 // عند بلوغ العدد المسنون: اهتزاز مزدوج، وقفل العدّاد، ثم ينتقل الوِرد إلى الذكر
 // التالي بـ PageView.nextPage، أو تظهر شارة إتمام الوِرد.
@@ -34,19 +37,35 @@ import '../domain/adhkar_category.dart';
 import '../domain/adhkar_repository.dart';
 import 'widgets/dhikr_info_sheet.dart';
 import 'widgets/dhikr_page.dart';
+import 'widgets/track_toggle.dart';
 
 /// مدة انزلاق الصفحة عند الانتقال التلقائي.
 const Duration _pageSlide = Duration(milliseconds: 380);
 
 /// مشغّل التركيز لفئة.
-class AdhkarPlayerScreen extends ConsumerWidget {
+class AdhkarPlayerScreen extends ConsumerStatefulWidget {
   const AdhkarPlayerScreen({super.key, required this.category});
 
   /// الفئة المعروضة.
   final AdhkarCategory category;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdhkarPlayerScreen> createState() => _AdhkarPlayerScreenState();
+}
+
+class _AdhkarPlayerScreenState extends ConsumerState<AdhkarPlayerScreen> {
+  /// المسار المختار في الفئة ذات التبديل؛ null لفئة بلا تبديل.
+  late String? _trackId = widget.category.firstTrack?.id;
+
+  void _selectTrack(AdhkarTrack track) {
+    if (track.id != _trackId) {
+      setState(() => _trackId = track.id);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AdhkarCategory category = widget.category;
     final AsyncValue<AdhkarCatalog> catalog = ref.watch(adhkarCatalogProvider(category.id));
     final Widget body;
     if (catalog.hasError) {
@@ -57,7 +76,13 @@ class AdhkarPlayerScreen extends ConsumerWidget {
     } else if (catalog.value == null) {
       body = const Center(child: CircularProgressIndicator());
     } else {
-      body = _PlayerBody(category: category);
+      final AdhkarScope scope = category.scopeFor(_trackId);
+      body = _PlayerBody(
+        key: ValueKey<String>('adhkar-body-${scope.key}'),
+        category: category,
+        scope: scope,
+        onTrack: _selectTrack,
+      );
     }
     return Scaffold(
       key: ValueKey<String>('adhkar-player-${category.id}'),
@@ -67,9 +92,15 @@ class AdhkarPlayerScreen extends ConsumerWidget {
 }
 
 class _PlayerBody extends ConsumerStatefulWidget {
-  const _PlayerBody({required this.category});
+  const _PlayerBody({super.key, required this.category, required this.scope, required this.onTrack});
 
   final AdhkarCategory category;
+
+  /// نطاق الوِرد المعروض: الفئة، أو مسار منها.
+  final AdhkarScope scope;
+
+  /// اختيار مسار من شريط التبديل.
+  final ValueChanged<AdhkarTrack> onTrack;
 
   @override
   ConsumerState<_PlayerBody> createState() => _PlayerBodyState();
@@ -85,7 +116,7 @@ class _PlayerBodyState extends ConsumerState<_PlayerBody> {
   /// رقم آخر انزلاق برمجي: انزلاق أحدث يُبطل خاتمة ما قبله.
   int _slideToken = 0;
 
-  String get _id => widget.category.id;
+  String get _id => widget.scope.key;
 
   @override
   void initState() {
@@ -188,6 +219,16 @@ class _PlayerBodyState extends ConsumerState<_PlayerBody> {
           total: items.length,
           onInfo: () => _showInfo(item, sources),
         ),
+        if (widget.category.hasTracks)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
+            child: AdhkarTrackToggle(
+              key: const ValueKey<String>('adhkar-track-toggle'),
+              tracks: widget.category.tracks,
+              selectedId: widget.scope.trackId ?? widget.category.tracks.first.id,
+              onSelected: widget.onTrack,
+            ),
+          ),
         if (complete)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),

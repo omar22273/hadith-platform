@@ -25,6 +25,36 @@ class TrailHeaderBox {
   final int firstNodeIndex;
 }
 
+/// فاصل قسمين يُراد إدراجه قبل عقدة بعينها، بارتفاعه.
+@immutable
+class TrailDividerSpec {
+  const TrailDividerSpec({required this.dividerIndex, required this.beforeNodeIndex, required this.height});
+
+  /// رقم الفاصل.
+  final int dividerIndex;
+
+  /// العقدة التي يسبقها الفاصل مباشرة.
+  final int beforeNodeIndex;
+
+  /// ارتفاع الفاصل.
+  final double height;
+}
+
+/// صندوق فاصل قسمين.
+@immutable
+class TrailDividerBox {
+  const TrailDividerBox({required this.rect, required this.dividerIndex, required this.beforeNodeIndex});
+
+  /// موضع الفاصل.
+  final Rect rect;
+
+  /// رقم الفاصل.
+  final int dividerIndex;
+
+  /// العقدة التي يسبقها.
+  final int beforeNodeIndex;
+}
+
 /// تخطيط المسار.
 @immutable
 class TrailLayout {
@@ -35,17 +65,22 @@ class TrailLayout {
     required this.headerHeight,
     required this.nodeRadius,
     required this.headers,
+    required this.dividers,
     required this.rowTops,
     required this.nodeCenters,
     required this.segments,
   });
 
   /// يحسب التخطيط. [groupOfNode] رقم مجموعة كل عقدة بترتيبها، ويوضع رأس
-  /// مجموعة قبل أول عقدة منها.
+  /// مجموعة قبل أول عقدة منها. [dividers] فواصل الأقسام: يُدرج كل منها بكامل
+  /// العرض قبل عقدته. [tallHeaderGroups] المجموعات التي يحمل رأسها عنواناً فرعياً
+  /// فيزيد ارتفاعه سطراً.
   factory TrailLayout.compute({
     required double width,
     required double textScale,
     required List<int> groupOfNode,
+    List<TrailDividerSpec> dividers = const <TrailDividerSpec>[],
+    Set<int> tallHeaderGroups = const <int>{},
   }) {
     final double scale = textScale < 1 ? 1 : (textScale > 1.3 ? 1.3 : textScale);
     final double rowHeight = 120 * scale;
@@ -55,22 +90,38 @@ class TrailLayout {
     const double headerGap = 6;
     const double bottom = 120;
     const double sidePadding = 16;
+    const double subtitleExtra = 30;
 
     final List<TrailHeaderBox> headers = <TrailHeaderBox>[];
+    final List<TrailDividerBox> dividerBoxes = <TrailDividerBox>[];
     final List<double> rowTops = <double>[];
     final List<Offset> centers = <Offset>[];
     double y = top;
     for (int k = 0; k < groupOfNode.length; k++) {
+      for (final TrailDividerSpec divider in dividers) {
+        if (divider.beforeNodeIndex == k) {
+          dividerBoxes.add(
+            TrailDividerBox(
+              rect: Rect.fromLTWH(sidePadding, y, width - sidePadding * 2, divider.height),
+              dividerIndex: divider.dividerIndex,
+              beforeNodeIndex: k,
+            ),
+          );
+          y += divider.height + headerGap;
+        }
+      }
       final bool newGroup = k == 0 || groupOfNode[k - 1] != groupOfNode[k];
       if (newGroup) {
+        final double height =
+            tallHeaderGroups.contains(groupOfNode[k]) ? headerHeight + subtitleExtra * scale : headerHeight;
         headers.add(
           TrailHeaderBox(
-            rect: Rect.fromLTWH(sidePadding, y, width - sidePadding * 2, headerHeight),
+            rect: Rect.fromLTWH(sidePadding, y, width - sidePadding * 2, height),
             groupIndex: groupOfNode[k],
             firstNodeIndex: k,
           ),
         );
-        y += headerHeight + headerGap;
+        y += height + headerGap;
       }
       rowTops.add(y);
       final double x = k.isEven ? width * 0.73 : width * 0.27;
@@ -97,6 +148,7 @@ class TrailLayout {
       headerHeight: headerHeight,
       nodeRadius: nodeRadius,
       headers: List<TrailHeaderBox>.unmodifiable(headers),
+      dividers: List<TrailDividerBox>.unmodifiable(dividerBoxes),
       rowTops: List<double>.unmodifiable(rowTops),
       nodeCenters: List<Offset>.unmodifiable(centers),
       segments: List<Path>.unmodifiable(segments),
@@ -120,6 +172,9 @@ class TrailLayout {
 
   /// رؤوس المجموعات.
   final List<TrailHeaderBox> headers;
+
+  /// فواصل الأقسام.
+  final List<TrailDividerBox> dividers;
 
   /// أعلى كل صف عقدة.
   final List<double> rowTops;

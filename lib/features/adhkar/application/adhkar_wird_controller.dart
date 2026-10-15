@@ -1,7 +1,8 @@
 // متحكم وِرد فئة من الأذكار: العدّ على الذكر الحالي بلمسة، والقفل النهائي عند
 // بلوغ العدد المسنون فلا زيادة عليه، ثم الانتقال التلقائي إلى أول ذكر لم يكتمل.
-// لكل فئة متحكمها (family بمعرّف الفئة)، وحالته في الذاكرة تبقى ما دام التطبيق
-// مفتوحاً وتبدأ وِرداً جديداً عند فتحه.
+// لكل نطاق متحكمه (family بمفتاح النطاق: معرّف الفئة، أو «الفئة#المسار» للفئات ذات
+// التبديل)، فلكل من الصباح والمساء وِرده وعدّاده؛ وحالته في الذاكرة تبقى ما دام
+// التطبيق مفتوحاً وتبدأ وِرداً جديداً عند فتحه.
 
 import 'dart:async';
 
@@ -88,17 +89,17 @@ class AdhkarWirdState {
 
 /// المتحكم.
 class AdhkarWirdController extends Notifier<AdhkarWirdState> {
-  AdhkarWirdController(this.categoryId);
+  AdhkarWirdController(this.scope);
 
-  /// معرّف الفئة التي يعدّ عليها هذا المتحكم.
-  final String categoryId;
+  /// مفتاح النطاق الذي يعدّ عليه هذا المتحكم.
+  final String scope;
 
   Timer? _advanceTimer;
 
   @override
   AdhkarWirdState build() {
     ref.onDispose(() => _advanceTimer?.cancel());
-    final List<DhikrItem> items = ref.watch(adhkarItemsProvider(categoryId));
+    final List<DhikrItem> items = ref.watch(adhkarItemsProvider(scope));
     return AdhkarWirdState(
       index: 0,
       counts: List<int>.unmodifiable(List<int>.filled(items.length, 0)),
@@ -106,7 +107,7 @@ class AdhkarWirdController extends Notifier<AdhkarWirdState> {
     );
   }
 
-  List<DhikrItem> get _items => ref.read(adhkarItemsProvider(categoryId));
+  List<DhikrItem> get _items => ref.read(adhkarItemsProvider(scope));
 
   /// لمسة على بطاقة الذكر الحالي: ضغطة واحدة. بلوغ العدد المسنون يقفل الذكر
   /// نهائياً، وكل لمسة بعده مرفوضة هنا، لا في الواجهة وحدها.
@@ -176,6 +177,6 @@ class AdhkarWirdController extends Notifier<AdhkarWirdState> {
   }
 }
 
-/// حالة وِرد فئة من الأذكار بمعرّفها.
+/// حالة وِرد نطاق من الأذكار بمفتاحه.
 final NotifierProviderFamily<AdhkarWirdController, AdhkarWirdState, String> adhkarWirdProvider =
     NotifierProvider.family<AdhkarWirdController, AdhkarWirdState, String>(AdhkarWirdController.new);

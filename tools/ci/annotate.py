@@ -11,8 +11,8 @@ test step can be diagnosed without downloading the raw job log.
 
 import sys
 
-CHUNK = 12000
-MAX_CHUNKS = 8
+CHUNK = 3500
+MAX_CHUNKS = 9
 
 
 def encode(value: str) -> str:

@@ -202,7 +202,8 @@ class SeerahDraftForm {
   const SeerahDraftForm({
     required this.id,
     required this.title,
-    required this.epoch,
+    required this.epochId,
+    required this.covenant,
     required this.placeIndex,
     required this.timeLabel,
     required this.scene,
@@ -217,7 +218,8 @@ class SeerahDraftForm {
   static const SeerahDraftForm blank = SeerahDraftForm(
     id: '',
     title: '',
-    epoch: SeerahEpoch.meccan,
+    epochId: '',
+    covenant: SeerahCovenant.meccan,
     placeIndex: 0,
     timeLabel: '',
     scene: '',
@@ -234,8 +236,11 @@ class SeerahDraftForm {
   /// المحطة (عنوان الحدث).
   final String title;
 
-  /// الحقبة.
-  final SeerahEpoch epoch;
+  /// معرّف الطور التاريخي الكبير من أطوار ملف السيرة.
+  final String epochId;
+
+  /// العهد: قبل البعثة أو المكي أو المدني.
+  final SeerahCovenant covenant;
 
   /// الموضع من المواضع المقترحة.
   final int placeIndex;
@@ -270,6 +275,9 @@ class SeerahDraftForm {
     if (title.trim().isEmpty) {
       errors.add('اسم المحطة مطلوب.');
     }
+    if (epochId.trim().isEmpty) {
+      errors.add('اختر الطور التاريخي.');
+    }
     if (placeIndex < 0 || placeIndex >= seerahPlacePresets.length) {
       errors.add('اختر الموضع.');
     }
@@ -284,6 +292,9 @@ class SeerahDraftForm {
     }
     if (!_idPattern.hasMatch(sourceId.trim())) {
       errors.add('اختر المصدر.');
+    }
+    if (locator.trim().isEmpty) {
+      errors.add('موضع الشاهد في المصدر مطلوب: الجزء والصفحة أو رقم الحديث.');
     }
     if (quotes.values.every((String quote) => quote.trim().isEmpty)) {
       errors.add('أدخل نص شاهد واحد على الأقل منقولاً من المصدر بنصه.');
@@ -303,11 +314,24 @@ class SeerahDraftForm {
   SeerahStationModel toStation({required int order}) {
     final SeerahPlacePreset place = seerahPlacePresets[placeIndex];
     final String trimmedLocator = locator.trim();
+    final List<SeerahEvidence> evidence = <SeerahEvidence>[
+      for (final SeerahScene item in SeerahScene.values)
+        if ((quotes[item] ?? '').trim().isNotEmpty)
+          SeerahEvidence(
+            scene: item,
+            source: SourceRef(
+              sourceId: sourceId.trim(),
+              locator: trimmedLocator.isEmpty ? null : trimmedLocator,
+              quote: quotes[item]!.trim(),
+            ),
+          ),
+    ];
     return SeerahStationModel(
       id: id.trim(),
       order: order,
       title: title.trim(),
-      epoch: epoch,
+      epochId: epochId.trim(),
+      covenant: covenant,
       timeLabel: timeLabel.trim().isEmpty ? null : timeLabel.trim(),
       place: SeerahPlace(
         name: place.name,
@@ -319,17 +343,14 @@ class SeerahDraftForm {
       sceneDescription: scene.trim(),
       challenge: challenge.trim(),
       propheticDecision: decision.trim(),
-      evidence: <SeerahEvidence>[
-        for (final SeerahScene item in SeerahScene.values)
-          if ((quotes[item] ?? '').trim().isNotEmpty)
-            SeerahEvidence(
-              scene: item,
-              source: SourceRef(
-                sourceId: sourceId.trim(),
-                locator: trimmedLocator.isEmpty ? null : trimmedLocator,
-                quote: quotes[item]!.trim(),
-              ),
-            ),
+      evidence: evidence,
+      // الفصل الأول من الشواهد المدخلة نفسها؛ يُستبدل بفصول الكتاب حين تُولَّد المحطة من نصه.
+      chapters: <SeerahChapter>[
+        SeerahChapter(
+          id: 'c1',
+          title: 'الشواهد المدخلة',
+          passages: <SourceRef>[for (final SeerahEvidence item in evidence) item.source],
+        ),
       ],
       review: ReviewInfo(
         status: ReviewStatus.pendingScholarlyReview,

@@ -1,10 +1,12 @@
-// السبحة النبوية الذكية: تسبيح حر بعدّاد دائري هادئ.
+// السبحة الذكية: تسبيح حر بعدّاد دائري هادئ.
 //
 // 1. الرأس: زر الرجوع إلى مركز الأذكار، والعنوان، وزر تصفير الجولة.
 // 2. الخيارات: خمسة أذكار (سبحان الله، الحمد لله، الله أكبر، الصلاة على النبي ﷺ،
 //    الاستغفار) ثم ثلاثة أزرار للعدد المستهدف: ٣٣ أو ١٠٠ أو حر بلا حد.
 // 3. النصف السفلي كله منطقة لمس واحدة: كل نقرة تسبيحة، وفيها الحلقة الدائرية
 //    (يتقدم قوسها نحو العدد المستهدف) والعدد، ومجموع الذكر والمجموع الكلي.
+// 4. أسفل المنطقة زر «إعادة تعيين كافة الإحصائيات ↺»: يفتح AlertDialog للتأكيد،
+//    وعند التأكيد تُصفَّر فوراً كل العدادات والمجاميع المحفوظة محلياً.
 //
 // تسبيحة بنقرة: اهتزاز خفيف selectionClick. بلوغ العدد المستهدف: اهتزاز متوسط
 // مزدوج وهالة خضراء، وأول نقرة بعدها تبدأ جولة جديدة. الاختيار والمجاميع تُحفظ
@@ -61,6 +63,40 @@ class _SebhaScreenState extends ConsumerState<SebhaScreen> {
     }
   }
 
+  /// نافذة التأكيد؛ التصفير الشامل لا يجري إلا بعد «تصفير الكل».
+  Future<void> _confirmResetAll() async {
+    final AppPalette palette = AppPalette.of(context);
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        key: const ValueKey<String>('sebha-reset-all-dialog'),
+        shape: AppShapes.rounded(AppShapes.radiusLarge),
+        title: const Text('إعادة تعيين كافة الإحصائيات؟'),
+        content: Text(
+          'سيُصفَّر عدّاد الجولة الحالية ومجاميع الأذكار الخمسة المحفوظة في هذا الجهاز، '
+          'ولا يمكن التراجع عن ذلك.',
+          style: AppTypography.ui(color: palette.ink, fontSize: 14, height: 1.8),
+        ),
+        actions: <Widget>[
+          TextButton(
+            key: const ValueKey<String>('sebha-reset-all-cancel'),
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('إلغاء'),
+          ),
+          FilledButton(
+            key: const ValueKey<String>('sebha-reset-all-confirm'),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('تصفير الكل'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      ref.read(sebhaProvider.notifier).resetAll();
+      unawaited(HapticFeedback.lightImpact());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final SebhaState state = ref.watch(sebhaProvider);
@@ -77,6 +113,7 @@ class _SebhaScreenState extends ConsumerState<SebhaScreen> {
               onTarget: controller.selectTarget,
             ),
             Expanded(child: _TapZone(state: state, onTap: _onTap)),
+            _ResetAllButton(onPressed: _confirmResetAll),
           ],
         ),
       ),
@@ -107,7 +144,7 @@ class _Header extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              'السبحة النبوية الذكية',
+              'السبحة الذكية',
               key: const ValueKey<String>('sebha-title'),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -122,6 +159,69 @@ class _Header extends StatelessWidget {
             icon: const Icon(Icons.restart_alt_rounded),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// زر «إعادة تعيين كافة الإحصائيات ↺» أسفل منطقة اللمس؛ خارجها كي لا تُحتسب نقرته تسبيحة.
+class _ResetAllButton extends StatelessWidget {
+  const _ResetAllButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+    final ShapeBorder shape = AppShapes.rounded(
+      AppShapes.radiusSmall,
+      side: BorderSide(color: palette.line),
+    );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      child: Semantics(
+        button: true,
+        label: 'إعادة تعيين كافة الإحصائيات',
+        child: ExcludeSemantics(
+          child: DecoratedBox(
+            decoration: ShapeDecoration(color: palette.surface, shape: shape),
+            child: Material(
+              type: MaterialType.transparency,
+              shape: shape,
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                key: const ValueKey<String>('sebha-reset-all'),
+                onTap: onPressed,
+                customBorder: shape,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Flexible(
+                          child: Text(
+                            'إعادة تعيين كافة الإحصائيات',
+                            textAlign: TextAlign.center,
+                            style: AppTypography.ui(
+                              color: palette.inkSoft,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              height: 1.3,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(Icons.restart_alt_rounded, size: 20, color: palette.inkSoft),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -317,14 +417,18 @@ class _TapZone extends StatelessWidget {
                     constraints.maxHeight - 96,
                     constraints.maxWidth - 28,
                   ].reduce((double a, double b) => a < b ? a : b).clamp(96.0, 230.0).toDouble();
+                  // إن ضاق الارتفاع (هاتف ضيّق بأكبر الخطوط) انكمش العدّاد مع مجاميعه بدل أن يفيض.
                   return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        _CounterRing(state: state, side: side, duration: duration),
-                        const SizedBox(height: 10),
-                        _Totals(state: state),
-                      ],
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          _CounterRing(state: state, side: side, duration: duration),
+                          const SizedBox(height: 10),
+                          _Totals(state: state),
+                        ],
+                      ),
                     ),
                   );
                 },

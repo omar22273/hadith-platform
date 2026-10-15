@@ -137,7 +137,7 @@ void main() {
     expect(find.byType(SeerahStationScreen), findsOneWidget);
     expect(find.text('المشهد الموجز'), findsOneWidget);
     expect(find.text('مأزق الشورى والتحدي'), findsOneWidget);
-    expect(find.text('الرواية التاريخية وتفاصيل الأحداث'), findsOneWidget);
+    expect(find.text('الرواية التاريخية المطولة'), findsOneWidget);
 
     await tester.tap(find.byType(BackButton));
     await settle(tester);

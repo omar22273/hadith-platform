@@ -103,6 +103,16 @@ EXTRAS = {
     }
     return null;
   }
+
+  /// القسم الذي يضم الحديث برقمه، أو null إن لم تُعرَّف أقسام أو لم يقع الرقم في أحدها.
+  CurriculumSection? sectionOf(int number) {
+    for (final CurriculumSection section in sections ?? const <CurriculumSection>[]) {
+      if (number >= section.firstNumber && number <= section.lastNumber) {
+        return section;
+      }
+    }
+    return null;
+  }
 """,
     "SeerahDataset": """
   /// يعيد المحطة بمعرّفها، أو null إن لم توجد.
@@ -123,13 +133,34 @@ EXTRAS = {
       );
     return List<SeerahStationModel>.unmodifiable(result);
   }
-""",
-    "AdhkarCatalog": """
-  /// الأذكار مرتبة بحقل order كما تُعرض في الوِرد.
-  List<DhikrItem> get itemsInOrder {
-    final List<DhikrItem> result = List<DhikrItem>.of(items)
-      ..sort((DhikrItem a, DhikrItem b) => a.order.compareTo(b.order));
-    return List<DhikrItem>.unmodifiable(result);
+
+  /// الأطوار مرتبة بحقل number كما تُعرض في شاشة المسار.
+  List<SeerahEpochInfo> get epochsInOrder {
+    final List<SeerahEpochInfo> result = List<SeerahEpochInfo>.of(epochs)
+      ..sort(
+        (SeerahEpochInfo a, SeerahEpochInfo b) => a.number.compareTo(b.number),
+      );
+    return List<SeerahEpochInfo>.unmodifiable(result);
+  }
+
+  /// الطور بمعرّفه، أو null إن لم يوجد.
+  SeerahEpochInfo? epochById(String epochId) {
+    for (final SeerahEpochInfo epoch in epochs) {
+      if (epoch.id == epochId) {
+        return epoch;
+      }
+    }
+    return null;
+  }
+
+  /// الطور الذي تنتمي إليه المحطة، أو null إن كان معرّفه مجهولاً.
+  SeerahEpochInfo? epochOf(SeerahStationModel station) => epochById(station.epochId);
+
+  /// محطات طور واحد بترتيبها الزمني.
+  List<SeerahStationModel> stationsOfEpoch(String epochId) {
+    return List<SeerahStationModel>.unmodifiable(
+      chronological.where((SeerahStationModel station) => station.epochId == epochId),
+    );
   }
 """,
     "SeerahStationModel": """
@@ -140,22 +171,48 @@ EXTRAS = {
     );
   }
 
-  /// فقرات الرواية المفصلة (تفصل بينها سطور فارغة)؛ فارغة إن غابت الرواية
-  /// أو كانت بياضاً، فيعود العرض إلى نصوص المشاهد الموثقة.
-  List<String> get narrativeParagraphs {
-    final String? text = detailedNarrative;
-    if (text == null) {
-      return const <String>[];
-    }
-    return List<String>.unmodifiable(
-      text
-          .split(RegExp(r'\\n\\s*\\n'))
-          .map((String paragraph) => paragraph.trim())
-          .where((String paragraph) => paragraph.isNotEmpty),
-    );
+  /// هل كُتبت طبقة المعايشة والموقف (المشهد والمأزق والقرار) لهذه المحطة؛ غيابها يعني محطة مولّدة
+  /// آلياً من الكتاب لم تُكتب طبقتها الأولى بعد، فتُعرض روايتها المطولة وحدها.
+  bool get hasExperience => sceneDescription != null && challenge != null && propheticDecision != null;
+
+  /// هل لشريط البوصلة سنة أو عمر منصوص عليهما في الشواهد.
+  bool get hasCompassFacts => yearLabel != null || ageLabel != null;
+
+  /// عدد مقاطع الرواية المطولة في كل فصولها.
+  int get passageCount => chapters.fold<int>(0, (int total, SeerahChapter chapter) => total + chapter.passages.length);
+""",
+    "DhikrItem": """
+  /// هل الذكر نص قرآني أدخله المالك؛ يُعرض بين ﴿ ﴾ وتُحوَّل فواصل الآيات فيه.
+  bool get isQuran => evidence.any((SourceRef reference) => reference.sourceId == 'quran_owner_text');
+
+  /// النص كما يُعرض: الآية بين ﴿ ﴾ وفواصل الآيات (*) علامات ۝، وغير الآيات كما هي دون تغيير.
+  String get displayText => isQuran ? '﴿${text.replaceAll(' * ', ' ۝ ')}﴾' : text;
+
+  /// هل يظهر الذكر في المسار [trackId]؛ الذكر بلا مسارات يظهر في كل مسار.
+  bool inTrack(String trackId) {
+    final List<String>? own = tracks;
+    return own == null || own.contains(trackId);
+  }
+""",
+    "SunanCatalog": """
+  /// السنن مرتبة بحقل order كما تُعرض في الشاشة.
+  List<SunnahItem> get itemsInOrder {
+    final List<SunnahItem> result = List<SunnahItem>.of(items)
+      ..sort((SunnahItem a, SunnahItem b) => a.order.compareTo(b.order));
+    return List<SunnahItem>.unmodifiable(result);
   }
 
-  /// هل للمحطة رواية مفصلة جاهزة للعرض.
-  bool get hasDetailedNarrative => narrativeParagraphs.isNotEmpty;
+  /// سنن باب واحد بترتيب العرض.
+  List<SunnahItem> inBab(SunnahBab bab) {
+    return List<SunnahItem>.unmodifiable(itemsInOrder.where((SunnahItem item) => item.bab == bab));
+  }
+""",
+    "AdhkarCatalog": """
+  /// الأذكار مرتبة بحقل order كما تُعرض في الوِرد.
+  List<DhikrItem> get itemsInOrder {
+    final List<DhikrItem> result = List<DhikrItem>.of(items)
+      ..sort((DhikrItem a, DhikrItem b) => a.order.compareTo(b.order));
+    return List<DhikrItem>.unmodifiable(result);
+  }
 """,
 }

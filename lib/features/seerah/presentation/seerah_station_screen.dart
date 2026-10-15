@@ -1,15 +1,23 @@
-// شاشة المحطة: تدفق عمودي واحد بدل ثلاث صفحات متتابعة.
+// شاشة المحطة الموحدة بطبقتين في تدفق عمودي واحد.
 //
-// 1. المشهد الموجز: وصف الموقف في أربعة أسطر، يُفتح كاملاً بزر عند الحاجة.
-// 2. مأزق الشورى والتحدي: المأزق بنصه، وخياراته إن نصّ عليها الشاهد؛ فإن لم
-//    ينص فزر واحد لكشف القرار. لا يُخترع خيار من خارج ملف البيانات.
-// 3. القرار النبوي ونتيجته: يظهر بعد اختيار المستخدم (أو كشفه) مع شاهده.
-// 4. «الرواية التاريخية وتفاصيل الأحداث»: قسم قابل للطي لمن أراد التوسع.
+// أعلاها شريط البوصلة [العهد • السنة • عمر النبي ﷺ • الموقع] ثم الطور، وبطاقة «ما سبق»
+// (previous_link) تربط المحطة بسابقتها.
 //
-// كشف القرار يعدّ المحطة مفتوحة (تظهر علامتها على الخريطة)، وبعده يظهر زر
-// الانتقال إلى المحطة التالية. لا تقييم للاختيار: لا صواب ولا خطأ ولا لون عقاب.
+// الطبقة الأولى «المعايشة والموقف» (تُعرض حين كُتبت للمحطة):
+//   التمهيد المشوق ← المشهد الموجز (أربعة أسطر يُفتح كاملاً بزر) ← مأزق الشورى والتحدي
+//   وسؤال الشورى وخياراته إن نصّ عليها الشاهد (فإن لم ينص فزر كشف واحد) ← القرار النبوي
+//   بعد الاختيار أو الكشف ← «في المحطة التالية» (next_hook).
+//
+// الطبقة الثانية «الرواية التاريخية المطولة»: فصول قرائية بمقاطع حرفية موثقة تحت كل مقطع
+// شارة مصدره وصفحته، وشريط حجم الخط. تُطوى حين تسبقها طبقة المعايشة، وتُفتح من البدء في
+// المحطة التي لم تُكتب طبقتها الأولى بعد (المولّدة من نص الكتاب).
+//
+// كشف القرار يعدّ المحطة مفتوحة (تظهر علامتها على الخريطة)، وبعده يظهر زر الانتقال إلى
+// المحطة التالية؛ والمحطة بلا طبقة معايشة يظهر زر الانتقال فيها من البدء ويعدّها مفتوحة
+// بالانتقال. لا تقييم للاختيار: لا صواب ولا خطأ ولا لون عقاب.
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,21 +25,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/content/models/source_catalog.dart';
 import '../../../core/content/source_catalog_provider.dart';
 import '../../../core/content/widgets/source_quote_tile.dart';
-import '../../../core/text/arabic_digits.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../core/ui/app_shapes.dart';
+import '../../../core/ui/reading_size_bar.dart';
 import '../../../core/ui/smooth_surface.dart';
-import '../../../core/ui/wide_action_button.dart';
 import '../application/seerah_providers.dart';
 import '../data/models/seerah_station.dart';
 import '../domain/seerah_checkpoint.dart';
 import 'seerah_checkpoint_screen.dart';
+import 'widgets/seerah_compass_bar.dart';
+import 'widgets/seerah_experience_cards.dart';
 import 'widgets/seerah_labels.dart';
-import 'widgets/seerah_narrative_section.dart';
-
-/// عدد أسطر المشهد الموجز قبل فتحه كاملاً.
-const int _briefLines = 4;
+import 'widgets/seerah_reading_section.dart';
 
 /// شاشة المحطة.
 class SeerahStationScreen extends ConsumerStatefulWidget {
@@ -46,10 +51,21 @@ class SeerahStationScreen extends ConsumerStatefulWidget {
 
 class _SeerahStationScreenState extends ConsumerState<SeerahStationScreen> {
   final GlobalKey _decisionAnchor = GlobalKey();
+  final ScrollController _scroll = ScrollController();
 
   /// الخيار الذي اختاره المستخدم؛ null إن كشف القرار بلا خيارات.
   int? _chosen;
   bool _revealed = false;
+
+  /// فتح الطبقة الثانية؛ null يعني الافتراضي (مفتوحة إن لم تكن للمحطة طبقة معايشة).
+  bool? _readingOpen;
+  bool _evidenceOpen = false;
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
 
   /// يكشف القرار النبوي، ويعدّ المحطة مفتوحة، ويُظهر القرار على الشاشة.
   void _reveal({int? choice}) {
@@ -61,19 +77,28 @@ class _SeerahStationScreenState extends ConsumerState<SeerahStationScreen> {
       _revealed = true;
     });
     ref.read(seerahVisitedProvider.notifier).markVisited(widget.stationId);
+    _scrollToDecision(0);
+  }
+
+  /// القائمة كسولة: إن لم تُبنَ بطاقة القرار بعد، تُقدَّم القائمة قليلاً ثم يُعاد المحاولة.
+  void _scrollToDecision(int attempt) {
     WidgetsBinding.instance.addPostFrameCallback((Duration _) {
-      final BuildContext? target = _decisionAnchor.currentContext;
-      if (!mounted || target == null) {
+      if (!mounted) {
         return;
       }
-      unawaited(
-        Scrollable.ensureVisible(
-          target,
-          alignment: 0.04,
-          duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 420),
-          curve: Curves.easeOutCubic,
-        ),
-      );
+      final BuildContext? target = _decisionAnchor.currentContext;
+      final Duration duration =
+          MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 420);
+      if (target != null) {
+        unawaited(Scrollable.ensureVisible(target, alignment: 0.04, duration: duration, curve: Curves.easeOutCubic));
+        return;
+      }
+      if (attempt >= 6 || !_scroll.hasClients) {
+        return;
+      }
+      final ScrollPosition position = _scroll.position;
+      _scroll.jumpTo(math.min(position.maxScrollExtent, position.pixels + position.viewportDimension * 0.6));
+      _scrollToDecision(attempt + 1);
     });
   }
 
@@ -83,6 +108,7 @@ class _SeerahStationScreenState extends ConsumerState<SeerahStationScreen> {
     List<SeerahStationModel> ordered,
     int currentIndex,
   ) async {
+    ref.read(seerahVisitedProvider.notifier).markVisited(widget.stationId);
     final SeerahCheckpoint? checkpoint = SeerahCheckpoint.after(ordered, currentIndex);
     if (checkpoint != null) {
       await Navigator.of(context).push<bool>(
@@ -106,9 +132,15 @@ class _SeerahStationScreenState extends ConsumerState<SeerahStationScreen> {
     );
   }
 
+  void _finish() {
+    ref.read(seerahVisitedProvider.notifier).markVisited(widget.stationId);
+    Navigator.of(context).maybePop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
+    final TextTheme text = Theme.of(context).textTheme;
     final SeerahDataset? dataset = ref.watch(seerahDatasetProvider).value;
     final SourceCatalog? sources = ref.watch(sourceCatalogProvider).value;
     final SeerahStationModel? station = dataset?.stationById(widget.stationId);
@@ -121,6 +153,173 @@ class _SeerahStationScreenState extends ConsumerState<SeerahStationScreen> {
     final List<SeerahStationModel> ordered = dataset.chronological;
     final int index = ordered.indexWhere((SeerahStationModel s) => s.id == station.id);
     final SeerahStationModel? next = index >= 0 && index + 1 < ordered.length ? ordered[index + 1] : null;
+    final SeerahEpochInfo? epoch = dataset.epochOf(station);
+
+    final String? scene = station.sceneDescription;
+    final String? challenge = station.challenge;
+    final String? decision = station.propheticDecision;
+    final bool experience = scene != null && challenge != null && decision != null;
+    final bool readingOpen = _readingOpen ?? !experience;
+    final bool canContinue = _revealed || !experience;
+    final String? previousLink = station.previousLink;
+    final String? nextHook = station.nextHook;
+
+    final List<Widget> items = <Widget>[];
+    void add(Widget widget, {double gap = 14}) {
+      items
+        ..add(widget)
+        ..add(SizedBox(height: gap));
+    }
+
+    add(SeerahCompassBar(station: station, sources: sources), gap: 8);
+    if (epoch != null) {
+      add(
+        Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(6, 0, 6, 0),
+          child: Text(
+            epochCaption(epoch),
+            key: const ValueKey<String>('station-epoch'),
+            style: text.labelMedium?.copyWith(color: palette.amberText, fontWeight: FontWeight.w600),
+          ),
+        ),
+      );
+    }
+    if (previousLink != null) {
+      add(
+        KeyedSubtree(
+          key: const ValueKey<String>('station-previous-link'),
+          child: SeerahBridgeCard(icon: Icons.history_rounded, label: 'ما سبق', text: previousLink),
+        ),
+      );
+    }
+
+    if (scene != null && challenge != null && decision != null) {
+      add(const SectionEyebrow('المعايشة والموقف', icon: Icons.explore_outlined), gap: 10);
+      final String? hook = station.hook;
+      if (hook != null) {
+        add(SeerahHookCard(text: hook));
+      }
+      add(SeerahBriefScene(text: scene));
+      add(
+        SeerahDilemmaCard(
+          challenge: challenge,
+          shuraQuestion: station.shuraQuestion,
+          options: station.dilemmaOptions ?? const <String>[],
+          chosen: _chosen,
+          revealed: _revealed,
+          onChoose: (int option) => _reveal(choice: option),
+          onReveal: _reveal,
+        ),
+      );
+      if (_revealed) {
+        add(
+          SeerahDecisionCard(
+            key: _decisionAnchor,
+            decision: decision,
+            evidence: station.evidenceFor(SeerahScene.decision),
+            sources: sources,
+          ),
+        );
+        if (nextHook != null) {
+          add(
+            KeyedSubtree(
+              key: const ValueKey<String>('station-next-hook'),
+              child: SeerahBridgeCard(icon: Icons.near_me_rounded, label: 'في المحطة التالية', text: nextHook),
+            ),
+          );
+        }
+      }
+    }
+
+    add(
+      SeerahReadingHeader(
+        station: station,
+        open: readingOpen,
+        onToggle: () => setState(() => _readingOpen = !readingOpen),
+      ),
+      gap: readingOpen ? 12 : 14,
+    );
+    if (readingOpen) {
+      add(const ReadingSizeBar(), gap: 18);
+      for (int c = 0; c < station.chapters.length; c++) {
+        final SeerahChapter chapter = station.chapters[c];
+        add(
+          SeerahChapterHeading(
+            key: ValueKey<String>('chapter-${chapter.id}'),
+            chapter: chapter,
+            number: c + 1,
+            total: station.chapters.length,
+          ),
+          gap: 10,
+        );
+        for (int p = 0; p < chapter.passages.length; p++) {
+          add(
+            SeerahPassageView(
+              id: '${chapter.id}-$p',
+              passage: chapter.passages[p],
+              sources: sources,
+            ),
+            gap: p == chapter.passages.length - 1 ? 26 : 14,
+          );
+        }
+      }
+    }
+
+    if (!experience && nextHook != null) {
+      add(
+        KeyedSubtree(
+          key: const ValueKey<String>('station-next-hook'),
+          child: SeerahBridgeCard(icon: Icons.near_me_rounded, label: 'في المحطة التالية', text: nextHook),
+        ),
+      );
+    }
+
+    if (experience) {
+      add(
+        SeerahEvidenceHeader(
+          open: _evidenceOpen,
+          onToggle: () => setState(() => _evidenceOpen = !_evidenceOpen),
+        ),
+        gap: _evidenceOpen ? 12 : 14,
+      );
+      if (_evidenceOpen) {
+        for (final SeerahScene each in SeerahScene.values) {
+          add(
+            SeerahSceneEvidenceBlock(
+              scene: each,
+              evidence: station.evidenceFor(each),
+              builder: (SeerahEvidence item) =>
+                  SourceQuoteTile(reference: item.source, source: sources?.byId(item.source.sourceId)),
+            ),
+            gap: 18,
+          );
+        }
+      }
+    }
+
+    items.add(
+      Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(6, 0, 6, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'المقاطع منقولة بنصها من الكتب المثبتة، وعناوين الفصول والتمهيد وسؤال الشورى '
+              'والربط بين المحطات صياغة تحريرية مقتصرة على شواهد المحطة.',
+              style: text.labelSmall?.copyWith(color: palette.inkSoft, height: 1.7),
+            ),
+            for (final String note in station.review.notes.skip(experience ? 1 : 0))
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  '• $note',
+                  style: text.labelSmall?.copyWith(color: palette.inkSoft, height: 1.7),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -134,28 +333,13 @@ class _SeerahStationScreenState extends ConsumerState<SeerahStationScreen> {
           Expanded(
             child: ListView(
               key: const ValueKey<String>('station-scroll'),
+              controller: _scroll,
               physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 28),
-              children: <Widget>[
-                _BriefScene(station: station),
-                const SizedBox(height: 14),
-                _DilemmaCard(
-                  station: station,
-                  chosen: _chosen,
-                  revealed: _revealed,
-                  onChoose: (int option) => _reveal(choice: option),
-                  onReveal: _reveal,
-                ),
-                if (_revealed) ...<Widget>[
-                  const SizedBox(height: 14),
-                  _DecisionCard(key: _decisionAnchor, station: station, sources: sources),
-                ],
-                const SizedBox(height: 14),
-                SeerahNarrativeSection(station: station, sources: sources),
-              ],
+              children: items,
             ),
           ),
-          if (_revealed)
+          if (canContinue)
             SafeArea(
               top: false,
               child: Padding(
@@ -164,9 +348,7 @@ class _SeerahStationScreenState extends ConsumerState<SeerahStationScreen> {
                   width: double.infinity,
                   child: FilledButton.icon(
                     key: const ValueKey<String>('station-continue'),
-                    onPressed: next == null
-                        ? () => Navigator.of(context).maybePop()
-                        : () => unawaited(_continueTo(next, ordered, index)),
+                    onPressed: next == null ? _finish : () => unawaited(_continueTo(next, ordered, index)),
                     icon: Icon(next == null ? Icons.map_rounded : Icons.arrow_forward_rounded),
                     label: Text(
                       next == null
@@ -182,279 +364,6 @@ class _SeerahStationScreenState extends ConsumerState<SeerahStationScreen> {
               ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-/// عنوان بطاقة: أيقونة وعنوان تراثي.
-class _CardHeading extends StatelessWidget {
-  const _CardHeading({required this.icon, required this.title});
-
-  final IconData icon;
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    return Row(
-      children: <Widget>[
-        Icon(icon, color: palette.amberText),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            title,
-            style: AppTypography.heritageTitle(color: palette.ink, fontSize: 24),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// المشهد الموجز: وصف الموقف في أربعة أسطر، وزر لفتحه كاملاً إن زاد عنها.
-class _BriefScene extends StatefulWidget {
-  const _BriefScene({required this.station});
-
-  final SeerahStationModel station;
-
-  @override
-  State<_BriefScene> createState() => _BriefSceneState();
-}
-
-class _BriefSceneState extends State<_BriefScene> {
-  bool _expanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    final SeerahStationModel station = widget.station;
-    final TextStyle style = AppTypography.athar(color: palette.ink, fontSize: 21);
-    return SmoothSurface(
-      key: const ValueKey<String>('station-brief'),
-      elevated: true,
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          const _CardHeading(icon: Icons.wb_sunny_outlined, title: 'المشهد الموجز'),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 6,
-            children: <Widget>[
-              SoftChip(label: epochLabel(station.epoch), icon: Icons.timeline_rounded),
-              SoftChip(label: station.place.name, icon: Icons.place_rounded),
-              if (station.timeLabel != null) SoftChip(label: station.timeLabel!, icon: Icons.schedule_rounded),
-            ],
-          ),
-          const SizedBox(height: 12),
-          LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              final TextPainter probe = TextPainter(
-                text: TextSpan(text: station.sceneDescription, style: style),
-                textDirection: Directionality.of(context),
-                textScaler: MediaQuery.textScalerOf(context),
-                maxLines: _briefLines,
-              )..layout(maxWidth: constraints.maxWidth);
-              final bool longer = probe.didExceedMaxLines;
-              probe.dispose();
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Text(
-                    station.sceneDescription,
-                    key: const ValueKey<String>('station-brief-text'),
-                    maxLines: _expanded ? null : _briefLines,
-                    overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
-                    style: style,
-                  ),
-                  if (longer)
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: TextButton(
-                        key: const ValueKey<String>('station-brief-toggle'),
-                        onPressed: () => setState(() => _expanded = !_expanded),
-                        child: Text(_expanded ? 'طيّ المشهد' : 'قراءة المشهد كاملاً'),
-                      ),
-                    ),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// مأزق الشورى والتحدي: المأزق بنصه، ثم خياراته (إن نص عليها الشاهد) أو زر كشف.
-class _DilemmaCard extends StatelessWidget {
-  const _DilemmaCard({
-    required this.station,
-    required this.chosen,
-    required this.revealed,
-    required this.onChoose,
-    required this.onReveal,
-  });
-
-  final SeerahStationModel station;
-  final int? chosen;
-  final bool revealed;
-  final ValueChanged<int> onChoose;
-  final VoidCallback onReveal;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    final TextTheme text = Theme.of(context).textTheme;
-    final List<String> options = station.dilemmaOptions ?? const <String>[];
-    return SmoothSurface(
-      key: const ValueKey<String>('station-dilemma'),
-      borderColor: palette.amber.withValues(alpha: 0.45),
-      elevated: true,
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          const _CardHeading(icon: Icons.help_outline_rounded, title: 'مأزق الشورى والتحدي'),
-          const SizedBox(height: 10),
-          Text(
-            station.challenge,
-            key: const ValueKey<String>('station-challenge'),
-            style: AppTypography.athar(color: palette.ink, fontSize: 21),
-          ),
-          if (options.isNotEmpty) ...<Widget>[
-            const SizedBox(height: 14),
-            Text(
-              revealed ? 'اخترتَ:' : 'اختر ما تراه ثم يُكشف القرار النبوي:',
-              style: text.labelLarge?.copyWith(color: palette.inkSoft, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 8),
-            for (int i = 0; i < options.length; i++) ...<Widget>[
-              if (i > 0) const SizedBox(height: 8),
-              _OptionTile(
-                index: i,
-                label: options[i],
-                selected: chosen == i,
-                dimmed: revealed && chosen != i,
-                onTap: revealed ? null : () => onChoose(i),
-              ),
-            ],
-          ] else if (!revealed) ...<Widget>[
-            const SizedBox(height: 16),
-            WideActionButton(
-              key: const ValueKey<String>('station-reveal'),
-              label: 'اكشف القرار النبوي',
-              subtitle: 'تأمّل الموقف أولاً ثم اكشف',
-              icon: Icons.lightbulb_outline_rounded,
-              onPressed: onReveal,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-/// خيار واحد من خيارات المأزق: نصه كما ورد في الشاهد.
-class _OptionTile extends StatelessWidget {
-  const _OptionTile({
-    required this.index,
-    required this.label,
-    required this.selected,
-    required this.dimmed,
-    required this.onTap,
-  });
-
-  final int index;
-  final String label;
-  final bool selected;
-  final bool dimmed;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    return SmoothSurface(
-      key: ValueKey<String>('station-option-$index'),
-      onTap: onTap,
-      semanticLabel: 'الخيار ${arabicDigits(index + 1)}: $label',
-      color: selected ? palette.amberSoft : palette.surface,
-      borderColor: selected ? palette.amber : palette.line,
-      radius: AppShapes.radiusMedium,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      child: Row(
-        children: <Widget>[
-          Icon(
-            selected ? Icons.radio_button_checked_rounded : Icons.radio_button_unchecked_rounded,
-            size: 22,
-            color: selected ? palette.amberText : palette.inkSoft,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              label,
-              style: AppTypography.athar(
-                color: dimmed ? palette.inkSoft : palette.ink,
-                fontSize: 19,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// القرار النبوي ونتيجته مع شاهده، يظهر بعد الاختيار أو الكشف.
-class _DecisionCard extends StatelessWidget {
-  const _DecisionCard({super.key, required this.station, required this.sources});
-
-  final SeerahStationModel station;
-  final SourceCatalog? sources;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    final List<SeerahEvidence> evidence = station.evidenceFor(SeerahScene.decision);
-    final Duration fade = MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 380);
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: 1),
-      duration: fade,
-      curve: Curves.easeOut,
-      builder: (BuildContext context, double opacity, Widget? child) => Opacity(opacity: opacity, child: child),
-      child: SmoothSurface(
-        key: const ValueKey<String>('station-decision'),
-        gradient: LinearGradient(
-          begin: AlignmentDirectional.topStart,
-          end: AlignmentDirectional.bottomEnd,
-          colors: <Color>[palette.emeraldSoft, palette.surface],
-        ),
-        elevated: true,
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const _CardHeading(icon: Icons.lightbulb_outline_rounded, title: 'القرار النبوي ونتيجته'),
-            const SizedBox(height: 10),
-            Text(
-              station.propheticDecision,
-              key: const ValueKey<String>('station-decision-text'),
-              style: AppTypography.athar(color: palette.ink, fontSize: 21),
-            ),
-            const SizedBox(height: 16),
-            SectionEyebrow(
-              evidence.length == 1 ? 'الشاهد من المصادر' : 'الشواهد من المصادر (${arabicDigits(evidence.length)})',
-              icon: Icons.format_quote_rounded,
-            ),
-            const SizedBox(height: 8),
-            for (final SeerahEvidence item in evidence) ...<Widget>[
-              SourceQuoteTile(reference: item.source, source: sources?.byId(item.source.sourceId)),
-              const SizedBox(height: 8),
-            ],
-          ],
-        ),
       ),
     );
   }

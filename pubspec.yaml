@@ -1,7 +1,7 @@
 name: hadith_platform
 description: "منصة هَدْي، على خُطاه ﷺ علماً وعملاً: الأربعون النووية ورحلة السيرة والأذكار وميدان المراجعة."
 publish_to: none
-version: 2.8.0+16
+version: 2.9.0+17
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -44,6 +44,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/data/adhkar/
+    - assets/data/sunan/
     - assets/data/catalogs/
     - assets/data/curriculum/
     - assets/data/hadith/nawawi40/

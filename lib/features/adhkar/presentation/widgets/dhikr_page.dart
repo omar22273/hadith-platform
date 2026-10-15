@@ -1,6 +1,7 @@
 // صفحة الذكر الواحدة داخل PageView، وهي ثلاثة عناصر بصرية لا غير:
 //
-// 1. نص الذكر المشكول بخط كبير في الوسط (يمرَّر داخلياً إن طال).
+// 1. نص الذكر المشكول بخط كبير في الوسط (يمرَّر داخلياً إن طال)، والآية بين ﴿ ﴾، وفوقه
+//    شريط تنبيه رفيع إن كانت درجة الحديث دون الصحيح أو لا أصل له في الكتب الستة المثبتة.
 // 2. منطقة اللمس السفلية: نصف الصفحة السفلي كله يستجيب للنقر في أي موضع منه.
 // 3. فيها عدّاد دائري بارز يعرض «باقٍ N»، فإذا بلغ العدد المسنون أضاءت المنطقة
 //    بهالة خضراء وانقفل العدّ نهائياً.
@@ -14,6 +15,7 @@ import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/feedback_colors.dart';
 import '../../../../core/ui/app_shapes.dart';
+import '../../../../core/ui/smooth_surface.dart';
 import '../../data/models/adhkar.dart';
 
 /// صفحة ذكر.
@@ -63,21 +65,68 @@ class _DhikrText extends StatelessWidget {
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight - 16),
             child: Center(
-              child: Text(
-                item.text,
-                key: ValueKey<String>('dhikr-text-${item.id}'),
-                textAlign: TextAlign.center,
-                style: AppTypography.matnOf(
-                  context,
-                  color: palette.ink,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w700,
-                ).copyWith(height: 2),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  if (item.caution != null) ...<Widget>[
+                    _CautionBanner(itemId: item.id, message: item.caution!),
+                    const SizedBox(height: 12),
+                  ],
+                  Text(
+                    item.displayText,
+                    key: ValueKey<String>('dhikr-text-${item.id}'),
+                    textAlign: TextAlign.center,
+                    style: AppTypography.matnOf(
+                      context,
+                      color: palette.ink,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w700,
+                    ).copyWith(height: 2),
+                  ),
+                ],
               ),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+/// شريط التنبيه على بطاقة الذكر: درجة دون الصحيح، أو ذكر لا أصل له في الكتب الستة المثبتة.
+class _CautionBanner extends StatelessWidget {
+  const _CautionBanner({required this.itemId, required this.message});
+
+  final String itemId;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+    final TextTheme text = Theme.of(context).textTheme;
+    return SmoothSurface(
+      key: ValueKey<String>('dhikr-caution-$itemId'),
+      color: palette.amberSoft,
+      borderColor: palette.amber.withValues(alpha: 0.6),
+      radius: AppShapes.radiusMedium,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(Icons.warning_amber_rounded, size: 20, color: palette.amberText),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: text.bodySmall?.copyWith(color: palette.amberText, height: 1.6, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

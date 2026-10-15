@@ -37,6 +37,7 @@ class CurriculumManifest {
     required this.plannedCount,
     required this.dailyCap,
     required this.items,
+    this.sections,
   });
 
   /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
@@ -48,6 +49,7 @@ class CurriculumManifest {
       plannedCount: readInt(json, 'plannedCount'),
       dailyCap: readModel(json, 'dailyCap', DailyCapPolicy.fromJson),
       items: readModelList(json, 'items', CurriculumItem.fromJson),
+      sections: readModelListOrNull(json, 'sections', CurriculumSection.fromJson),
     );
   }
 
@@ -69,11 +71,24 @@ class CurriculumManifest {
   /// الأحاديث بالترتيب.
   final List<CurriculumItem> items;
 
+  /// أقسام الكتاب على المسار، اختيارية: كل قسم نطاق متصل من الأرقام بكتابه ومؤلفه؛ يرسم المسار بين كل قسمين متتاليين فاصلاً بارزاً. غيابها يعني كتاباً واحداً بلا فواصل.
+  final List<CurriculumSection>? sections;
+
   /// الحديث التالي في المنهج، ومنه تُقرأ بطاقة تشويق الغد.
   CurriculumItem? itemAfter(String hadithId) {
     for (int index = 0; index < items.length - 1; index++) {
       if (items[index].hadithId == hadithId) {
         return items[index + 1];
+      }
+    }
+    return null;
+  }
+
+  /// القسم الذي يضم الحديث برقمه، أو null إن لم تُعرَّف أقسام أو لم يقع الرقم في أحدها.
+  CurriculumSection? sectionOf(int number) {
+    for (final CurriculumSection section in sections ?? const <CurriculumSection>[]) {
+      if (number >= section.firstNumber && number <= section.lastNumber) {
+        return section;
       }
     }
     return null;
@@ -88,6 +103,7 @@ class CurriculumManifest {
       'plannedCount': plannedCount,
       'dailyCap': dailyCap.toJson(),
       'items': items.map((CurriculumItem item) => item.toJson()).toList(),
+      if (sections != null) 'sections': sections!.map((CurriculumSection item) => item.toJson()).toList(),
     };
   }
 
@@ -102,7 +118,8 @@ class CurriculumManifest {
         title == other.title &&
         plannedCount == other.plannedCount &&
         dailyCap == other.dailyCap &&
-        listEquals(items, other.items);
+        listEquals(items, other.items) &&
+        listEquals(sections, other.sections);
   }
 
   @override
@@ -114,6 +131,96 @@ class CurriculumManifest {
       plannedCount,
       dailyCap,
       Object.hashAll(items),
+      Object.hashAll(sections ?? const <Object?>[]),
+    ]);
+  }
+}
+
+/// قسم من الكتاب على المسار: كتاب بعينه ومؤلفه ونطاق أحاديثه.
+@immutable
+class CurriculumSection {
+  const CurriculumSection({
+    required this.id,
+    required this.title,
+    required this.author,
+    required this.firstNumber,
+    required this.lastNumber,
+    this.description,
+    required this.segmentLabel,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory CurriculumSection.fromJson(JsonMap json) {
+    return CurriculumSection(
+      id: readString(json, 'id'),
+      title: readString(json, 'title'),
+      author: readString(json, 'author'),
+      firstNumber: readInt(json, 'firstNumber'),
+      lastNumber: readInt(json, 'lastNumber'),
+      description: readStringOrNull(json, 'description'),
+      segmentLabel: readString(json, 'segmentLabel'),
+    );
+  }
+
+  /// معرّف القسم.
+  final String id;
+
+  /// عنوان القسم، مثل «الأربعون النووية».
+  final String title;
+
+  /// نسبة القسم إلى مؤلفه، مثل «للإمام يحيى بن شرف النووي».
+  final String author;
+
+  /// رقم أول حديث في القسم.
+  final int firstNumber;
+
+  /// رقم آخر حديث في القسم.
+  final int lastNumber;
+
+  /// وصف القسم يُكتب بعد النطاق في إعلان بدايته، اختياري.
+  final String? description;
+
+  /// اسم القسم في عنوان الشريحة التي تجمع حديثين من قسمين، مثل «تتمة الخمسين الرجبية».
+  final String segmentLabel;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'author': author,
+      'firstNumber': firstNumber,
+      'lastNumber': lastNumber,
+      if (description != null) 'description': description,
+      'segmentLabel': segmentLabel,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is CurriculumSection &&
+        id == other.id &&
+        title == other.title &&
+        author == other.author &&
+        firstNumber == other.firstNumber &&
+        lastNumber == other.lastNumber &&
+        description == other.description &&
+        segmentLabel == other.segmentLabel;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      id,
+      title,
+      author,
+      firstNumber,
+      lastNumber,
+      description,
+      segmentLabel,
     ]);
   }
 }

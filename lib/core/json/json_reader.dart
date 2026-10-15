@@ -165,6 +165,18 @@ List<T> readModelList<T>(
   return List<T>.unmodifiable(result);
 }
 
+/// قائمة كائنات اختيارية؛ الغياب وnull سواء، وإن وُجدت فعناصرها كائنات صحيحة البنية.
+List<T>? readModelListOrNull<T>(
+  JsonMap json,
+  String key,
+  T Function(JsonMap json) parse,
+) {
+  if (json[key] == null) {
+    return null;
+  }
+  return readModelList(json, key, parse);
+}
+
 /// قائمة نصوص إلزامية (قد تكون فارغة)، تُعاد غير قابلة للتعديل.
 List<String> readStringList(JsonMap json, String key) {
   final Object? value = _required(json, key);

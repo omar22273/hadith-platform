@@ -106,7 +106,8 @@ def from_json_expr(f):
     if p["item"] == "String":
         fn = "readStringListOrNull" if p["nullable"] else "readStringList"
         return f"{fn}(json, {k})"
-    return f"readModelList(json, {k}, {p['item']}.fromJson)"
+    fn = "readModelListOrNull" if p["nullable"] else "readModelList"
+    return f"{fn}(json, {k}, {p['item']}.fromJson)"
 
 
 def to_json_expr(f):
@@ -121,7 +122,7 @@ def to_json_expr(f):
     if p["item"] == "String":
         # الحقل العام لا يُرقّى بعد فحص null، فتلزم علامة التأكيد في الاختياري.
         return f"List<String>.of({f.name}{'!' if p['nullable'] else ''})"
-    return f"{f.name}.map(({p['item']} item) => item.toJson()).toList()"
+    return f"{f.name}{'!' if p['nullable'] else ''}.map(({p['item']} item) => item.toJson()).toList()"
 
 
 def is_list(f):
