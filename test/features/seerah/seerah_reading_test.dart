@@ -102,9 +102,11 @@ void main() {
           find.descendant(of: _key('passage-badge-${chapter.id}-$p'), matching: find.text(citation)),
           findsOneWidget,
         );
+        if (p == 0) {
+          // الصفحة بأرقام عربية: «ج١ ص١٥٧»؛ والمقاطع الأولى تخرج من البناء بعد التمرير فيُفحص أولها هنا.
+          expect(find.textContaining('ج١ ص١٥٧'), findsWidgets);
+        }
       }
-      // الصفحة بأرقام عربية: «ج١ ص١٥٧».
-      expect(find.textContaining('ج١ ص١٥٧'), findsWidgets);
     });
 
     testWidgets('a badge opens the sheet of the edition the passage was taken from', (WidgetTester tester) async {
@@ -150,7 +152,7 @@ void main() {
       await scrollStationTo(tester, _key('station-reading'));
       await tester.tap(find.text(seerahReadingTitle));
       await settle(tester);
-      await scrollStationTo(tester, _key('passage-c1-0'));
+      await scrollStationTo(tester, _key('narrative-font-slider'));
 
       await tester.drag(_key('narrative-font-slider'), const Offset(120, 0));
       await settle(tester);

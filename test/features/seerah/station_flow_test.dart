@@ -159,6 +159,8 @@ void main() {
 
       expect(key('station-reveal'), findsNothing, reason: 'choosing is what reveals');
       expect(key('station-decision'), findsNothing);
+      // المحطة طويلة في خط الاختبار العريض، والقائمة كسولة: يُنزل إلى الخيارات قبل فحصها ونقرها.
+      await scrollStationTo(tester, key('station-option-0'));
       for (int i = 0; i < options.length; i++) {
         expect(find.descendant(of: key('station-option-$i'), matching: find.text(options[i])), findsOneWidget);
       }
