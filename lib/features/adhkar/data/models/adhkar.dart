@@ -92,6 +92,9 @@ class DhikrItem {
     this.virtue,
     required this.evidence,
     required this.review,
+    this.tracks,
+    this.grading,
+    this.derivation,
   });
 
   /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
@@ -105,6 +108,9 @@ class DhikrItem {
       virtue: readStringOrNull(json, 'virtue'),
       evidence: readModelList(json, 'evidence', SourceRef.fromJson),
       review: readModel(json, 'review', ReviewInfo.fromJson),
+      tracks: readStringListOrNull(json, 'tracks'),
+      grading: readStringOrNull(json, 'grading'),
+      derivation: readModelOrNull(json, 'derivation', TextDerivation.fromJson),
     );
   }
 
@@ -132,6 +138,24 @@ class DhikrItem {
   /// حالة المراجعة العلمية.
   final ReviewInfo review;
 
+  /// المسارات التي يظهر فيها الذكر داخل الفئة ذات التبديل (صباح/مساء، نوم/استيقاظ، منزل/مسجد)؛ غيابها يعني أن الفئة بلا تبديل.
+  final List<String>? tracks;
+
+  /// درجة الحديث كما سُجّلت في الإصدار المعتمد نفسه (أسطر مفصولة بسطر جديد، سطر لكل حديث)، تُعرض في نافذة المعلومات؛ لا يكتبها المحرر بيده.
+  final String? grading;
+
+  /// اشتقاق النص إن لم يكن قصاً حرفياً واحداً: إبدال كلمة بأخرى منقولة من الشاهد نفسه، تنفيذاً لتحديد المالك وبدلالة الشاهد؛ يغيب في سائر الأذكار.
+  final TextDerivation? derivation;
+
+  /// هل الذكر نص قرآني أدخله المالك؛ يُعرض بين ﴿ ﴾ وتُحوَّل فواصل الآيات فيه.
+  bool get isQuran => evidence.any((SourceRef reference) => reference.sourceId == 'quran_owner_text');
+
+  /// هل يظهر الذكر في المسار [trackId]؛ الذكر بلا مسارات يظهر في كل مسار.
+  bool inTrack(String trackId) {
+    final List<String>? own = tracks;
+    return own == null || own.contains(trackId);
+  }
+
   /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
   JsonMap toJson() {
     return <String, dynamic>{
@@ -143,6 +167,9 @@ class DhikrItem {
       if (virtue != null) 'virtue': virtue,
       'evidence': evidence.map((SourceRef item) => item.toJson()).toList(),
       'review': review.toJson(),
+      if (tracks != null) 'tracks': List<String>.of(tracks!),
+      if (grading != null) 'grading': grading,
+      if (derivation != null) 'derivation': derivation?.toJson(),
     };
   }
 
@@ -159,7 +186,10 @@ class DhikrItem {
         count == other.count &&
         virtue == other.virtue &&
         listEquals(evidence, other.evidence) &&
-        review == other.review;
+        review == other.review &&
+        listEquals(tracks, other.tracks) &&
+        grading == other.grading &&
+        derivation == other.derivation;
   }
 
   @override
@@ -173,6 +203,66 @@ class DhikrItem {
       virtue,
       Object.hashAll(evidence),
       review,
+      Object.hashAll(tracks ?? const <Object?>[]),
+      grading,
+      derivation,
+    ]);
+  }
+}
+
+/// إبدال كلمة في نص ذكر مقتطع حرفياً من شاهده، مع بيان سببه.
+@immutable
+class TextDerivation {
+  const TextDerivation({
+    required this.fromWord,
+    required this.toWord,
+    required this.note,
+  });
+
+  /// يبني الكائن من خريطة JSON، ويرمي [JsonParseException] عند أي خلل في البنية.
+  factory TextDerivation.fromJson(JsonMap json) {
+    return TextDerivation(
+      fromWord: readString(json, 'fromWord'),
+      toWord: readString(json, 'toWord'),
+      note: readString(json, 'note'),
+    );
+  }
+
+  /// الكلمة كما في الشاهد (مجرّدة من التشكيل).
+  final String fromWord;
+
+  /// الكلمة البديلة المنقولة بتشكيلها من الشاهد نفسه (مجرّدة هنا).
+  final String toWord;
+
+  /// سبب الإبدال ودلالة الشاهد عليه.
+  final String note;
+
+  /// يحوّل الكائن إلى خريطة JSON مطابقة للمخطط.
+  JsonMap toJson() {
+    return <String, dynamic>{
+      'fromWord': fromWord,
+      'toWord': toWord,
+      'note': note,
+    };
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is TextDerivation &&
+        fromWord == other.fromWord &&
+        toWord == other.toWord &&
+        note == other.note;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hashAll(<Object?>[
+      fromWord,
+      toWord,
+      note,
     ]);
   }
 }

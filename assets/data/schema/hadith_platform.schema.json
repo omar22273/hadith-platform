@@ -1663,7 +1663,10 @@
             "gharib",
             "rijal",
             "history",
-            "geography"
+            "geography",
+            "adhkar_collection",
+            "quran_text",
+            "owner_text"
           ],
           "description": "النوع."
         },
@@ -2235,6 +2238,61 @@
         "review": {
           "$ref": "#/$defs/ReviewInfo",
           "description": "حالة المراجعة العلمية."
+        },
+        "tracks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "description": "المسارات التي يظهر فيها الذكر داخل الفئة ذات التبديل (صباح/مساء، نوم/استيقاظ، منزل/مسجد)؛ غيابها يعني أن الفئة بلا تبديل."
+        },
+        "grading": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "درجة الحديث كما سُجّلت في الإصدار المعتمد نفسه (أسطر مفصولة بسطر جديد، سطر لكل حديث)، تُعرض في نافذة المعلومات؛ لا يكتبها المحرر بيده."
+        },
+        "derivation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TextDerivation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "اشتقاق النص إن لم يكن قصاً حرفياً واحداً: إبدال كلمة بأخرى منقولة من الشاهد نفسه، تنفيذاً لتحديد المالك وبدلالة الشاهد؛ يغيب في سائر الأذكار."
+        }
+      }
+    },
+    "TextDerivation": {
+      "type": "object",
+      "description": "إبدال كلمة في نص ذكر مقتطع حرفياً من شاهده، مع بيان سببه.",
+      "additionalProperties": false,
+      "required": [
+        "fromWord",
+        "toWord",
+        "note"
+      ],
+      "properties": {
+        "fromWord": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الكلمة كما في الشاهد (مجرّدة من التشكيل)."
+        },
+        "toWord": {
+          "type": "string",
+          "minLength": 1,
+          "description": "الكلمة البديلة المنقولة بتشكيلها من الشاهد نفسه (مجرّدة هنا)."
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "description": "سبب الإبدال ودلالة الشاهد عليه."
         }
       }
     },

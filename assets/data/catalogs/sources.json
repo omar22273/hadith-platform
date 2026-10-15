@@ -253,6 +253,51 @@
         "commit": "59f3442ddc50654429fa8dd95bc0d879c017999c",
         "retrievedAt": "2026-10-14"
       }
+    },
+    {
+      "id": "hisn_al_muslim",
+      "title": "حصن المسلم",
+      "author": "سعيد بن علي بن وهف القحطاني",
+      "authorDeathHijri": null,
+      "kind": "adhkar_collection",
+      "edition": null,
+      "digital": {
+        "provider": "ملف نصي أرفقه مالك المشروع (نسخة بها شوائب نسخ تصلحها hisn_fixes.py)",
+        "repository": "https://github.com/omar22273/hadith-platform",
+        "path": "tools/content/sources/hisn_al_muslim.txt",
+        "commit": "59e521ed1cb1debd25b59918c27e7c9142ac94d5",
+        "retrievedAt": "2026-10-15"
+      }
+    },
+    {
+      "id": "quran_owner_text",
+      "title": "القرآن الكريم — الآيات المشكولة التي أدخلها المالك",
+      "author": "كلام الله تعالى",
+      "authorDeathHijri": null,
+      "kind": "quran_text",
+      "edition": null,
+      "digital": {
+        "provider": "نص أدخله مالك المشروع في طلب v2.9.0 واستُخرج منه آلياً",
+        "repository": "https://github.com/omar22273/hadith-platform",
+        "path": "tools/content/sources/quran_owner_text.json",
+        "commit": "59e521ed1cb1debd25b59918c27e7c9142ac94d5",
+        "retrievedAt": "2026-10-15"
+      }
+    },
+    {
+      "id": "owner_adhkar_v290",
+      "title": "نصوص الأذكار المشكولة التي أدخلها المالك",
+      "author": "مالك المشروع",
+      "authorDeathHijri": null,
+      "kind": "owner_text",
+      "edition": null,
+      "digital": {
+        "provider": "نص أدخله مالك المشروع في طلب v2.9.0 واستُخرج منه آلياً",
+        "repository": "https://github.com/omar22273/hadith-platform",
+        "path": "tools/content/sources/owner_adhkar_v290.json",
+        "commit": "59e521ed1cb1debd25b59918c27e7c9142ac94d5",
+        "retrievedAt": "2026-10-15"
+      }
     }
   ]
 }

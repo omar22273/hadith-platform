@@ -20,6 +20,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import adhkar_corpus as ac  # noqa: E402
 import adhkar_matrix_specs as specs  # noqa: E402
+import adhkar_sources  # noqa: E402
+import difflib  # noqa: E402
 
 TASHKEEL = re.compile("[ً-ْ]")
 FORBIDDEN = re.compile("[‏‎\"«»{}]")
@@ -35,8 +37,18 @@ def locator_of(ref):
     return ref.split(".")[0]
 
 
+EXTRA = adhkar_sources.ExtraSources()
+
+
 def by_ref(corpus, ed, ref):
-    """الحديث برقمه العربي (arabicnumber) في الإصدار، ويجب أن يكون وحيداً."""
+    """الحديث برقمه العربي (arabicnumber) في الإصدار، ويجب أن يكون وحيداً.
+
+    المفاتيح الإضافية q/o/h تقرأ من المصادر المثبّتة في tools/content/sources."""
+    if EXTRA.is_extra(ed):
+        try:
+            return EXTRA.entry(ed, ref)
+        except KeyError as error:
+            raise BuildError(str(error))
     found = [
         h for h in corpus.entries(ed)
         if (str(h.get("arabicnumber")) == ref) or (h.get("arabicnumber") is None and str(h["hadithnumber"]) == ref)
@@ -56,25 +68,108 @@ def albani_grade(corpus, ed, ref):
 GRADE_LABELS = {"Sahih": "صحيح", "Hasan": "حسن", "Hasan Sahih": "حسن صحيح", "Sahih Isnaad": "صحيح الإسناد"}
 BOOK_NAMES = {"b": "صحيح البخاري", "m": "صحيح مسلم"}
 
+# أسماء المحققين كما ترد في الإصدار ونطقها العربي. تُكتب هنا أسماء أعلام لا ألفاظ حديث.
+GRADER_AR = {
+    "Al-Albani": "الألباني",
+    "Zubair Ali Zai": "الزبير علي زئي",
+    "Shuaib Al Arnaut": "شعيب الأرناؤوط",
+    "Muhammad Muhyi Al-Din Abdul Hamid": "محمد محيي الدين عبد الحميد",
+    "Bashar Awad Maarouf": "بشار عواد معروف",
+    "Ahmad Muhammad Shakir": "أحمد محمد شاكر",
+    "Muhammad Fouad Abd al-Baqi": "محمد فؤاد عبد الباقي",
+    "Abu Ghuddah": "أبو غدة",
+}
+# أوصاف الدرجات كما ترد في الإصدار؛ ما لا يرد هنا لا يُترجم ولا يُعرض (فلا تخمين).
+GRADE_AR = {
+    "Sahih": "صحيح",
+    "Hasan": "حسن",
+    "Hasan Sahih": "حسن صحيح",
+    "Daif": "ضعيف",
+    "Very Daif": "ضعيف جداً",
+    "Mawdu": "موضوع",
+    "Munkar": "منكر",
+    "Shadh": "شاذ",
+    "Isnaad Hasan": "إسناده حسن",
+    "Isnaad Sahih": "إسناده صحيح",
+    "Hasan Isnaad": "حسن الإسناد",
+    "Sahih Isnaad": "صحيح الإسناد",
+    "Daif Isnaad": "ضعيف الإسناد",
+    "Sanad Daif": "إسناده ضعيف",
+    "Sahih Lighairihi": "صحيح لغيره",
+    "Hasan Lighairihi": "حسن لغيره",
+    "Sahih Muquf": "صحيح موقوف",
+    "Sahih - Agreed Upon": "صحيح متفق عليه",
+    "Sahih Muslim": "في صحيح مسلم",
+    "Sahih Bukhari": "في صحيح البخاري",
+}
+NOT_FROM_SIX = "لم يرد في الكتب الستة المثبّتة؛ النص من إدخال مالك المشروع (ومرجعه حصن المسلم) وتخريجه بانتظار المراجعة العلمية."
 
-def check_grade(corpus, spec_ev, item_id):
+
+def grade_lines(corpus, sources, evidences):
+    """سطر درجة لكل حديث متمايز من الكتب الستة، منقولاً من أحكام الإصدار نفسه."""
+    lines = []
+    seen = set()
+    for ev in evidences:
+        ed, ref = ev["ed"], ev["ref"]
+        key = (ed, ref)
+        if key in seen:
+            continue
+        seen.add(key)
+        if ed == "q":
+            lines.append("نص قرآني مشكول أدخله مالك المشروع بنصه الحرفي.")
+            continue
+        if ed == "o":
+            lines.append(NOT_FROM_SIX)
+            continue
+        if ed == "h":
+            continue
+        title = sources[ac.EDITIONS[ed][1]]["title"]
+        place = f"{title} رقم {locator_of(ref)}"
+        if ed in BOOK_NAMES:
+            lines.append(f"{place}: مروي في {BOOK_NAMES[ed]}.")
+            continue
+        entry = by_ref(corpus, ed, ref)
+        parts = []
+        for grader in entry.get("grades", []):
+            name = GRADER_AR.get(grader.get("name"))
+            grade = GRADE_AR.get(grader.get("grade"))
+            if name and grade:
+                parts.append((0 if grader.get("name") == ALBANI else 1, f"{name}: {grade}"))
+        if not parts:
+            verdict = ev.get("verdict")
+            if verdict:
+                lines.append(f"{place}: حكم صاحب الكتاب في الإصدار: «{ac.clean_noise(verdict)}».")
+            else:
+                lines.append(f"{place}: لا درجة مسجلة له في الإصدار.")
+            continue
+        parts.sort(key=lambda p: p[0])
+        lines.append(f"{place}: " + "؛ ".join(p[1] for p in parts) + ".")
+    return lines
+
+
+def check_grade(corpus, spec_ev, item_id, weak_ok=False):
     """يرفض الشاهد من غير الصحيحين ما لم تكن درجته صحيحة أو حسنة عند الألباني في الإصدار.
 
     إن خلا مدخل الحديث من درجة (رواية فرعية في الإصدار) قُبل بحكم صاحب الكتاب إذا ورد في نص
-    الإصدار نفسه حرفياً وطابق [verdict] في المواصفة.
+    الإصدار نفسه حرفياً وطابق [verdict] في المواصفة. وما طلب المالك ذكره صراحةً وهو ضعيف عند
+    الألباني يُقبل بـ weak_ok مع تسجيل درجته؛ ويُرجَع بصفة (الوصف، هل هو ضعيف).
     """
     ed, ref = spec_ev["ed"], spec_ev["ref"]
+    if EXTRA.is_extra(ed):
+        return "نص من مصدر أدخله المالك أو أرفقه", False
     if ed in BOOK_NAMES:
-        return "مروي في " + BOOK_NAMES[ed]
+        return "مروي في " + BOOK_NAMES[ed], False
     grade = albani_grade(corpus, ed, ref)
     if grade in GRADE_LABELS:
-        return "درجته عند الألباني في الإصدار: " + GRADE_LABELS[grade]
+        return "درجته عند الألباني في الإصدار: " + GRADE_LABELS[grade], False
     verdict = spec_ev.get("verdict")
     if grade is None and verdict:
         entry = by_ref(corpus, ed, ref)
         if not ac.contains_plain(entry["text"], verdict):
             raise BuildError(f"{item_id}: verdict {verdict!r} not found in {ed}:{ref}")
-        return "حكم صاحب الكتاب في نص الإصدار: «" + ac.clean_noise(verdict) + "»"
+        return "حكم صاحب الكتاب في نص الإصدار: «" + ac.clean_noise(verdict) + "»", False
+    if weak_ok and grade in GRADE_AR:
+        return "درجته عند الألباني في الإصدار: " + GRADE_AR[grade], True
     raise BuildError(f"{item_id}: {ed}:{ref} grade by {ALBANI} is {grade!r}; only Sahih/Hasan are allowed")
 
 

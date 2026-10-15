@@ -134,6 +134,16 @@ EXTRAS = {
     return List<SeerahStationModel>.unmodifiable(result);
   }
 """,
+    "DhikrItem": """
+  /// هل الذكر نص قرآني أدخله المالك؛ يُعرض بين ﴿ ﴾ وتُحوَّل فواصل الآيات فيه.
+  bool get isQuran => evidence.any((SourceRef reference) => reference.sourceId == 'quran_owner_text');
+
+  /// هل يظهر الذكر في المسار [trackId]؛ الذكر بلا مسارات يظهر في كل مسار.
+  bool inTrack(String trackId) {
+    final List<String>? own = tracks;
+    return own == null || own.contains(trackId);
+  }
+""",
     "AdhkarCatalog": """
   /// الأذكار مرتبة بحقل order كما تُعرض في الوِرد.
   List<DhikrItem> get itemsInOrder {

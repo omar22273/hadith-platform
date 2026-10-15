@@ -24,7 +24,16 @@ enum SourceKind {
   history('history'),
 
   /// كتاب في البلدان والمواضع.
-  geography('geography');
+  geography('geography'),
+
+  /// كتاب في الأذكار والأدعية المأثورة.
+  adhkarCollection('adhkar_collection'),
+
+  /// نص قرآني مشكول أدخله مالك المشروع بنصه الحرفي.
+  quranText('quran_text'),
+
+  /// نص مشكول أدخله مالك المشروع في طلبه.
+  ownerText('owner_text');
 
   const SourceKind(this.wire);
 
