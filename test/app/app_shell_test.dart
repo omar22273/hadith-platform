@@ -108,7 +108,7 @@ void main() {
 
     await tester.tap(_navLabel('الإعدادات'));
     await _settle(tester);
-    final Finder version = find.text('Version 2.8.0');
+    final Finder version = find.text('Version 2.9.0');
     await tester.scrollUntilVisible(
       version,
       300,

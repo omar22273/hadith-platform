@@ -55,7 +55,16 @@ STATUS = "pending_scholarly_review"
 _ARABIC_DIGITS = str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩")
 _TASHKEEL = re.compile("[ً-ٰٟۖ-ۭـ]")
 _FOLD = str.maketrans({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ى": "ي", "ة": "ه"})
-_YEAR_IN_TITLE = re.compile(r"(?:\bفي\s+)?((?:[^\s،()]+\s+){0,2}سنة\s+[^\s،().]+)")
+_MONTHS = (
+    r"(?:المحرم|محرم|صفر|ربيع\s+(?:الأول|الآخر|الثاني)|جمادى\s+(?:الأولى|الآخرة|الآخر)|رجب|شعبان|رمضان|شوال"
+    r"|ذي\s+القعدة|ذو\s+القعدة|ذي\s+الحجة|ذو\s+الحجة)"
+)
+# «[شهر] [الشهر] سنة <عدد>» كما ترد في عناوين الكتاب؛ والعدد يُتحقق منه بـ _YEAR_NUMBERS فلا تلتقط «سنة الوفود».
+_YEAR_IN_TITLE = re.compile(r"(?:(?:شهر\s+)?(" + _MONTHS + r")\s+)?سنة\s+([^\s،().:؛]+)")
+_YEAR_NUMBERS = {
+    "واحدة", "إحدى", "اثنتين", "اثنتان", "ثنتين", "ثلاث", "ثلاثة", "أربع", "أربعة", "خمس", "خمسة", "ست", "ستة",
+    "سبع", "سبعة", "ثمان", "ثماني", "ثمانية", "تسع", "تسعة", "عشر", "عشرة",
+}
 
 
 def norm(text: str) -> str:
@@ -166,6 +175,7 @@ class Unit:
     offset: int
     vol: int
     page: int
+    heads: list[tuple[str, book.Para]] = field(default_factory=list)
     epoch: str | None = None
     after_hijra: bool = False
     skip: str | None = None
@@ -197,24 +207,35 @@ def build_units(b: book.Book, cfg: Config, report: "Report") -> list[Unit]:
             return
         head = clean_title(current[0].title) or next((clean_title(s.title) for s in current if clean_title(s.title)), "")
         kept: list[book.Section] = []
-        for section in current:
-            if not section.paras:
-                continue
-            if is_verse(section, cfg):
+        heads: list[tuple[str, book.Para]] = []
+        dropped = 0
+        for i, section in enumerate(current):
+            if section.paras and is_verse(section, cfg):
                 report.verse.append((head, clean_title(section.title) or head, section.chars))
-            else:
+                dropped += 1
+                continue
+            if section.paras:
                 kept.append(section)
+            # عنوان القسم وأول فقرة بعده في الكتاب: موضعه، ولو خلا القسم نفسه من فقرات (عنوان كبير يليه فرعي).
+            first = next((p for later in current[i:] for p in later.paras), None)
+            if first is not None and clean_title(section.title):
+                heads.append((book.canon(section.title).rstrip(" :"), first))
         paras = [p for s in kept for p in s.paras]
+        title = head
+        if dropped and "شعر" in norm(head) and kept:
+            # وحدة عنوانها شعر وبقي منها سرد نثري: عنوان المحطة عنوان السرد الباقي لا عنوان الشعر المستبعد.
+            title = clean_title(kept[0].title) or head
         if paras:
             units.append(
                 Unit(
                     index=len(units),
-                    title=head,
+                    title=title,
                     sections=kept,
                     chars=sum(len(p.text) for p in paras),
                     offset=paras[0].offset,
                     vol=paras[0].vol,
                     page=paras[0].first_page,
+                    heads=heads,
                 )
             )
         elif any(s.paras for s in current):
@@ -411,15 +432,17 @@ def build_chapters(draft: Draft, cfg: Config) -> list[dict]:
 
 def year_basis(draft: Draft, cfg: Config) -> tuple[str, dict] | None:
     """السنة المنصوص عليها في عنوان قسم من المحطة، وشاهدها العنوان نفسه بموضعه."""
+    paras = draft.paras
+    low, high = paras[0].offset, paras[-1].offset
     for unit in draft.units:
-        for section in unit.sections:
-            title = book.canon(section.title).rstrip(" :")
-            match = _YEAR_IN_TITLE.search(title)
-            if match and section.paras:
-                para = section.paras[0]
-                label = match.group(1).strip()
-                if label.startswith("في "):
-                    label = label[3:]
+        for title, para in unit.heads:
+            if not low <= para.offset <= high:
+                continue
+            for match in _YEAR_IN_TITLE.finditer(title):
+                month, number = match.group(1), match.group(2)
+                if number not in _YEAR_NUMBERS:
+                    continue
+                label = f"{month} سنة {number}" if month else f"سنة {number}"
                 return label, {"sourceId": cfg.source_id, "locator": para.locator, "quote": title}
     return None
 
@@ -474,7 +497,8 @@ def make_station(draft: Draft, cfg: Config, gazetteer: Gazetteer, taken: set[str
         report.grouped += 1
     if draft.part:
         notes.append(f"قسم الكتاب «{draft.units[0].title}» ضخم فقُسم إلى {ar(draft.part[1])} أجزاء عند حدود أقسامه.")
-        report.split += 1
+        if draft.part[0] == 1:
+            report.split += 1
     if not derived:
         report.default_places += 1
     station["review"] = {"status": STATUS, "reviewer": None, "reviewedAt": None, "notes": notes}
@@ -596,7 +620,7 @@ class Report:
             mine = [s for s in gen if s["epoch_id"] == epoch_id]
             cur = [s for s in stations if s["epoch_id"] == epoch_id and not s["id"].startswith(GENERATED_PREFIX)]
             lines.append(f"- الطور {ar(number)} «{title}»: {len(mine)} مولّدة + {len(cur)} محررة")
-        lines.append(f"- محطات جُمعت من أقسام متجاورة: {self.grouped}؛ محطات قُسمت أجزاءً: {self.split}")
+        lines.append(f"- محطات جُمعت من أقسام متجاورة: {self.grouped}؛ وحدات قُسمت أجزاءً: {self.split}")
         lines.append(f"- سنوات اشتُقت من العناوين: {self.years}؛ مواضع افتراضية بحسب العهد: {self.default_places}")
         lines.append("")
         lines.append("## الوحدات المتخطاة")

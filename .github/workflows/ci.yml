@@ -38,6 +38,15 @@ jobs:
           python3 tools/ci/annotate.py $([ $status -eq 0 ] && echo notice || echo error) "Data validation" --file validate.txt
           exit $status
 
+      - name: Seerah tooling tests and dataset structure
+        if: ${{ !cancelled() }}
+        run: |
+          status=0
+          python3 -m unittest discover -s tools/seerah -p 'test_*.py' > seerah_tools.txt 2>&1 || status=1
+          python3 tools/seerah/verify_seerah.py --structure-only >> seerah_tools.txt 2>&1 || status=1
+          python3 tools/ci/annotate.py $([ $status -eq 0 ] && echo notice || echo error) "Seerah tooling" --file seerah_tools.txt
+          exit $status
+
       - name: Analyze
         if: ${{ !cancelled() }}
         run: |
