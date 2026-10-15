@@ -223,7 +223,7 @@ void main() {
 
     testWidgets('the teaser for the next station closes the chapters', (WidgetTester tester) async {
       await open(tester, bare, custom: bareDataset);
-      await scrollStationTo(tester, _key('station-next-hook'), delta: 1000);
+      await scrollStationTo(tester, _key('station-next-hook'));
       expect(find.descendant(of: _key('station-next-hook'), matching: find.text(bare.nextHook!)), findsOneWidget);
     });
 
@@ -246,7 +246,7 @@ void main() {
 
     final SeerahChapter lastChapter = hijra.chapters.last;
     final int lastIndex = lastChapter.passages.length - 1;
-    await scrollStationTo(tester, _key('passage-${lastChapter.id}-$lastIndex'), delta: 1200);
+    await scrollStationTo(tester, _key('passage-${lastChapter.id}-$lastIndex'));
     expect(_key('passage-${lastChapter.id}-$lastIndex'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

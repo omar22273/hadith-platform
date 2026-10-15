@@ -140,30 +140,44 @@ def _paragraph_pages(b: book.Book, start: int, end: int):
     return pages
 
 
-def quote_issues(dataset: dict, books: dict[str, book.Book], bukhari: dict[int, str]) -> list[str]:
+def quote_issues(
+    dataset: dict,
+    books: dict[str, book.Book],
+    bukhari: dict[int, str] | None = None,
+    only_sources: set[str] | None = None,
+) -> list[str]:
+    """يدقق حرفية كل مقطع في الملف مقابل مدوناته.
+
+    books     : كتب النصوص مفتاحها «ih» أو «is» أو معرّف المصدر نفسه (للطبعات الأخرى).
+    bukhari   : نصوص البخاري برقم الحديث؛ بدونها تُترك مقاطع البخاري بلا تدقيق.
+    only_sources: إن أُعطيت دُقّقت مقاطع هذه المصادر وحدها."""
+    by_source = {corpora.SOURCE_IDS.get(key, key): value for key, value in books.items()}
     issues: list[str] = []
     for where, ref in _refs(dataset):
         source, quote, loc = ref["sourceId"], ref.get("quote") or "", ref.get("locator") or ""
+        if only_sources is not None and source not in only_sources:
+            continue
         if source == corpora.SOURCE_IDS["bk"]:
+            if bukhari is None:
+                continue
             if not loc.isdigit() or int(loc) not in bukhari:
                 issues.append(f"{where}: رقم حديث البخاري «{loc}» غير موجود")
             elif corpora.norm_hadith(quote) not in bukhari[int(loc)]:
                 issues.append(f"{where}: نص ليس من حديث البخاري {loc}: {quote[:40]}")
             continue
-        key = {corpora.SOURCE_IDS["ih"]: "ih", corpora.SOURCE_IDS["is"]: "is"}.get(source)
-        if key is None:
+        b = by_source.get(source)
+        if b is None:
             issues.append(f"{where}: مصدر لا مدونة له هنا «{source}»")
             continue
-        b = books[key]
         needle = book.canon(quote)
         if needle != quote.strip() and book.canon(needle) != needle:
             issues.append(f"{where}: نص غير معياري")
         starts = list(_occurrences(b, needle))
         if not starts:
             # عنوان قسم من الكتاب نفسه (شاهد زمني مأخوذ من عناوين الطبعة).
-            if any(book.canon(s.title) == needle for s in b.sections):
+            if any(book.canon(sec.title) == needle for sec in b.sections):
                 continue
-            issues.append(f"{where}: النص ليس في {key}: {quote[:50]}")
+            issues.append(f"{where}: النص ليس في {source}: {quote[:50]}")
             continue
         wanted = _pages(loc)
         if wanted is None:

@@ -19,6 +19,7 @@ import 'package:hadith_platform/features/seerah/presentation/widgets/seerah_labe
 import 'package:hadith_platform/features/seerah/presentation/widgets/seerah_reading_section.dart';
 
 import '../../support/app_harness.dart';
+import '../../support/seerah_support.dart';
 
 JsonMap _load(String path) => asJsonMap(jsonDecode(File(path).readAsStringSync()), path);
 
@@ -53,10 +54,6 @@ void main() {
   }
 
   Finder key(String name) => find.byKey(ValueKey<String>(name));
-
-  Finder pageScrollable() {
-    return find.descendant(of: key('station-scroll'), matching: find.byType(Scrollable)).first;
-  }
 
   group('the journey card', () {
     testWidgets('has one wide start button and neither of the old two', (WidgetTester tester) async {
@@ -169,6 +166,8 @@ void main() {
       await tester.tap(key('station-option-1'));
       await settle(tester);
       expect(tester.widget<Text>(key('station-decision-text')).data, badr.propheticDecision);
+      // الصفحة تنزل إلى القرار، فيُرجع إلى المأزق ليُبنى ما فوقه.
+      await scrollStationTo(tester, key('station-dilemma'));
       expect(find.text('اخترتَ:'), findsOneWidget);
       expect(find.descendant(of: key('station-option-1'), matching: find.byIcon(Icons.radio_button_checked_rounded)), findsOneWidget);
       expect(find.descendant(of: key('station-option-0'), matching: find.byIcon(Icons.radio_button_unchecked_rounded)), findsOneWidget);
@@ -178,12 +177,13 @@ void main() {
       await tester.tap(key('station-option-0'), warnIfMissed: false);
       await settle(tester);
       expect(find.descendant(of: key('station-option-1'), matching: find.byIcon(Icons.radio_button_checked_rounded)), findsOneWidget);
+      await scrollStationTo(tester, key('station-decision'));
       expect(key('station-decision'), findsOneWidget);
     });
 
     testWidgets('on a phone-sized screen, choosing scrolls the decision into view', (WidgetTester tester) async {
       await openStation(tester, badr, size: const Size(412, 915));
-      await tester.scrollUntilVisible(key('station-option-0'), 300, scrollable: pageScrollable());
+      await scrollStationTo(tester, key('station-option-0'));
       await tester.tap(key('station-option-0'));
       await settle(tester);
 

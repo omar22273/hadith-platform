@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -111,7 +112,20 @@ Finder stationPageScrollable() {
   ).first;
 }
 
-/// القائمة كسولة: ما بعد الشاشة لا يُبنى، فيُمرَّر إليه أولاً.
-Future<void> scrollStationTo(WidgetTester tester, Finder target, {double delta = 300, int maxScrolls = 200}) {
-  return tester.scrollUntilVisible(target, delta, maxScrolls: maxScrolls, scrollable: stationPageScrollable());
+/// القائمة كسولة: ما بعد الشاشة وقبلها لا يُبنى، فيُقفز بها قفزاً (بلا سحب ولا ارتداد) من أولها
+/// حتى يُبنى [target]، ثم يُوضع في أعلى الشاشة، وتُكمل الإطارات ليكون موضعه حديثاً قبل أي نقر عليه.
+Future<void> scrollStationTo(WidgetTester tester, Finder target, {int maxScrolls = 400}) async {
+  final ScrollPosition position = tester.state<ScrollableState>(stationPageScrollable()).position;
+  if (target.hitTestable().evaluate().isEmpty) {
+    position.jumpTo(0);
+    await tester.pump();
+    final double step = position.viewportDimension * 0.9;
+    for (int i = 0; i < maxScrolls && target.evaluate().isEmpty && position.pixels < position.maxScrollExtent; i++) {
+      position.jumpTo(math.min(position.maxScrollExtent, position.pixels + step));
+      await tester.pump();
+    }
+  }
+  expect(target, findsWidgets, reason: 'the station page never built the target');
+  await Scrollable.ensureVisible(tester.element(target.first));
+  await settle(tester);
 }

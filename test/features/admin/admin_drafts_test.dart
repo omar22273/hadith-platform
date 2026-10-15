@@ -80,7 +80,7 @@ void main() {
     });
 
     test('a quote without its locator is refused', () {
-      final SeerahDraftForm noLocator = SeerahDraftForm(
+      const SeerahDraftForm noLocator = SeerahDraftForm(
         id: 'test_station',
         title: 'محطة تجريبية',
         epochId: 'epoch_07_state_badr_uhud',
