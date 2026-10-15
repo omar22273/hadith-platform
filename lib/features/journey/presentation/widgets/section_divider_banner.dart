@@ -163,10 +163,14 @@ class _SectionLine extends StatelessWidget {
           children: <Widget>[
             Icon(icon, size: 18, color: labelColor),
             const SizedBox(width: 6),
-            Text(
-              label,
-              key: labelKey,
-              style: AppTypography.ui(color: labelColor, fontSize: 13, fontWeight: FontWeight.w700, height: 1.5),
+            // يلتف الوسم على سطرين عند أكبر الخطوط بدل أن يفيض الصف.
+            Flexible(
+              child: Text(
+                label,
+                key: labelKey,
+                textAlign: TextAlign.center,
+                style: AppTypography.ui(color: labelColor, fontSize: 13, fontWeight: FontWeight.w700, height: 1.5),
+              ),
             ),
           ],
         ),

@@ -417,14 +417,18 @@ class _TapZone extends StatelessWidget {
                     constraints.maxHeight - 96,
                     constraints.maxWidth - 28,
                   ].reduce((double a, double b) => a < b ? a : b).clamp(96.0, 230.0).toDouble();
+                  // إن ضاق الارتفاع (هاتف ضيّق بأكبر الخطوط) انكمش العدّاد مع مجاميعه بدل أن يفيض.
                   return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        _CounterRing(state: state, side: side, duration: duration),
-                        const SizedBox(height: 10),
-                        _Totals(state: state),
-                      ],
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          _CounterRing(state: state, side: side, duration: duration),
+                          const SizedBox(height: 10),
+                          _Totals(state: state),
+                        ],
+                      ),
                     ),
                   );
                 },
