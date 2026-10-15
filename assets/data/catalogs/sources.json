@@ -295,7 +295,7 @@
         "provider": "نص أدخله مالك المشروع في طلب v2.9.0 واستُخرج منه آلياً",
         "repository": "https://github.com/omar22273/hadith-platform",
         "path": "tools/content/sources/owner_adhkar_v290.json",
-        "commit": "59e521ed1cb1debd25b59918c27e7c9142ac94d5",
+        "commit": "e9c65f721e396db0b9f30561122bfdb2e6ada38f",
         "retrievedAt": "2026-10-15"
       }
     }

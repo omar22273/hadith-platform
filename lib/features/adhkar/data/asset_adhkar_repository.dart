@@ -22,7 +22,11 @@ class AssetAdhkarRepository implements AdhkarRepository {
     ]);
     final AdhkarCatalog catalog = AdhkarCatalog.fromJson(loaded[0] as Map<String, dynamic>);
     final SourceCatalog sources = SourceCatalog.fromJson(loaded[1] as Map<String, dynamic>);
-    final List<String> issues = checkAdhkarCatalog(catalog, sources: sources);
+    final List<String> issues = checkAdhkarCatalog(
+      catalog,
+      sources: sources,
+      trackIds: category.tracks.map((AdhkarTrack t) => t.id).toSet(),
+    );
     if (catalog.id != category.id) {
       issues.add('catalog.id: expected "${category.id}" but the file carries "${catalog.id}".');
     }

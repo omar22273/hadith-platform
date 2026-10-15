@@ -5,6 +5,65 @@
 
 import 'package:flutter/material.dart';
 
+/// مسار من مسارات الفئة ذات التبديل: معرّفه في حقل tracks من البيانات، وتسميته على زر التبديل.
+@immutable
+class AdhkarTrack {
+  const AdhkarTrack({required this.id, required this.label});
+
+  /// المعرّف، وهو القيمة الواردة في حقل tracks من بيانات الأذكار.
+  final String id;
+
+  /// التسمية على زر التبديل بالرمز التعبيري كما حددها مالك المشروع.
+  final String label;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) || other is AdhkarTrack && other.id == id && other.label == label;
+  }
+
+  @override
+  int get hashCode => Object.hash(id, label);
+}
+
+/// نطاق وِرد: فئة بكاملها، أو مسار واحد من فئة ذات تبديل («الفئة#المسار»).
+/// هو مفتاح مزودات الأذكار والوِرد، فلكل مسار وِرده وعدّاده المستقلان.
+@immutable
+class AdhkarScope {
+  const AdhkarScope._(this.categoryId, this.trackId);
+
+  /// نطاق فئة بكاملها.
+  const AdhkarScope.category(String categoryId) : this._(categoryId, null);
+
+  /// نطاق مسار من فئة.
+  const AdhkarScope.track(String categoryId, String trackId) : this._(categoryId, trackId);
+
+  /// يقرأ المفتاح النصي.
+  factory AdhkarScope.parse(String key) {
+    final int cut = key.indexOf('#');
+    if (cut < 0) {
+      return AdhkarScope._(key, null);
+    }
+    return AdhkarScope._(key.substring(0, cut), key.substring(cut + 1));
+  }
+
+  /// معرّف الفئة.
+  final String categoryId;
+
+  /// معرّف المسار، أو null لنطاق الفئة بكاملها.
+  final String? trackId;
+
+  /// المفتاح النصي.
+  String get key => trackId == null ? categoryId : '$categoryId#$trackId';
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) || other is AdhkarScope && other.key == key;
+  }
+
+  @override
+  int get hashCode => key.hashCode;
+}
+
 /// فئة من الأذكار أو السنن: عنوانها في المركز وملف بياناتها.
 @immutable
 class AdhkarCategory {
@@ -14,6 +73,7 @@ class AdhkarCategory {
     required this.subtitle,
     required this.icon,
     required this.assetPath,
+    this.tracks = const <AdhkarTrack>[],
   });
 
   /// المعرّف، وهو معرّف الملف داخل البيانات (حقل id في AdhkarCatalog).
@@ -30,6 +90,23 @@ class AdhkarCategory {
 
   /// مسار ملف البيانات في الأصول.
   final String assetPath;
+
+  /// مسارات التبديل إن كانت للفئة (زرّان بتسميتَي المالك)؛ فارغة للفئة بلا تبديل.
+  final List<AdhkarTrack> tracks;
+
+  /// هل للفئة تبديل بين مسارين.
+  bool get hasTracks => tracks.isNotEmpty;
+
+  /// نطاق الوِرد للمسار [trackId]، أو للفئة كلها إن لم تكن ذات مسارات.
+  AdhkarScope scopeFor(String? trackId) {
+    if (!hasTracks || trackId == null) {
+      return AdhkarScope.category(id);
+    }
+    return AdhkarScope.track(id, trackId);
+  }
+
+  /// المسار الذي يُفتح عليه المشغّل أول مرة.
+  AdhkarTrack? get firstTrack => hasTracks ? tracks.first : null;
 
   @override
   bool operator ==(Object other) {
@@ -51,6 +128,10 @@ abstract final class AdhkarCategories {
     subtitle: 'أوراد تفتتح بها يومك وتختمه',
     icon: Icons.wb_twilight_rounded,
     assetPath: '$_folder/adhkar_morning_evening.json',
+    tracks: <AdhkarTrack>[
+      AdhkarTrack(id: 'morning', label: '☀️ أذكار الصباح'),
+      AdhkarTrack(id: 'evening', label: '🌙 أذكار المساء'),
+    ],
   );
 
   /// أذكار النوم والاستيقاظ.
@@ -60,6 +141,10 @@ abstract final class AdhkarCategories {
     subtitle: 'عند الاضطجاع وعند الانتباه من النوم',
     icon: Icons.bedtime_outlined,
     assetPath: '$_folder/adhkar_sleep.json',
+    tracks: <AdhkarTrack>[
+      AdhkarTrack(id: 'sleep', label: '🛌 أذكار النوم'),
+      AdhkarTrack(id: 'wake', label: '🌅 أذكار الاستيقاظ'),
+    ],
   );
 
   /// أذكار أدبار الصلوات المكتوبة.
@@ -78,6 +163,10 @@ abstract final class AdhkarCategories {
     subtitle: 'عند الدخول وعند الخروج',
     icon: Icons.home_outlined,
     assetPath: '$_folder/adhkar_home_masjid.json',
+    tracks: <AdhkarTrack>[
+      AdhkarTrack(id: 'home', label: '🏠 أذكار المنزل (دخول وخروج)'),
+      AdhkarTrack(id: 'masjid', label: '🕌 أذكار المسجد (ذهاب ودخول وخروج)'),
+    ],
   );
 
   /// السنن النبوية المهجورة.

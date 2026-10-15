@@ -28,9 +28,18 @@ final FutureProviderFamily<AdhkarCatalog, String> adhkarCatalogProvider =
   retry: contentNoRetry,
 );
 
-/// أذكار فئة بترتيب عرضها؛ فارغة حتى يُحمَّل ملفها.
+/// أذكار نطاق بترتيب عرضها؛ فارغة حتى يُحمَّل ملف الفئة. المفتاح «معرّف الفئة» لأذكار الفئة
+/// كلها، أو «معرّف الفئة#المسار» لأذكار مسار واحد من فئة ذات تبديل (انظر [AdhkarScope]).
 final ProviderFamily<List<DhikrItem>, String> adhkarItemsProvider = Provider.family<List<DhikrItem>, String>(
-  (Ref ref, String categoryId) => ref.watch(adhkarCatalogProvider(categoryId)).value?.itemsInOrder ?? const <DhikrItem>[],
+  (Ref ref, String scopeKey) {
+    final AdhkarScope scope = AdhkarScope.parse(scopeKey);
+    final List<DhikrItem> all = ref.watch(adhkarCatalogProvider(scope.categoryId)).value?.itemsInOrder ?? const <DhikrItem>[];
+    final String? trackId = scope.trackId;
+    if (trackId == null) {
+      return all;
+    }
+    return List<DhikrItem>.unmodifiable(all.where((DhikrItem item) => item.inTrack(trackId)));
+  },
 );
 
 /// المهلة بين بلوغ العدد المسنون والانتقال التلقائي إلى الذكر التالي، تتيح

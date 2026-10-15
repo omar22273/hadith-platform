@@ -37,7 +37,7 @@ NUMBER_WORDS = {
 }
 HISN_NOTE = re.compile(r"حصن المسلم \((الباب \d+، الذكر \d+)")
 HISN_LOCATOR = re.compile(r"^الباب (\d+)، الذكر (\d+)$")
-OWNER_LOCATOR = re.compile(r"^طلب المالك v2\.9\.0، السطر (\d+)$")
+OWNER_LOCATOR = re.compile(r"^طلب المالك، السطر (\d+)$")
 ALBANI_WEAK = re.compile(r"الألباني: (ضعيف|موضوع|منكر)")
 
 

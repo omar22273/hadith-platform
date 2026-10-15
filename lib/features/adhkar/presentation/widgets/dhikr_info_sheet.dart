@@ -1,6 +1,7 @@
-// ورقة معلومات الذكر: التخريج، والفضل النبوي، والمصدر. كل ما فيها منقول من
-// ملف البيانات: الإحالات من شواهد الذكر، والفضل عبارة حرفية من أحد شواهده تغيب
-// عن الورقة إن لم يكن للذكر فضل منصوص، فلا يُكتب هنا لفظ من خارج الملف.
+// ورقة معلومات الذكر: التخريج، والدرجة، والفضل النبوي، والمصدر. كل ما فيها منقول من
+// ملف البيانات: الإحالات من شواهد الذكر، والدرجة أسطر سُجّلت آلياً من الإصدار المعتمد
+// نفسه، والفضل عبارة حرفية من أحد شواهده تغيب عن الورقة إن لم يكن للذكر فضل منصوص،
+// وملاحظة الاشتقاق إن كان النص مشتقاً؛ فلا يُكتب هنا لفظ من خارج الملف.
 
 import 'package:flutter/material.dart';
 
@@ -8,6 +9,7 @@ import '../../../../core/content/citation.dart';
 import '../../../../core/content/models/source_catalog.dart';
 import '../../../../core/content/models/source_ref.dart';
 import '../../../../core/content/widgets/source_quote_tile.dart';
+import '../../../../core/text/arabic_digits.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/ui/app_shapes.dart';
@@ -43,6 +45,12 @@ class DhikrInfoSheet extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final String? virtue = item.virtue?.trim();
     final List<SourceRef> citations = _distinctByCitation(item.evidence, sources);
+    final List<String> gradeLines = <String>[
+      for (final String line in (item.grading ?? '').split('\n'))
+        if (line.trim().isNotEmpty) line.trim(),
+    ];
+    final String? caution = item.caution?.trim();
+    final TextDerivation? derivation = item.derivation;
     return Column(
       key: const ValueKey<String>('dhikr-info-sheet'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -58,6 +66,61 @@ class DhikrInfoSheet extends StatelessWidget {
         for (final SourceRef reference in citations) ...<Widget>[
           _TakhrijLine(reference: reference, source: sources?.byId(reference.sourceId)),
           const SizedBox(height: 6),
+        ],
+        if (gradeLines.isNotEmpty || (caution != null && caution.isNotEmpty)) ...<Widget>[
+          const SizedBox(height: 14),
+          const SectionEyebrow('الدرجة', icon: Icons.rule_rounded),
+          const SizedBox(height: 8),
+          if (caution != null && caution.isNotEmpty) ...<Widget>[
+            SmoothSurface(
+              key: const ValueKey<String>('dhikr-info-caution'),
+              color: palette.amberSoft,
+              borderColor: palette.amber.withValues(alpha: 0.6),
+              radius: AppShapes.radiusMedium,
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                caution,
+                style: text.bodyMedium?.copyWith(color: palette.amberText, height: 1.7, fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+          if (gradeLines.isNotEmpty)
+            SmoothSurface(
+              key: const ValueKey<String>('dhikr-info-grading'),
+              color: palette.surfaceMuted,
+              borderColor: palette.line,
+              radius: AppShapes.radiusMedium,
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  for (int i = 0; i < gradeLines.length; i++) ...<Widget>[
+                    if (i > 0) const SizedBox(height: 8),
+                    Text(
+                      arabicDigits(gradeLines[i]),
+                      style: text.bodyMedium?.copyWith(color: palette.ink, height: 1.7),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+        ],
+        if (derivation != null) ...<Widget>[
+          const SizedBox(height: 14),
+          const SectionEyebrow('اشتقاق النص', icon: Icons.swap_horiz_rounded),
+          const SizedBox(height: 8),
+          SmoothSurface(
+            key: const ValueKey<String>('dhikr-info-derivation'),
+            color: palette.surfaceMuted,
+            borderColor: palette.line,
+            radius: AppShapes.radiusMedium,
+            padding: const EdgeInsets.all(12),
+            child: Text(
+              derivation.note,
+              style: text.bodyMedium?.copyWith(color: palette.ink, height: 1.7),
+            ),
+          ),
         ],
         if (virtue != null && virtue.isNotEmpty) ...<Widget>[
           const SizedBox(height: 14),

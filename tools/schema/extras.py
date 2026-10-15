@@ -138,6 +138,9 @@ EXTRAS = {
   /// هل الذكر نص قرآني أدخله المالك؛ يُعرض بين ﴿ ﴾ وتُحوَّل فواصل الآيات فيه.
   bool get isQuran => evidence.any((SourceRef reference) => reference.sourceId == 'quran_owner_text');
 
+  /// النص كما يُعرض: الآية بين ﴿ ﴾ وفواصل الآيات (*) علامات ۝، وغير الآيات كما هي دون تغيير.
+  String get displayText => isQuran ? '﴿${text.replaceAll(' * ', ' ۝ ')}﴾' : text;
+
   /// هل يظهر الذكر في المسار [trackId]؛ الذكر بلا مسارات يظهر في كل مسار.
   bool inTrack(String trackId) {
     final List<String>? own = tracks;

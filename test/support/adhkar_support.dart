@@ -24,6 +24,22 @@ JsonMap loadJson(String path) => asJsonMap(jsonDecode(File(path).readAsStringSyn
 /// ملف فئة بعد التحويل إلى النموذج.
 AdhkarCatalog loadCategory(AdhkarCategory category) => AdhkarCatalog.fromJson(loadJson(category.assetPath));
 
+/// أذكار مسار من فئة ذات تبديل بترتيب عرضها؛ وأذكار الفئة كلها إن لم تكن لها مسارات.
+/// بلا [trackId] يُؤخذ المسار الأول، وهو الذي يُفتح عليه المشغّل.
+List<DhikrItem> loadScopeItems(AdhkarCategory category, [String? trackId]) {
+  final List<DhikrItem> all = loadCategory(category).itemsInOrder;
+  final String? track = trackId ?? category.firstTrack?.id;
+  if (track == null) {
+    return all;
+  }
+  return List<DhikrItem>.unmodifiable(all.where((DhikrItem item) => item.inTrack(track)));
+}
+
+/// مفتاح نطاق الوِرد لمسار (أو لفئة بلا تبديل).
+String scopeKeyOf(AdhkarCategory category, [String? trackId]) {
+  return category.scopeFor(trackId ?? category.firstTrack?.id).key;
+}
+
 /// يسجل كل اهتزاز بنوعه.
 List<String> recordHaptics(WidgetTester tester) {
   final List<String> haptics = <String>[];
@@ -100,6 +116,12 @@ Future<ProviderContainer> openCategory(
   await container.read(adhkarCatalogProvider(category.id).future);
   await settle(tester);
   return container;
+}
+
+/// يختار مساراً من شريط التبديل في المشغّل المفتوح.
+Future<void> selectTrack(WidgetTester tester, String trackId) async {
+  await tester.tap(find.byKey(ValueKey<String>('adhkar-track-$trackId')));
+  await settle(tester);
 }
 
 /// يفتح السبحة من المركز.

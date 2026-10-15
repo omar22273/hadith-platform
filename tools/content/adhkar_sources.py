@@ -57,7 +57,7 @@ class ExtraSources:
             for span in data["spans"]:
                 key = span["key"]
                 entries.append({"hadithnumber": key, "arabicnumber": key, "text": span["text"], "grades": [], "count_note": span["count_note"]})
-                labels[key] = f"طلب المالك v2.9.0، السطر {span['line']}"
+                labels[key] = f"طلب المالك، السطر {span['line']}"
         elif ed == "h":
             for entry in self.hisn().entries:
                 key = f"{entry.chapter}.{entry.number}"
