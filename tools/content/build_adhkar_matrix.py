@@ -5,10 +5,15 @@
 adhkar_matrix_specs.py تحدد فقط: أي حديث، ومن أي كلمة مفتاحية إلى أي كلمة مفتاحية.
 أما النص نفسه فيقتطعه adhkar_corpus.cut من الإصدار الرقمي، ويُثبت أنه تتابع كلمات حرفي،
 وأن نص الذكر وفضله جزء حرفي من شاهد أو أكثر، وأن العدد (إن زاد على واحد) منصوص في الشاهد.
-ما رتبته دون الصحيح والحسن عند الألباني في الإصدار نفسه يُرفض.
+ما رتبته دون الصحيح والحسن عند الألباني في الإصدار نفسه يُرفض، إلا ما نصّ عليه المالك وأُعلنت درجته
+(weak_ok) فيُقبل مع تنبيه ظاهر ودرجة مفصّلة في نافذة المعلومات.
+
+مصادر إضافية بمفاتيح q/o/h (انظر adhkar_sources.py): آيات المالك، وعباراته المشكولة، وملف حصن المسلم.
+الأذكار التي ليست في الكتب الستة وتشكيلها من نص المالك وحده توسَم بأنها بانتظار المراجعة العلمية.
 
 الاستعمال:
     python3 tools/content/build_adhkar_matrix.py <hadith-api checkout> [--preview] [--out assets/data/adhkar]
+                                                [--report docs/adhkar_hisn_crosscheck.md]
 """
 import argparse
 import json
@@ -35,6 +40,15 @@ class BuildError(Exception):
 
 def locator_of(ref):
     return ref.split(".")[0]
+
+
+def source_id_of(ed):
+    return adhkar_sources.EXTRA_EDITIONS[ed] if ed in adhkar_sources.EXTRA_EDITIONS else ac.EDITIONS[ed][1]
+
+
+def locator_for(ed, ref):
+    """الموضع المكتوب في الشاهد: رقم الحديث للكتب الستة، وتسمية الموضع للمصادر الإضافية."""
+    return EXTRA.locator(ed, ref) if ed in adhkar_sources.EXTRA_EDITIONS else locator_of(ref)
 
 
 EXTRA = adhkar_sources.ExtraSources()
@@ -65,7 +79,13 @@ def albani_grade(corpus, ed, ref):
     return grades.get(ALBANI)
 
 
-GRADE_LABELS = {"Sahih": "صحيح", "Hasan": "حسن", "Hasan Sahih": "حسن صحيح", "Sahih Isnaad": "صحيح الإسناد"}
+GRADE_LABELS = {
+    "Sahih": "صحيح",
+    "Hasan": "حسن",
+    "Hasan Sahih": "حسن صحيح",
+    "Sahih Isnaad": "صحيح الإسناد",
+    "Hasan Isnaad": "حسن الإسناد",
+}
 BOOK_NAMES = {"b": "صحيح البخاري", "m": "صحيح مسلم"}
 
 # أسماء المحققين كما ترد في الإصدار ونطقها العربي. تُكتب هنا أسماء أعلام لا ألفاظ حديث.
@@ -185,6 +205,13 @@ def drop_waw(text):
 
 def build_quote(corpus, ev, item_id):
     entry = by_ref(corpus, ev["ed"], ev["ref"])
+    if ev["first"] is None:
+        # نص كامل من مصدر إضافي (آية، عبارة المالك، ذكر في حصن المسلم).
+        if not EXTRA.is_extra(ev["ed"]):
+            raise BuildError(f"{item_id}: whole-text evidence is only for the q/o/h sources")
+        if "..." in entry["text"] or "…" in entry["text"]:
+            raise BuildError(f"{item_id}: {ev['ed']}:{ev['ref']} is abridged by the owner and cannot be used whole")
+        return ac.clean_noise(entry["text"]), ""
     try:
         quote, start, end = ac.cut(
             entry["text"], ev["first"], ev.get("last"), occurrence=ev.get("occ", 0), last_occurrence=ev.get("lo", 0)
@@ -197,6 +224,8 @@ def build_quote(corpus, ev, item_id):
 
 def build_piece(quotes, piece, item_id, what):
     quote = quotes[piece["ev"]]
+    if piece.get("whole"):
+        return quote
     try:
         text, _, _ = ac.cut(quote, piece["first"], piece.get("last"), occurrence=piece.get("occ", 0), last_occurrence=piece.get("lo", 0))
     except ac.CutError as error:
@@ -210,19 +239,119 @@ def build_piece(quotes, piece, item_id, what):
     return text
 
 
-def build_item(corpus, order, spec, preview):
+def surface_of(quote, plain_word):
+    """الصورة المشكولة لكلمة مجرّدة كما وردت في نص الشاهد (أول ورود)."""
+    wanted = ac.core(plain_word)
+    for token in quote.split():
+        if ac.core(token) == wanted:
+            return ac.strip_edges(token)
+    return None
+
+
+def apply_derivation(text, quotes, derive, item_id):
+    """إبدال كلمة واحدة في نص مقتطع حرفياً بكلمة أخرى منقولة بتشكيلها من شاهد آخر للذكر.
+
+    الإبدال يكون بدلالة الشاهد نفسه: العبارة [proof] يجب أن ترد في نص الشاهد الأساسي (كأن يقول: ومن
+    قال مثل ذلك حين يمسي). لا تُكتب الكلمة البديلة هنا، بل تؤخذ من الشاهد المسمّى."""
+    base = quotes[derive["base"]]
+    donor = quotes[derive["donor"]]
+    if not ac.contains_plain(base, derive["proof"]):
+        raise BuildError(f"{item_id}: derivation proof {derive['proof']!r} not found in its base quote")
+    new_surface = surface_of(donor, derive["to"])
+    if new_surface is None:
+        raise BuildError(f"{item_id}: replacement word {derive['to']!r} not found in the donor quote")
+    old_core = ac.core(derive["from"])
+    words = text.split()
+    hits = [i for i, w in enumerate(words) if ac.core(w) == old_core]
+    if len(hits) != 1:
+        raise BuildError(f"{item_id}: expected one {derive['from']!r} in the text, got {len(hits)}")
+    old_surface = words[hits[0]]
+    words[hits[0]] = new_surface
+    proof_surface = None
+    tokens = base.split()
+    wanted = [ac.core(w) for w in derive["proof"].split()]
+    for i in range(len(tokens)):
+        if [ac.core(t) for t in tokens[i:i + len(wanted)]] == wanted:
+            proof_surface = ac.strip_edges(" ".join(tokens[i:i + len(wanted)]))
+            break
+    note = (
+        f"الشاهد نفسه ينص على أن المسائي كالصباحي: «{proof_surface}»؛ فأُبدلت «{ac.strip_edges(old_surface)}» "
+        f"بـ«{new_surface}» المنقولة بتشكيلها من الشاهد الآخر للذكر، ولم يُغيَّر في النص غير هذه الكلمة."
+    )
+    return " ".join(words), {"fromWord": old_core, "toWord": ac.core(derive["to"]), "note": note}
+
+
+def hisn_compare(book, ref, text):
+    """مقارنة نص الذكر المعتمد بذكر حصن المسلم المقابل: نسبة التطابق والفروق على مستوى الكلمات المجرّدة."""
+    chapter, number = (int(part) for part in ref.split("."))
+    entry = book.entry(chapter, number)
+    mine = [c for c in (ac.core(t) for t in text.split()) if c and c != "*"]
+    theirs = [c for c in entry.tokens if c != "*"]
+    matcher = difflib.SequenceMatcher(None, mine, theirs, autojunk=False)
+    diffs = []
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag != "equal":
+            diffs.append((" ".join(mine[i1:i2]), " ".join(theirs[j1:j2])))
+    return {
+        "ref": ref,
+        "chapter": entry.chapter_title,
+        "ratio": round(matcher.ratio(), 3),
+        "diffs": diffs,
+        "hisn_count": entry.count,
+        "hisn_count_words": entry.count_words,
+    }
+
+
+def caution_for(evidence_specs, weak_grades):
+    """تنبيه البطاقة: يُحسب من الدرجة المسجلة لا من يد المحرر."""
+    if weak_grades:
+        return (
+            f"تنبيه: درجة هذا الحديث عند الألباني في الإصدار المعتمد «{weak_grades[0]}»؛ "
+            "أُدرج الذكر لأن طلب المالك وحصن المسلم أوردَاه، فراجع الدرجة المفصّلة في ⓘ قبل الاعتماد عليه."
+        )
+    if all(ev["ed"] in ("o", "h") for ev in evidence_specs) and any(ev["ed"] == "o" for ev in evidence_specs):
+        return (
+            "تنبيه: لم يُوجد هذا الذكر في الكتب الستة المثبّتة؛ نصه المشكول من إدخال المالك ومرجعه حصن المسلم، "
+            "وتخريجه بانتظار المراجعة العلمية."
+        )
+    return None
+
+
+NOTE_QUOTE = re.compile("«([^»]+)»")
+
+
+def check_note_quotes(notes, quotes, item_id):
+    """كل عبارة بين «» في ملاحظات المواصفة يجب أن تكون جزءاً من أحد الشواهد؛ فلا يُكتب لفظ في ملاحظة من الذاكرة."""
+    for note in notes:
+        for phrase in NOTE_QUOTE.findall(note):
+            if not any(ac.contains_plain(quote, phrase) for quote in quotes):
+                raise BuildError(f"{item_id}: the note quotes {phrase!r}, which is not inside any of its evidence quotes")
+
+
+def build_item(corpus, sources, hisn, order, spec, preview, report):
     item_id = spec["id"]
     quotes = []
-    grades = []
+    labels = []
     followings = []
+    weak_grades = []
+    used_weak = False
     for ev in spec["ev"]:
         quote, following = build_quote(corpus, ev, item_id)
         if FORBIDDEN.search(quote):
             raise BuildError(f"{item_id}: quote carries stray direction or quote marks")
         quotes.append(quote)
         followings.append(following)
-        grades.append(check_grade(corpus, ev, item_id))
+        label, weak = check_grade(corpus, ev, item_id, spec.get("weak_ok", False))
+        labels.append(label)
+        if weak:
+            used_weak = True
+            weak_grades.append(GRADE_AR[albani_grade(corpus, ev["ed"], ev["ref"])])
+    if spec.get("weak_ok") and not used_weak:
+        raise BuildError(f"{item_id}: weak_ok is set but every witness is already Sahih/Hasan")
     text = build_piece(quotes, spec["text"], item_id, "text")
+    derivation = None
+    if spec.get("derive"):
+        text, derivation = apply_derivation(text, quotes, spec["derive"], item_id)
     if not TASHKEEL.search(text) or len(text) < 6:
         raise BuildError(f"{item_id}: text must be vocalized and not trivial")
     virtue = None
@@ -233,12 +362,22 @@ def build_item(corpus, order, spec, preview):
     count = spec["count"]
     proof = spec.get("proof")
     notes = []
+    hisn_ref = spec.get("hisn")
+    hisn_info = hisn_compare(hisn, hisn_ref, text) if hisn_ref else None
     if count > 1:
-        if not proof:
-            raise BuildError(f"{item_id}: count {count} needs a proof phrase from the quotes")
-        if not any(ac.contains_plain(q, proof) for q in quotes):
-            raise BuildError(f"{item_id}: proof phrase {proof!r} not found in any quote")
-        notes.append(f"العدد ({count}) منصوص في الشاهد بعبارة «{proof}».")
+        if proof:
+            if not any(ac.contains_plain(q, proof) for q in quotes):
+                raise BuildError(f"{item_id}: proof phrase {proof!r} not found in any quote")
+            notes.append(f"العدد ({count}) منصوص في الشاهد بعبارة «{proof}».")
+        elif spec.get("count_from") == "hisn":
+            if hisn_info is None or hisn_info["hisn_count"] != count:
+                raise BuildError(f"{item_id}: count {count} is not what Hisn states ({hisn_info and hisn_info['hisn_count']})")
+            notes.append(
+                f"العدد ({count}) ليس منصوصاً في الشاهد؛ أُخذ من طلب المالك ومن حصن المسلم "
+                f"({locator_for('h', hisn_ref)}: «{' / '.join(hisn_info['hisn_count_words'])}»)."
+            )
+        else:
+            raise BuildError(f"{item_id}: count {count} needs a proof phrase from the quotes (or count_from='hisn')")
     else:
         if proof:
             if not any(ac.contains_plain(q, proof) for q in quotes):
@@ -247,25 +386,35 @@ def build_item(corpus, order, spec, preview):
         else:
             notes.append("لم يُنص في الشاهد على عدد؛ يُقرأ الذكر مرة واحدة.")
     seen = set()
-    for ev, grade in zip(spec["ev"], grades):
+    for ev, label in zip(spec["ev"], labels):
         key = (ev["ed"], ev["ref"])
-        if key in seen:
+        if key in seen or EXTRA.is_extra(ev["ed"]):
             continue
         seen.add(key)
-        notes.append(f"{ac.EDITIONS[ev['ed']][1]} رقم {locator_of(ev['ref'])}: {grade}.")
+        notes.append(f"{source_id_of(ev['ed'])} رقم {locator_of(ev['ref'])}: {label}.")
     if any(ev["ed"] == "m" for ev in spec["ev"]):
         notes.append(MUSLIM_NOTE)
+    check_note_quotes(spec.get("notes", ()), quotes, item_id)
     notes.extend(spec.get("notes", ()))
-    notes.append(
-        "النص والإحالة منقولان حرفياً بالاقتطاع الآلي من إصدار fawazahmed0/hadith-api المعتمد في فهرس المصادر "
-        f"(الإيداع {ac.COMMIT[:7]}) دون كتابة أي لفظ منه من الذاكرة (انظر tools/content/build_adhkar_matrix.py)؛ "
-        "أُزيلت منه علامات الاتجاه وعلامات الاقتباس وأقواس الآيات فقط."
-    )
+    if derivation:
+        notes.append(derivation["note"])
+    if any(not EXTRA.is_extra(ev["ed"]) for ev in spec["ev"]):
+        notes.append(
+            "النص والإحالة منقولان حرفياً بالاقتطاع الآلي من إصدار fawazahmed0/hadith-api المعتمد في فهرس المصادر "
+            f"(الإيداع {ac.COMMIT[:7]}) دون كتابة أي لفظ منه من الذاكرة (انظر tools/content/build_adhkar_matrix.py)؛ "
+            "أُزيلت منه علامات الاتجاه وعلامات الاقتباس وأقواس الآيات فقط."
+        )
+    if any(ev["ed"] in ("q", "o") for ev in spec["ev"]):
+        notes.append(
+            "النص المشكول منقول حرفياً بالاستخراج الآلي من طلب مالك المشروع v2.9.0 "
+            "(tools/content/extract_owner_texts.py) دون أن يمر على يد المحرر."
+        )
     notes.append("الضبط كما في الإصدار الرقمي دون تعديل؛ يراجعه مصحح قبل النشر.")
     evidence = [
-        {"sourceId": ac.EDITIONS[ev["ed"]][1], "locator": locator_of(ev["ref"]), "quote": quote}
+        {"sourceId": source_id_of(ev["ed"]), "locator": locator_for(ev["ed"], ev["ref"]), "quote": quote}
         for ev, quote in zip(spec["ev"], quotes)
     ]
+    grading_lines = grade_lines(corpus, sources, spec["ev"])
     result = {
         "id": item_id,
         "order": order,
@@ -275,25 +424,66 @@ def build_item(corpus, order, spec, preview):
     }
     if virtue:
         result["virtue"] = virtue
+    if spec.get("tracks"):
+        result["tracks"] = list(spec["tracks"])
     result["evidence"] = evidence
+    if grading_lines:
+        result["grading"] = "\n".join(grading_lines)
+    caution = caution_for(spec["ev"], weak_grades)
+    if caution:
+        result["caution"] = caution
+    if derivation:
+        result["derivation"] = derivation
     result["review"] = {"status": "pending_scholarly_review", "reviewer": None, "reviewedAt": None, "notes": notes}
+    if hisn_info:
+        report.append({"item": item_id, "title": spec["title"], "count": count, **hisn_info})
     if preview:
-        print(f"--- {item_id}  x{count}  [{'; '.join(grades)}]")
+        print(f"--- {item_id}  x{count}  tracks={spec.get('tracks')}  [{'; '.join(labels)}]")
         print("  text   :", text)
         if virtue:
             print("  virtue :", virtue)
+        if caution:
+            print("  caution:", caution)
+        if hisn_info:
+            print(f"  hisn   : {hisn_ref} ratio={hisn_info['ratio']} diffs={hisn_info['diffs']}")
         for ev, quote, following in zip(spec["ev"], quotes, followings):
             print(f"  quote  : {ev['ed']}:{ev['ref']} ({len(quote.split())} words) ... بعده: {following}")
     return result
 
 
-def build_file(corpus, file_id, definition, preview, failures):
+def check_tracks(file_id, definition, items):
+    """تبديل الفئة: كل ذكر له مساراته من مسارات الملف، ولكل مسار ذكر واحد على الأقل."""
+    declared = definition.get("tracks")
+    if not declared:
+        for item in items:
+            if item.get("tracks"):
+                raise BuildError(f"{file_id}:{item['id']}: has tracks but the file declares none")
+        return
+    used = set()
+    for item in items:
+        own = item.get("tracks")
+        if not own:
+            raise BuildError(f"{file_id}:{item['id']}: needs tracks (file has {declared})")
+        for track in own:
+            if track not in declared:
+                raise BuildError(f"{file_id}:{item['id']}: unknown track {track!r}")
+            used.add(track)
+    for track in declared:
+        if track not in used:
+            raise BuildError(f"{file_id}: track {track!r} has no items")
+
+
+def build_file(corpus, sources, hisn, file_id, definition, preview, failures, report):
     items = []
     for order, spec in enumerate(definition["items"], start=1):
         try:
-            items.append(build_item(corpus, order, spec, preview))
-        except (BuildError, ac.CutError) as error:
-            failures.append(f"{file_id}: {error}")
+            items.append(build_item(corpus, sources, hisn, order, spec, preview, report))
+        except (BuildError, ac.CutError, KeyError) as error:
+            failures.append(f"{file_id}:{spec['id']}: {error}")
+    try:
+        check_tracks(file_id, definition, items)
+    except BuildError as error:
+        failures.append(str(error))
     return {"schemaVersion": "2.0.0", "id": file_id, "title": definition["title"], "items": items}
 
 
@@ -304,14 +494,44 @@ def known_sources(path):
 
 
 def check_sources(catalog, sources):
-    """كل مصدر شاهد معروف في فهرس المصادر، وإيداع الإصدار الرقمي فيه هو المثبّت هنا."""
+    """كل مصدر شاهد معروف في فهرس المصادر، وإيداع الإصدار الرقمي للكتب الستة هو المثبّت هنا."""
+    extra_ids = set(adhkar_sources.EXTRA_EDITIONS.values())
     for item in catalog["items"]:
         for evidence in item["evidence"]:
             source = sources.get(evidence["sourceId"])
             if source is None:
                 raise BuildError(f"{item['id']}: unknown sourceId {evidence['sourceId']}")
+            if evidence["sourceId"] in extra_ids:
+                continue
             if source["digital"]["commit"] != ac.COMMIT:
                 raise BuildError(f"{item['id']}: source {evidence['sourceId']} is not pinned to commit {ac.COMMIT[:7]}")
+
+
+def write_report(path, report, fixes_applied):
+    """تقرير مطابقة حصن المسلم: لكل ذكر معتمد مقابله في الحصن ونسبة التطابق والفروق، وقائمة الإصلاحات المسمّاة."""
+    lines = [
+        "# تقرير مطابقة «حصن المسلم» على المدونة المثبتة (v2.9.0)",
+        "",
+        "يُولَّد آلياً بواسطة `tools/content/build_adhkar_matrix.py --report` ولا يُحرَّر باليد.",
+        "",
+        "الأذكار المعروضة في التطبيق تُقتطع حرفياً من الكتب الستة المثبتة (فيُضمن تشكيلها)، ويُقارَن كل ذكر بمقابله في ملف الحصن",
+        "بعد تنظيفه وتطبيق الإصلاحات المسمّاة (`hisn_fixes.py`). الفروق أدناه على مستوى الكلمات المجرّدة من التشكيل:",
+        "العمود الأول لفظ التطبيق، والثاني لفظ ملف الحصن؛ الفرق الفارغ يعني زيادة أو نقصاناً.",
+        "",
+        "| الذكر | موضعه في الحصن | التطابق | العدد (التطبيق/الحصن) | الفروق (التطبيق ⇠ الحصن) |",
+        "|---|---|---|---|---|",
+    ]
+    for row in sorted(report, key=lambda r: r["ref"]):
+        diffs = "؛ ".join(f"«{a or '∅'}» ⇠ «{b or '∅'}»" for a, b in row["diffs"]) or "—"
+        counts = f"{row['count']} / {row['hisn_count'] if row['hisn_count'] is not None else '—'}"
+        lines.append(f"| {row['title']} | الباب {row['chapter']}، {row['ref']} | {int(row['ratio'] * 100)}٪ | {counts} | {diffs} |")
+    lines += ["", "## الإصلاحات المسمّاة المطبَّقة على ملف الحصن", ""]
+    for name, hits in sorted(fixes_applied.items()):
+        lines.append(f"- `{name}` ×{hits}")
+    lines.append("")
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines))
 
 
 def main():
@@ -321,26 +541,35 @@ def main():
     parser.add_argument("--only")
     parser.add_argument("--out", default="assets/data/adhkar")
     parser.add_argument("--sources", default="assets/data/catalogs/sources.json")
+    parser.add_argument("--report")
     args = parser.parse_args()
     corpus = ac.Corpus(args.root)
+    hisn = EXTRA.hisn()
     ids = set()
     built = {}
     failures = []
+    report = []
     sources = known_sources(args.sources)
     for file_id, definition in specs.FILES.items():
         if args.only and args.only != file_id:
             continue
         if args.preview:
             print(f"=========== {file_id}")
-        catalog = build_file(corpus, file_id, definition, args.preview, failures)
-        check_sources(catalog, sources)
+        catalog = build_file(corpus, sources, hisn, file_id, definition, args.preview, failures, report)
+        try:
+            check_sources(catalog, sources)
+        except BuildError as error:
+            failures.append(str(error))
         for item in catalog["items"]:
             if item["id"] in ids:
-                raise BuildError(f"duplicate item id {item['id']}")
+                failures.append(f"duplicate item id {item['id']}")
             ids.add(item["id"])
         built[file_id] = catalog
     if failures:
         raise BuildError("\n".join(failures))
+    if args.report:
+        write_report(args.report, report, hisn.applied)
+        print("wrote", args.report, len(report), "rows")
     if args.preview:
         return
     os.makedirs(args.out, exist_ok=True)

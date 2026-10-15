@@ -7,10 +7,10 @@ import adhkar_spec_sleep as sleep
 import adhkar_spec_sunan as sunan
 
 FILES = {
-    "adhkar_morning_evening": {"title": morning_evening.TITLE, "items": morning_evening.ITEMS},
-    "adhkar_sleep": {"title": sleep.TITLE, "items": sleep.ITEMS},
+    "adhkar_morning_evening": {"title": morning_evening.TITLE, "items": morning_evening.ITEMS, "tracks": morning_evening.TRACKS},
+    "adhkar_sleep": {"title": sleep.TITLE, "items": sleep.ITEMS, "tracks": sleep.TRACKS},
     "adhkar_after_prayer": {"title": after_prayer.TITLE, "items": after_prayer.ITEMS},
-    "adhkar_home_masjid": {"title": home_masjid.TITLE, "items": home_masjid.ITEMS},
+    "adhkar_home_masjid": {"title": home_masjid.TITLE, "items": home_masjid.ITEMS, "tracks": home_masjid.TRACKS},
     "sunan_mahjoorah": {"title": sunan.TITLE, "items": sunan.ITEMS},
     "adhkar_daily_life": {"title": daily_life.TITLE, "items": daily_life.ITEMS},
 }

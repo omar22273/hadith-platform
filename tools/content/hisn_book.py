@@ -50,6 +50,9 @@ _WRAP = re.compile(r'^[\s"“”«»]+|[\s"“”«».]+$')
 _SPACE = re.compile(r"\s+")
 _BEFORE_PUNCT = re.compile(r"\s+([،,.:؛!؟])")
 _AFTER_COMMA = re.compile(r"([،,؛])(?=[^\s\d])")
+# نقطة أو نقطتان ملتصقتان بما بعدهما من حروف (فقال:لا، انت.اللهم) تُفصَل بمسافة؛ والحذف يتجنب النقاط المتتالية.
+_GLUED_STOP = re.compile(r"(?<![.])([:.])(?=[ء-ي])")
+_INNER_QUOTES = re.compile('["“”]')
 
 
 class HisnError(Exception):
@@ -153,8 +156,10 @@ def clean(text):
     out = out.replace("{", " ").replace("}", " ")
     out = out.replace("[", " ").replace("]", " ")
     out = out.replace("*", " ")
+    out = _INNER_QUOTES.sub(" ", out)
     out = _BEFORE_PUNCT.sub(r"\1", out)
     out = _AFTER_COMMA.sub(r"\1 ", out)
+    out = _GLUED_STOP.sub(r"\1 ", out)
     out = _SPACE.sub(" ", out).strip()
     out = _WRAP.sub("", out)
     out = _SPACE.sub(" ", out).strip()

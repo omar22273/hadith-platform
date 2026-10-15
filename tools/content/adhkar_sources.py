@@ -55,7 +55,7 @@ class ExtraSources:
             with open(os.path.join(self.dir, "owner_adhkar_v290.json"), encoding="utf-8") as fh:
                 data = json.load(fh)
             for span in data["spans"]:
-                key = str(span["line"])
+                key = span["key"]
                 entries.append({"hadithnumber": key, "arabicnumber": key, "text": span["text"], "grades": [], "count_note": span["count_note"]})
                 labels[key] = f"طلب المالك v2.9.0، السطر {span['line']}"
         elif ed == "h":

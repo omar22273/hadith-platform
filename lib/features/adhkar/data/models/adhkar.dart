@@ -94,6 +94,7 @@ class DhikrItem {
     required this.review,
     this.tracks,
     this.grading,
+    this.caution,
     this.derivation,
   });
 
@@ -110,6 +111,7 @@ class DhikrItem {
       review: readModel(json, 'review', ReviewInfo.fromJson),
       tracks: readStringListOrNull(json, 'tracks'),
       grading: readStringOrNull(json, 'grading'),
+      caution: readStringOrNull(json, 'caution'),
       derivation: readModelOrNull(json, 'derivation', TextDerivation.fromJson),
     );
   }
@@ -144,6 +146,9 @@ class DhikrItem {
   /// درجة الحديث كما سُجّلت في الإصدار المعتمد نفسه (أسطر مفصولة بسطر جديد، سطر لكل حديث)، تُعرض في نافذة المعلومات؛ لا يكتبها المحرر بيده.
   final String? grading;
 
+  /// تنبيه قصير يظهر على بطاقة الذكر حين تكون درجته دون الصحيح أو لا أصل له في الكتب الستة المثبتة؛ يُحسب آلياً من الدرجة المسجلة.
+  final String? caution;
+
   /// اشتقاق النص إن لم يكن قصاً حرفياً واحداً: إبدال كلمة بأخرى منقولة من الشاهد نفسه، تنفيذاً لتحديد المالك وبدلالة الشاهد؛ يغيب في سائر الأذكار.
   final TextDerivation? derivation;
 
@@ -169,6 +174,7 @@ class DhikrItem {
       'review': review.toJson(),
       if (tracks != null) 'tracks': List<String>.of(tracks!),
       if (grading != null) 'grading': grading,
+      if (caution != null) 'caution': caution,
       if (derivation != null) 'derivation': derivation?.toJson(),
     };
   }
@@ -189,6 +195,7 @@ class DhikrItem {
         review == other.review &&
         listEquals(tracks, other.tracks) &&
         grading == other.grading &&
+        caution == other.caution &&
         derivation == other.derivation;
   }
 
@@ -205,6 +212,7 @@ class DhikrItem {
       review,
       Object.hashAll(tracks ?? const <Object?>[]),
       grading,
+      caution,
       derivation,
     ]);
   }
