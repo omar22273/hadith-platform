@@ -95,7 +95,7 @@ void main() {
       final Finder card = find.byKey(sunanCardKey);
       expect(find.descendant(of: card, matching: find.text(SunanInfo.subtitle)), findsOneWidget);
       expect(
-        tester.widget<Text>(find.byKey(ValueKey<String>('adhkar-card-count-${SunanInfo.id}'))).data,
+        tester.widget<Text>(find.byKey(const ValueKey<String>('adhkar-card-count-${SunanInfo.id}'))).data,
         arabicDigits(loadSunan().items.length),
       );
       final Iterable<DecoratedBox> boxes = tester.widgetList<DecoratedBox>(

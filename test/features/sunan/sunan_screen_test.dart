@@ -51,7 +51,8 @@ Future<void> _reveal(WidgetTester tester, SunnahBab? bab, String id) async {
   await tester.scrollUntilVisible(
     find.byKey(ValueKey<String>('sunnah-card-$id')),
     900,
-    scrollable: find.descendant(of: _list(bab), matching: find.byType(Scrollable)),
+    // بطاقات الأدلة فيها SelectableText وكل منها يحوي Scrollable، فالقائمة نفسها هي أول Scrollable تحت مفتاحها.
+    scrollable: find.descendant(of: _list(bab), matching: find.byType(Scrollable)).first,
     maxScrolls: 400,
   );
   await tester.pump();
