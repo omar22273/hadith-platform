@@ -58,7 +58,8 @@ void main() {
       return SeerahDraftForm(
         id: 'test_station',
         title: 'محطة تجريبية',
-        epoch: SeerahEpoch.medinan,
+        epochId: 'epoch_07_state_badr_uhud',
+        covenant: SeerahCovenant.medinan,
         placeIndex: 4,
         timeLabel: '',
         scene: 'مشهد',
@@ -75,6 +76,25 @@ void main() {
       expect(form(quotes: <SeerahScene, String>{}).validate(), isNotEmpty);
       const SeerahDraftForm bad = SeerahDraftForm.blank;
       expect(bad.validate(), isNotEmpty);
+      expect(bad.validate(), contains('اختر الطور التاريخي.'));
+    });
+
+    test('a quote without its locator is refused', () {
+      final SeerahDraftForm noLocator = SeerahDraftForm(
+        id: 'test_station',
+        title: 'محطة تجريبية',
+        epochId: 'epoch_07_state_badr_uhud',
+        covenant: SeerahCovenant.medinan,
+        placeIndex: 4,
+        timeLabel: '',
+        scene: 'مشهد',
+        challenge: 'مأزق',
+        decision: 'مخرج',
+        sourceId: 'sira_ibn_hisham',
+        locator: '  ',
+        quotes: <SeerahScene, String>{SeerahScene.setting: 'نص منقول'},
+      );
+      expect(noLocator.validate(), hasLength(1));
     });
 
     test('missing scenes are reported and noted in the review', () {
@@ -84,6 +104,10 @@ void main() {
       expect(station.order, 13);
       expect(station.timeLabel, isNull);
       expect(station.evidence.single.scene, SeerahScene.setting);
+      expect(station.epochId, 'epoch_07_state_badr_uhud');
+      expect(station.covenant, SeerahCovenant.medinan);
+      expect(station.chapters.single.passages.single.quote, 'نص منقول');
+      expect(station.chapters.single.passages.single.locator, 'ج1 ص1');
       expect(station.review.notes.length, 2);
       final String json = encodeJsonArray(<Map<String, dynamic>>[station.toJson()]);
       expect(verifySeerahStationArray(json), isTrue);

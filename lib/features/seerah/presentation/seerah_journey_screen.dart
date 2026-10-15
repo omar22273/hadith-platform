@@ -1,13 +1,15 @@
 // التبويب الثاني: رحلة السيرة النبوية من عام الفيل إلى الرفيق الأعلى.
-// خريطة تاريخية تفاعلية مستقلة عن مسار الأحاديث، وشريط زمن بالحقب الثلاث،
-// وبطاقة المحطة المختارة بزر واحد «ابدأ المحطة» يفتح شاشتها الموحدة.
+// خريطة تاريخية تفاعلية مستقلة عن مسار الأحاديث، وبطاقة المحطة المختارة بزر واحد
+// عريض «ابدأ المحطة» يفتح شاشتها الموحدة، ولوحة الأطوار التاريخية الكبرى المتسلسلة
+// تُفتح فيها محطات كل طور بترتيبها الزمني.
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/json/json_reader.dart';
 import '../../../core/text/arabic_digits.dart';
-import '../../../core/text/arabic_search.dart';
 import '../../../core/theme/app_palette.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/ui/app_shapes.dart';
@@ -18,10 +20,11 @@ import '../application/seerah_providers.dart';
 import '../data/models/seerah_station.dart';
 import '../domain/seerah_map.dart';
 import '../domain/seerah_repository.dart';
+import '../domain/seerah_search.dart';
 import 'seerah_station_screen.dart';
+import 'widgets/seerah_epochs_panel.dart';
 import 'widgets/seerah_labels.dart';
 import 'widgets/seerah_map_view.dart';
-import 'widgets/seerah_timeline.dart';
 
 /// شاشة رحلة السيرة.
 class SeerahJourneyScreen extends ConsumerWidget {
@@ -65,7 +68,35 @@ class _JourneyBody extends ConsumerStatefulWidget {
 
 class _JourneyBodyState extends ConsumerState<_JourneyBody> {
   final TextEditingController _query = TextEditingController();
+  final GlobalKey _cardKey = GlobalKey();
+  late SeerahSearchIndex _index = SeerahSearchIndex.build(widget.dataset);
   bool _searching = false;
+
+  @override
+  void didUpdateWidget(_JourneyBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.dataset, widget.dataset)) {
+      _index = SeerahSearchIndex.build(widget.dataset);
+    }
+  }
+
+  /// يُظهر بطاقة المحطة المختارة بعد اختيارها من لوحة الأطوار الأسفل منها.
+  void _revealCard() {
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+      final BuildContext? target = _cardKey.currentContext;
+      if (!mounted || target == null) {
+        return;
+      }
+      unawaited(
+        Scrollable.ensureVisible(
+          target,
+          alignment: 0.02,
+          duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 420),
+          curve: Curves.easeOutCubic,
+        ),
+      );
+    });
+  }
 
   @override
   void dispose() {
@@ -104,8 +135,9 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
     final Set<String> visited = ref.watch(seerahVisitedProvider);
     final int visitedCount = stations.where((SeerahStationModel s) => visited.contains(s.id)).length;
 
-    void select(int index) {
-      ref.read(selectedSeerahStationProvider.notifier).select(stations[index].id);
+    void pickFromPanel(SeerahStationModel station) {
+      ref.read(selectedSeerahStationProvider.notifier).select(station.id);
+      _revealCard();
     }
 
     Future<void> startStation(SeerahStationModel station) async {
@@ -124,7 +156,7 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
       }
       final SeerahStationModel? picked = await showSmoothSheet<SeerahStationModel>(
         context: context,
-        builder: (BuildContext sheetContext) => _ClusterSheet(cluster: cluster, visited: visited),
+        builder: (BuildContext sheetContext) => _ClusterSheet(dataset: dataset, cluster: cluster, visited: visited),
       );
       if (picked != null && context.mounted) {
         ref.read(selectedSeerahStationProvider.notifier).select(picked.id);
@@ -133,15 +165,7 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
 
     final SeerahStationModel selected = stations[selectedIndex];
     if (_searching) {
-      final List<SeerahStationModel> found = <SeerahStationModel>[
-        for (final SeerahStationModel station in stations)
-          if (ArabicSearch.matches(
-            '${station.title} ${station.place.name} ${station.timeLabel ?? ''} ${station.sceneDescription} '
-            '${station.challenge} ${station.propheticDecision}',
-            _query.text,
-          ))
-            station,
-      ];
+      final List<SeerahStationModel> found = _index.search(_query.text);
       return Column(
         children: <Widget>[
           Padding(
@@ -155,7 +179,7 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
                     textInputAction: TextInputAction.search,
                     onChanged: (String _) => setState(() {}),
                     decoration: const InputDecoration(
-                      hintText: 'ابحث في المحطات بالاسم أو الموضع أو كلمة من المشهد',
+                      hintText: 'ابحث بالاسم أو الموضع أو الطور أو كلمة من نص الرواية',
                       prefixIcon: Icon(Icons.search_rounded),
                       isDense: true,
                     ),
@@ -196,7 +220,7 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              'المحطة ${arabicDigits(station.order)} · ${epochLabel(station.epoch)} · ${station.place.name}',
+                              'المحطة ${arabicDigits(station.order)} · ${epochCaption(dataset.epochOf(station))} · ${station.place.name}',
                               style: text.labelMedium?.copyWith(
                                 color: palette.amberText,
                                 fontWeight: FontWeight.w600,
@@ -282,22 +306,29 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
             ),
           ),
         ),
-        SliverToBoxAdapter(
-          child: SeerahTimeline(
-            stations: stations,
-            selectedIndex: selectedIndex,
-            visited: visited,
-            onSelect: select,
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 18),
+          sliver: SliverToBoxAdapter(
+            child: KeyedSubtree(
+              key: _cardKey,
+              child: _SelectedStationCard(
+                station: selected,
+                epoch: dataset.epochOf(selected),
+                total: stations.length,
+                visited: visited.contains(selected.id),
+                onStart: () => startStation(selected),
+              ),
+            ),
           ),
         ),
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
           sliver: SliverToBoxAdapter(
-            child: _SelectedStationCard(
-              station: selected,
-              total: stations.length,
-              visited: visited.contains(selected.id),
-              onStart: () => startStation(selected),
+            child: SeerahEpochsPanel(
+              dataset: dataset,
+              selectedStationId: selected.id,
+              visited: visited,
+              onSelect: pickFromPanel,
             ),
           ),
         ),
@@ -319,12 +350,14 @@ class _JourneyBodyState extends ConsumerState<_JourneyBody> {
 class _SelectedStationCard extends StatelessWidget {
   const _SelectedStationCard({
     required this.station,
+    required this.epoch,
     required this.total,
     required this.visited,
     required this.onStart,
   });
 
   final SeerahStationModel station;
+  final SeerahEpochInfo? epoch;
   final int total;
   final bool visited;
   final VoidCallback onStart;
@@ -333,14 +366,21 @@ class _SelectedStationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
     final TextTheme text = Theme.of(context).textTheme;
+    // مقدمة البطاقة: التمهيد المشوق، وإلا المشهد، وإلا عنوان أول فصل من الرواية.
+    final String? teaser = station.hook ?? station.sceneDescription;
+    final String lead = teaser ?? station.chapters.first.title;
+    final String caption = epoch == null
+        ? 'المحطة ${arabicDigits(station.order)} من ${arabicDigits(total)}'
+        : 'المحطة ${arabicDigits(station.order)} من ${arabicDigits(total)} · ${epochCaption(epoch)}';
     return SmoothSurface(
+      key: const ValueKey<String>('selected-station-card'),
       elevated: true,
       padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Text(
-            'المحطة ${arabicDigits(station.order)} من ${arabicDigits(total)} · ${epochLabel(station.epoch)}',
+            caption,
             style: text.labelMedium?.copyWith(color: palette.amberText, fontWeight: FontWeight.w600),
           ),
           Text(
@@ -352,6 +392,7 @@ class _SelectedStationCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 6,
             children: <Widget>[
+              SoftChip(label: covenantLabel(station.covenant), icon: covenantIcon(station.covenant)),
               SoftChip(label: station.place.name, icon: Icons.place_rounded),
               if (station.timeLabel != null) SoftChip(label: station.timeLabel!, icon: Icons.schedule_rounded),
               if (visited)
@@ -365,7 +406,8 @@ class _SelectedStationCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            station.sceneDescription,
+            lead,
+            key: const ValueKey<String>('selected-station-lead'),
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: AppTypography.athar(color: palette.ink, fontSize: 18),
@@ -384,8 +426,9 @@ class _SelectedStationCard extends StatelessWidget {
 }
 
 class _ClusterSheet extends StatelessWidget {
-  const _ClusterSheet({required this.cluster, required this.visited});
+  const _ClusterSheet({required this.dataset, required this.cluster, required this.visited});
 
+  final SeerahDataset dataset;
   final SeerahPlaceCluster cluster;
   final Set<String> visited;
 
@@ -428,7 +471,7 @@ class _ClusterSheet extends StatelessWidget {
                         style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        epochLabel(station.epoch),
+                        epochCaption(dataset.epochOf(station)),
                         style: text.labelSmall?.copyWith(color: palette.inkSoft),
                       ),
                     ],

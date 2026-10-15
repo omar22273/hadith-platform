@@ -1943,12 +1943,13 @@
     },
     "SeerahDataset": {
       "type": "object",
-      "description": "ملف محطات رحلة السيرة النبوية.",
+      "description": "ملف محطات رحلة السيرة النبوية مقسّمة إلى أطوار تاريخية كبرى.",
       "additionalProperties": false,
       "required": [
         "schemaVersion",
         "id",
         "title",
+        "epochs",
         "stations"
       ],
       "properties": {
@@ -1969,6 +1970,15 @@
           "minLength": 1,
           "description": "العنوان."
         },
+        "epochs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SeerahEpochInfo"
+          },
+          "minItems": 8,
+          "maxItems": 10,
+          "description": "الأطوار التاريخية الكبرى بترتيبها الزمني (من ثمانية إلى عشرة)؛ بعضها قد لا تكون له محطات بعد."
+        },
         "stations": {
           "type": "array",
           "items": {
@@ -1979,22 +1989,81 @@
         }
       }
     },
+    "SeerahEpochInfo": {
+      "type": "object",
+      "description": "طور تاريخي كبير من أطوار السيرة (إرهاصات النبوة، البعثة، الهجرة…) تنتظم تحته محطات الرحلة.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "number",
+        "title"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الطور."
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "رقم الطور في المنهج (١ إلى ١٠)."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان الطور."
+        }
+      }
+    },
+    "SeerahChapter": {
+      "type": "object",
+      "description": "فصل قرائي في الرواية المطولة للمحطة: مقاطع منقولة حرفياً من الكتب المثبتة، لكل مقطع مصدره وصفحته.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "passages"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الفصل داخل المحطة."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان الفصل."
+        },
+        "passages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "مقاطع الفصل بترتيبها؛ quote فيها نص الكتاب حرفياً بعد إزالة علامات بنية الملف فقط، وlocator الجزء والصفحة أو رقم الحديث."
+        }
+      }
+    },
     "SeerahStationModel": {
       "type": "object",
-      "description": "محطة في رحلة السيرة بمشاهدها الثلاثة: المشهد الزماني، والمأزق، والقرار النبوي.",
+      "description": "محطة في رحلة السيرة بطبقتين: طبقة المعايشة والموقف (تمهيد ومشهد ومأزق وقرار نبوي)، وطبقة الرواية المطولة (فصول حرفية موثقة).",
       "additionalProperties": false,
       "required": [
         "id",
         "order",
         "title",
-        "epoch",
+        "epoch_id",
+        "covenant",
         "timeLabel",
         "place",
         "onRoute",
-        "sceneDescription",
-        "challenge",
-        "propheticDecision",
         "evidence",
+        "chapters",
         "review"
       ],
       "properties": {
@@ -2014,13 +2083,19 @@
           "minLength": 1,
           "description": "عنوان الحدث."
         },
-        "epoch": {
+        "epoch_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الطور التاريخي الكبير الذي تنتمي إليه المحطة، من epochs في الملف نفسه."
+        },
+        "covenant": {
           "enum": [
             "pre_mission",
             "meccan",
             "medinan"
           ],
-          "description": "الحقبة."
+          "description": "العهد: قبل البعثة أو المكي أو المدني."
         },
         "timeLabel": {
           "type": [
@@ -2028,6 +2103,30 @@
             "null"
           ],
           "description": "وسم زمني مختصر مستخلص من الشواهد، أو null إن لم تذكره."
+        },
+        "year_label": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "السنة كما تنص عليها الشواهد (شريط البوصلة)، تغيب إن لم تنص عليها؛ يلزمها compass_basis."
+        },
+        "age_label": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "عمر النبي ﷺ كما تنص عليه الشواهد (شريط البوصلة)، يغيب إن لم تنص عليه؛ يلزمه compass_basis."
+        },
+        "compass_basis": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "الشواهد الحرفية التي تستند إليها السنة والعمر في شريط البوصلة، تُعرض في ورقة مستند البوصلة."
         },
         "place": {
           "$ref": "#/$defs/SeerahPlace",
@@ -2037,28 +2136,61 @@
           "type": "boolean",
           "description": "هل يدخل الموضع في خط سير النبي ﷺ على الخريطة؛ false إذا كان المشهد عن غيره، كهجرة الصحابة إلى الحبشة."
         },
-        "sceneDescription": {
-          "type": "string",
-          "minLength": 1,
-          "description": "الوصف البصري والزماني للمشهد، مصوغاً من الشواهد وحدها."
-        },
-        "challenge": {
-          "type": "string",
-          "minLength": 1,
-          "description": "المأزق أو الحدث الواقعي، مصوغاً من الشواهد وحدها."
-        },
-        "propheticDecision": {
-          "type": "string",
-          "minLength": 1,
-          "description": "القرار النبوي ونتيجته، مصوغاً من الشواهد وحدها."
-        },
-        "detailed_narrative": {
+        "previous_link": {
           "type": [
             "string",
             "null"
           ],
           "minLength": 1,
-          "description": "الرواية الكاملة وتفاصيل الحدث، اختيارية: فقرات تفصل بينها سطور فارغة، تُنقل من المصادر الموثقة في evidence وحدها وتخضع لمراجعة review. غيابها يعرض نصوص المشاهد الموثقة كاملة."
+          "description": "ربط المحطة بما سبقها: جملة تحريرية مقتصرة على شواهد المحطتين؛ تغيب في أول محطة، أو حين لم تُكتب."
+        },
+        "next_hook": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "تمهيد مشوق للمحطة التالية: جملة تحريرية مقتصرة على شواهد المحطتين؛ تغيب في آخر محطة، أو حين لم تُكتب."
+        },
+        "hook": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "التمهيد السردي المشوق لطبقة المعايشة والموقف: صياغة تحريرية مقتصرة على الشواهد، تغيب إن لم تُكتب طبقة المعايشة."
+        },
+        "shura_question": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "سؤال الشورى الذي يوجَّه للقارئ قبل كشف القرار النبوي: صياغة تحريرية مقتصرة على الشواهد."
+        },
+        "sceneDescription": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "الوصف البصري والزماني للمشهد، مصوغاً من الشواهد وحدها؛ يغيب مع المأزق والقرار معاً حين لا تُكتب طبقة المعايشة للمحطة."
+        },
+        "challenge": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "المأزق أو الحدث الواقعي، مصوغاً من الشواهد وحدها."
+        },
+        "propheticDecision": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "القرار النبوي ونتيجته، مصوغاً من الشواهد وحدها."
         },
         "dilemma_options": {
           "type": "array",
@@ -2074,8 +2206,15 @@
           "items": {
             "$ref": "#/$defs/SeerahEvidence"
           },
+          "description": "النصوص المصدرية الموثقة لمشاهد طبقة المعايشة منقولة بنصها؛ فارغة حين لا توجد هذه الطبقة."
+        },
+        "chapters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SeerahChapter"
+          },
           "minItems": 1,
-          "description": "النصوص المصدرية الموثقة منقولة بنصها."
+          "description": "فصول الرواية المطولة بترتيبها: المقاطع الحرفية الموثقة."
         },
         "review": {
           "$ref": "#/$defs/ReviewInfo",

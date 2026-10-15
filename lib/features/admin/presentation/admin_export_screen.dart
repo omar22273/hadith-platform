@@ -338,7 +338,8 @@ class _SeerahTabState extends ConsumerState<_SeerahTab> with AutomaticKeepAliveC
   final Map<SeerahScene, TextEditingController> _quotes = <SeerahScene, TextEditingController>{
     for (final SeerahScene scene in SeerahScene.values) scene: TextEditingController(),
   };
-  SeerahEpoch _epoch = SeerahEpoch.meccan;
+  String? _epochId;
+  SeerahCovenant _covenant = SeerahCovenant.meccan;
   int _placeIndex = 0;
   String _sourceId = 'sira_ibn_hisham';
   List<String> _errors = const <String>[];
@@ -367,7 +368,8 @@ class _SeerahTabState extends ConsumerState<_SeerahTab> with AutomaticKeepAliveC
     return SeerahDraftForm(
       id: _id.text,
       title: _title.text,
-      epoch: _epoch,
+      epochId: _epochId ?? '',
+      covenant: _covenant,
       placeIndex: _placeIndex,
       timeLabel: _timeLabel.text,
       scene: _scene.text,
@@ -427,6 +429,8 @@ class _SeerahTabState extends ConsumerState<_SeerahTab> with AutomaticKeepAliveC
     final AdminState admin = ref.watch(adminControllerProvider);
     final List<SourceWork> sources = ref.watch(sourceCatalogProvider).value?.sources ?? const <SourceWork>[];
     final bool sourceKnown = sources.any((SourceWork source) => source.id == _sourceId);
+    final SeerahDataset? dataset = ref.watch(seerahDatasetProvider).value;
+    final List<SeerahEpochInfo> epochs = dataset?.epochsInOrder ?? const <SeerahEpochInfo>[];
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
       children: <Widget>[
@@ -445,16 +449,31 @@ class _SeerahTabState extends ConsumerState<_SeerahTab> with AutomaticKeepAliveC
               decoration: const InputDecoration(labelText: 'المعرّف اللاتيني', hintText: 'aqaba_second_pledge'),
             ),
             const SizedBox(height: 12),
-            DropdownButtonFormField<SeerahEpoch>(
-              initialValue: _epoch,
-              decoration: const InputDecoration(labelText: 'الحقبة'),
-              items: <DropdownMenuItem<SeerahEpoch>>[
-                for (final SeerahEpoch epoch in SeerahEpoch.values)
-                  DropdownMenuItem<SeerahEpoch>(value: epoch, child: Text(epochLabel(epoch))),
+            DropdownButtonFormField<String>(
+              key: const ValueKey<String>('admin-seerah-epoch'),
+              initialValue: _epochId,
+              isExpanded: true,
+              decoration: const InputDecoration(labelText: 'الطور التاريخي'),
+              items: <DropdownMenuItem<String>>[
+                for (final SeerahEpochInfo epoch in epochs)
+                  DropdownMenuItem<String>(
+                    value: epoch.id,
+                    child: Text(epochCaption(epoch), overflow: TextOverflow.ellipsis),
+                  ),
               ],
-              onChanged: (SeerahEpoch? value) {
+              onChanged: (String? value) => setState(() => _epochId = value),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<SeerahCovenant>(
+              initialValue: _covenant,
+              decoration: const InputDecoration(labelText: 'العهد'),
+              items: <DropdownMenuItem<SeerahCovenant>>[
+                for (final SeerahCovenant covenant in SeerahCovenant.values)
+                  DropdownMenuItem<SeerahCovenant>(value: covenant, child: Text(covenantLabel(covenant))),
+              ],
+              onChanged: (SeerahCovenant? value) {
                 if (value != null) {
-                  setState(() => _epoch = value);
+                  setState(() => _covenant = value);
                 }
               },
             ),
@@ -562,7 +581,8 @@ class _SeerahTabState extends ConsumerState<_SeerahTab> with AutomaticKeepAliveC
             for (final SeerahStationModel station in admin.seerahDrafts)
               _QueuedTile(
                 title: '${arabicDigits(station.order)}. ${station.title}',
-                subtitle: '${epochLabel(station.epoch)} · ${station.place.name} · ${arabicDigits(station.evidence.length)} شاهد',
+                subtitle:
+                    '${covenantLabel(station.covenant)} · ${station.place.name} · ${arabicDigits(station.evidence.length)} شاهد',
                 onRemove: () => ref.read(adminControllerProvider.notifier).removeSeerah(station.id),
               ),
           ],

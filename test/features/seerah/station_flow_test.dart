@@ -1,6 +1,7 @@
-// اختبارات شاشة المحطة الموحدة: مشهد موجز في أربعة أسطر، فمأزق الشورى والتحدي
-// بخياراته إن نصّ عليها الشاهد (أو زر كشف)، فالقرار النبوي بعد الاختيار، فقسم
-// «الرواية التاريخية وتفاصيل الأحداث» القابل للطي. بلا حكم على الاختيار.
+// اختبارات شاشة المحطة الموحدة بطبقتيها: شريط البوصلة والطور وبطاقة «ما سبق»، ثم
+// طبقة المعايشة والموقف (التمهيد فالمشهد الموجز فمأزق الشورى وسؤالها وخياراته إن نصّ
+// عليها الشاهد أو زر كشف فالقرار فتمهيد المحطة التالية)، ثم طبقة الرواية التاريخية
+// المطولة القابلة للطي. بلا حكم على الاختيار.
 
 import 'dart:async';
 import 'dart:convert';
@@ -14,6 +15,8 @@ import 'package:hadith_platform/core/json/json_reader.dart';
 import 'package:hadith_platform/features/seerah/application/seerah_providers.dart';
 import 'package:hadith_platform/features/seerah/data/models/seerah_station.dart';
 import 'package:hadith_platform/features/seerah/presentation/seerah_station_screen.dart';
+import 'package:hadith_platform/features/seerah/presentation/widgets/seerah_labels.dart';
+import 'package:hadith_platform/features/seerah/presentation/widgets/seerah_reading_section.dart';
 
 import '../../support/app_harness.dart';
 
@@ -27,6 +30,7 @@ void main() {
   final SeerahDataset dataset = SeerahDataset.fromJson(_load('assets/data/seerah_dataset.json'));
   final List<SeerahStationModel> ordered = dataset.chronological;
   final SeerahStationModel first = ordered.first;
+  final SeerahStationModel second = ordered[1];
   final SeerahStationModel badr = dataset.stationById('badr_hubab_counsel')!;
   final SeerahStationModel last = ordered.last;
 
@@ -50,6 +54,10 @@ void main() {
 
   Finder key(String name) => find.byKey(ValueKey<String>(name));
 
+  Finder pageScrollable() {
+    return find.descendant(of: key('station-scroll'), matching: find.byType(Scrollable)).first;
+  }
+
   group('the journey card', () {
     testWidgets('has one wide start button and neither of the old two', (WidgetTester tester) async {
       await pumpApp(tester, size: const Size(412, 1800));
@@ -62,6 +70,12 @@ void main() {
       expect(find.text('الرواية الكاملة وتفاصيل الحدث'), findsNothing);
       expect(tester.getSize(key('station-start')).width, greaterThan(412 * 0.8), reason: 'a wide button');
 
+      // البطاقة تذكر المحطة وطورها وعهدها، ومقدمتها التمهيد المشوق.
+      final Finder card = key('selected-station-card');
+      expect(find.descendant(of: card, matching: find.textContaining(epochCaption(dataset.epochOf(first)))), findsOneWidget);
+      expect(find.descendant(of: card, matching: find.text(covenantLabel(first.covenant))), findsOneWidget);
+      expect(tester.widget<Text>(key('selected-station-lead')).data, first.hook);
+
       await tester.tap(key('station-start'));
       await settle(tester);
       expect(find.byType(SeerahStationScreen), findsOneWidget);
@@ -70,8 +84,15 @@ void main() {
   });
 
   group('the station screen', () {
-    testWidgets('shows the brief scene and the dilemma, and keeps the decision hidden', (WidgetTester tester) async {
+    testWidgets('opens with the compass bar, the epoch and the hook, and keeps the decision hidden', (WidgetTester tester) async {
       await openStation(tester, first);
+
+      expect(key('station-compass'), findsOneWidget);
+      expect(tester.widget<Text>(key('station-epoch')).data, epochCaption(dataset.epochOf(first)));
+      expect(key('station-previous-link'), findsNothing, reason: 'nothing precedes the first station');
+
+      expect(find.text('المعايشة والموقف'), findsOneWidget);
+      expect(find.descendant(of: key('station-hook'), matching: find.text(first.hook!)), findsOneWidget);
 
       expect(find.text('المشهد الموجز'), findsOneWidget);
       final Text brief = tester.widget<Text>(key('station-brief-text'));
@@ -80,18 +101,33 @@ void main() {
 
       expect(find.text('مأزق الشورى والتحدي'), findsOneWidget);
       expect(tester.widget<Text>(key('station-challenge')).data, first.challenge);
+      expect(find.text('سؤال الشورى'), findsOneWidget);
+      expect(tester.widget<Text>(key('station-shura-question')).data, first.shuraQuestion);
 
-      // لا قرار ولا زر انتقال قبل الكشف، ولا خيارات مخترعة: زر كشف واحد.
+      // لا قرار ولا تمهيد تالٍ ولا زر انتقال قبل الكشف، ولا خيارات مخترعة: زر كشف واحد.
       expect(key('station-decision'), findsNothing);
-      expect(find.text(first.propheticDecision), findsNothing);
+      expect(find.text(first.propheticDecision!), findsNothing);
+      expect(key('station-next-hook'), findsNothing);
       expect(key('station-continue'), findsNothing);
       expect(key('station-option-0'), findsNothing);
       expect(key('station-reveal'), findsOneWidget);
-      expect(find.text('الرواية التاريخية وتفاصيل الأحداث'), findsOneWidget);
-      expect(key('narrative-scene-setting'), findsNothing, reason: 'the long reading is folded');
+
+      // الطبقة الثانية مطوية.
+      expect(find.text(seerahReadingTitle), findsOneWidget);
+      expect(key('chapter-${first.chapters.first.id}'), findsNothing);
+      expect(key('narrative-font-slider'), findsNothing);
     });
 
-    testWidgets('revealing shows the decision with its source, marks the station and offers the next', (WidgetTester tester) async {
+    testWidgets('a later station opens with the line that links it to the one before', (WidgetTester tester) async {
+      await openStation(tester, second);
+      expect(
+        find.descendant(of: key('station-previous-link'), matching: find.text(second.previousLink!)),
+        findsOneWidget,
+      );
+      expect(find.descendant(of: key('station-previous-link'), matching: find.text('ما سبق')), findsOneWidget);
+    });
+
+    testWidgets('revealing shows the decision with its source, marks the station and teases the next', (WidgetTester tester) async {
       final ProviderContainer container = await openStation(tester, first);
       expect(container.read(seerahVisitedProvider), isNot(contains(first.id)));
 
@@ -106,14 +142,17 @@ void main() {
       expect(key('station-reveal'), findsNothing);
       expect(container.read(seerahVisitedProvider), contains(first.id));
 
+      expect(find.descendant(of: key('station-next-hook'), matching: find.text(first.nextHook!)), findsOneWidget);
+      expect(find.descendant(of: key('station-next-hook'), matching: find.text('في المحطة التالية')), findsOneWidget);
+
       final Finder next = key('station-continue');
       expect(next, findsOneWidget);
-      expect(find.descendant(of: next, matching: find.text('المحطة التالية: ${ordered[1].title}')), findsOneWidget);
+      expect(find.descendant(of: next, matching: find.text('المحطة التالية: ${second.title}')), findsOneWidget);
 
       await tester.tap(next);
       await settle(tester);
-      expect(find.descendant(of: find.byType(AppBar), matching: find.text(ordered[1].title)), findsOneWidget);
-      expect(container.read(selectedSeerahStationProvider), ordered[1].id);
+      expect(find.descendant(of: find.byType(AppBar), matching: find.text(second.title)), findsOneWidget);
+      expect(container.read(selectedSeerahStationProvider), second.id);
     });
 
     testWidgets('a station whose source states the options shows them, and a choice reveals the decision', (WidgetTester tester) async {
@@ -142,6 +181,20 @@ void main() {
       expect(key('station-decision'), findsOneWidget);
     });
 
+    testWidgets('on a phone-sized screen, choosing scrolls the decision into view', (WidgetTester tester) async {
+      await openStation(tester, badr, size: const Size(412, 915));
+      await tester.scrollUntilVisible(key('station-option-0'), 300, scrollable: pageScrollable());
+      await tester.tap(key('station-option-0'));
+      await settle(tester);
+
+      final Finder decision = key('station-decision');
+      expect(decision, findsOneWidget);
+      final Rect rect = tester.getRect(decision);
+      expect(rect.top, greaterThanOrEqualTo(0));
+      expect(rect.top, lessThan(915 * 0.5), reason: 'the decision card is brought near the top');
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('a brief scene longer than four lines opens fully on request and folds again', (WidgetTester tester) async {
       await openStation(tester, first);
       final Finder toggle = key('station-brief-toggle');
@@ -158,10 +211,11 @@ void main() {
       expect(tester.widget<Text>(key('station-brief-text')).maxLines, 4);
     });
 
-    testWidgets('the last station ends with a return to the map', (WidgetTester tester) async {
+    testWidgets('the last station ends with a return to the map and no teaser for a next one', (WidgetTester tester) async {
       await openStation(tester, last);
       await tester.tap(key('station-reveal'));
       await settle(tester);
+      expect(key('station-next-hook'), findsNothing);
       expect(find.descendant(of: key('station-continue'), matching: find.text('العودة إلى الخريطة')), findsOneWidget);
 
       await tester.tap(key('station-continue'));
@@ -173,7 +227,7 @@ void main() {
       await openStation(tester, first);
       await tester.tap(key('station-reveal'));
       await settle(tester);
-      await tester.tap(find.text('الرواية التاريخية وتفاصيل الأحداث'));
+      await tester.tap(find.text(seerahReadingTitle));
       await settle(tester);
 
       expect(find.textContaining('بانتظار المراجعة'), findsNothing);
@@ -192,7 +246,7 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(key('station-continue'), findsOneWidget, reason: 'choosing an option reveals the decision');
 
-      await tester.tap(find.text('الرواية التاريخية وتفاصيل الأحداث'));
+      await tester.tap(find.text(seerahReadingTitle));
       await settle(tester);
       expect(tester.takeException(), isNull);
       expect(key('station-continue'), findsOneWidget);
@@ -203,6 +257,15 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(key('station-continue'), findsOneWidget);
       expect(tester.getRect(key('station-continue')).bottom, lessThanOrEqualTo(740));
+    });
+
+    testWidgets('even the narrowest phone shows the compass bar and the first layer without overflow', (WidgetTester tester) async {
+      await openStation(tester, dataset.stationById('hira_first_revelation')!, size: const Size(320, 4000), textScale: 1.3);
+      expect(tester.takeException(), isNull);
+      expect(key('compass-covenant'), findsOneWidget);
+      expect(key('compass-year'), findsOneWidget);
+      expect(key('compass-age'), findsOneWidget);
+      expect(key('compass-place'), findsOneWidget);
     });
   });
 }

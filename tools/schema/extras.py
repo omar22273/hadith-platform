@@ -133,6 +133,53 @@ EXTRAS = {
       );
     return List<SeerahStationModel>.unmodifiable(result);
   }
+
+  /// الأطوار مرتبة بحقل number كما تُعرض في شاشة المسار.
+  List<SeerahEpochInfo> get epochsInOrder {
+    final List<SeerahEpochInfo> result = List<SeerahEpochInfo>.of(epochs)
+      ..sort(
+        (SeerahEpochInfo a, SeerahEpochInfo b) => a.number.compareTo(b.number),
+      );
+    return List<SeerahEpochInfo>.unmodifiable(result);
+  }
+
+  /// الطور بمعرّفه، أو null إن لم يوجد.
+  SeerahEpochInfo? epochById(String epochId) {
+    for (final SeerahEpochInfo epoch in epochs) {
+      if (epoch.id == epochId) {
+        return epoch;
+      }
+    }
+    return null;
+  }
+
+  /// الطور الذي تنتمي إليه المحطة، أو null إن كان معرّفه مجهولاً.
+  SeerahEpochInfo? epochOf(SeerahStationModel station) => epochById(station.epochId);
+
+  /// محطات طور واحد بترتيبها الزمني.
+  List<SeerahStationModel> stationsOfEpoch(String epochId) {
+    return List<SeerahStationModel>.unmodifiable(
+      chronological.where((SeerahStationModel station) => station.epochId == epochId),
+    );
+  }
+""",
+    "SeerahStationModel": """
+  /// شواهد مشهد واحد بترتيبها في الملف.
+  List<SeerahEvidence> evidenceFor(SeerahScene scene) {
+    return List<SeerahEvidence>.unmodifiable(
+      evidence.where((SeerahEvidence item) => item.scene == scene),
+    );
+  }
+
+  /// هل كُتبت طبقة المعايشة والموقف (المشهد والمأزق والقرار) لهذه المحطة؛ غيابها يعني محطة مولّدة
+  /// آلياً من الكتاب لم تُكتب طبقتها الأولى بعد، فتُعرض روايتها المطولة وحدها.
+  bool get hasExperience => sceneDescription != null && challenge != null && propheticDecision != null;
+
+  /// هل لشريط البوصلة سنة أو عمر منصوص عليهما في الشواهد.
+  bool get hasCompassFacts => yearLabel != null || ageLabel != null;
+
+  /// عدد مقاطع الرواية المطولة في كل فصولها.
+  int get passageCount => chapters.fold<int>(0, (int total, SeerahChapter chapter) => total + chapter.passages.length);
 """,
     "DhikrItem": """
   /// هل الذكر نص قرآني أدخله المالك؛ يُعرض بين ﴿ ﴾ وتُحوَّل فواصل الآيات فيه.
@@ -167,31 +214,5 @@ EXTRAS = {
       ..sort((DhikrItem a, DhikrItem b) => a.order.compareTo(b.order));
     return List<DhikrItem>.unmodifiable(result);
   }
-""",
-    "SeerahStationModel": """
-  /// شواهد مشهد واحد بترتيبها في الملف.
-  List<SeerahEvidence> evidenceFor(SeerahScene scene) {
-    return List<SeerahEvidence>.unmodifiable(
-      evidence.where((SeerahEvidence item) => item.scene == scene),
-    );
-  }
-
-  /// فقرات الرواية المفصلة (تفصل بينها سطور فارغة)؛ فارغة إن غابت الرواية
-  /// أو كانت بياضاً، فيعود العرض إلى نصوص المشاهد الموثقة.
-  List<String> get narrativeParagraphs {
-    final String? text = detailedNarrative;
-    if (text == null) {
-      return const <String>[];
-    }
-    return List<String>.unmodifiable(
-      text
-          .split(RegExp(r'\\n\\s*\\n'))
-          .map((String paragraph) => paragraph.trim())
-          .where((String paragraph) => paragraph.isNotEmpty),
-    );
-  }
-
-  /// هل للمحطة رواية مفصلة جاهزة للعرض.
-  bool get hasDetailedNarrative => narrativeParagraphs.isNotEmpty;
 """,
 }
