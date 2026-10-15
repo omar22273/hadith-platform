@@ -1,7 +1,8 @@
 // فئات مركز الأذكار: كل بطاقة في المركز تقابل ملف بيانات واحداً في assets/data/adhkar/.
 //
-// الفئات الست ملفات بيانات مشكولة مقتطعة حرفياً من المصادر المعتمدة (انظر
-// tools/content/build_adhkar_matrix.py)؛ والسبحة الذكية السابعة شاشة عدّ حر لا ملف لها.
+// الفئات الخمس ملفات بيانات مشكولة مقتطعة حرفياً من المصادر المعتمدة (انظر
+// tools/content/build_adhkar_matrix.py). والسنن المهجورة بطاقة سادسة في المركز لكنها شاشة مستقلة
+// بشريط تصفية (features/sunan)، والسبحة الذكية السابعة شاشة عدّ حر لا ملف لها.
 
 import 'package:flutter/material.dart';
 
@@ -169,15 +170,6 @@ abstract final class AdhkarCategories {
     ],
   );
 
-  /// السنن النبوية المهجورة.
-  static const AdhkarCategory sunan = AdhkarCategory(
-    id: 'sunan_mahjoorah',
-    title: 'السنن النبوية المهجورة',
-    subtitle: 'ركعتا الوضوء، لعق الأصابع، الابتداء باليمين…',
-    icon: Icons.history_edu_outlined,
-    assetPath: '$_folder/sunan_mahjoorah.json',
-  );
-
   /// جامع الأدعية المأثورة.
   static const AdhkarCategory duas = AdhkarCategory(
     id: 'adhkar_daily_life',
@@ -187,13 +179,12 @@ abstract final class AdhkarCategories {
     assetPath: '$_folder/adhkar_daily_life.json',
   );
 
-  /// الفئات الست التي لها ملفات بيانات.
+  /// فئات الأذكار الخمس التي لها ملفات بيانات؛ والسنن المهجورة ميزة مستقلة (features/sunan).
   static const List<AdhkarCategory> all = <AdhkarCategory>[
     morningEvening,
     sleep,
     afterPrayer,
     homeMasjid,
-    sunan,
     duas,
   ];
 

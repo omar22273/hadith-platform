@@ -2304,6 +2304,127 @@
         }
       }
     },
+    "SunanCatalog": {
+      "type": "object",
+      "description": "ملف السنن النبوية المهجورة: بطاقات مرجعية تُقرأ وتُطبَّق، ليست أذكاراً للعدّ.",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "title",
+        "items"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "إصدار المخطط."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف الملف."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "العنوان."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SunnahItem"
+          },
+          "minItems": 1,
+          "description": "السنن بترتيب عرضها."
+        }
+      }
+    },
+    "SunnahItem": {
+      "type": "object",
+      "description": "سنة نبوية ثابتة بدليلها المشكول ومصدره.",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "order",
+        "title",
+        "bab",
+        "text",
+        "evidence",
+        "review"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(_[a-z0-9]+)*$",
+          "description": "معرّف السنة."
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "الترتيب في الشاشة."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "عنوان السنة."
+        },
+        "bab": {
+          "enum": [
+            "purity_prayer",
+            "food_drink",
+            "home_going_out",
+            "sleep_clothing",
+            "gatherings_manners"
+          ],
+          "description": "الباب الذي تُصفّى به السنة في الشريط العلوي."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "وقتها وكيفية العمل بها: عبارة مشكولة منقولة حرفياً من لفظ الحديث، وهي جزء من نص أحد الشواهد."
+        },
+        "virtue": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "الفضل النبوي: عبارة منقولة حرفياً، وهي جزء من نص أحد الشواهد؛ تغيب إن لم يكن للسنة فضل منصوص في شواهدها."
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "minItems": 1,
+          "description": "الدليل: نص الحديث حرفياً من المصدر المعتمد مع موضعه."
+        },
+        "review": {
+          "$ref": "#/$defs/ReviewInfo",
+          "description": "حالة المراجعة العلمية."
+        },
+        "grading": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "درجة الحديث كما سُجّلت في الإصدار المعتمد نفسه (سطر لكل حديث)، تُعرض على البطاقة؛ لا يكتبها المحرر بيده."
+        },
+        "caution": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "description": "تنبيه قصير يظهر على البطاقة حين تكون درجة الحديث دون الصحيح؛ يُحسب آلياً من الدرجة المسجلة."
+        }
+      }
+    },
     "HadithDraft": {
       "type": "object",
       "description": "مسودة حديث من لوحة الإدخال، تُحوَّل لاحقاً إلى HadithDailyModel بعد التوثيق.",

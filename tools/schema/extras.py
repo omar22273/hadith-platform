@@ -147,6 +147,19 @@ EXTRAS = {
     return own == null || own.contains(trackId);
   }
 """,
+    "SunanCatalog": """
+  /// السنن مرتبة بحقل order كما تُعرض في الشاشة.
+  List<SunnahItem> get itemsInOrder {
+    final List<SunnahItem> result = List<SunnahItem>.of(items)
+      ..sort((SunnahItem a, SunnahItem b) => a.order.compareTo(b.order));
+    return List<SunnahItem>.unmodifiable(result);
+  }
+
+  /// سنن باب واحد بترتيب العرض.
+  List<SunnahItem> inBab(SunnahBab bab) {
+    return List<SunnahItem>.unmodifiable(itemsInOrder.where((SunnahItem item) => item.bab == bab));
+  }
+""",
     "AdhkarCatalog": """
   /// الأذكار مرتبة بحقل order كما تُعرض في الوِرد.
   List<DhikrItem> get itemsInOrder {

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""يبني ملفات الأذكار الستة في assets/data/adhkar/ بالاقتطاع الحرفي من المدونة المثبّتة.
+"""يبني ملفات الأذكار (assets/data/adhkar/) وملف السنن المهجورة (assets/data/sunan/) بالاقتطاع الحرفي من المدونة المثبّتة.
 
 الخط الأحمر: لا يوجد في هذا المشروع لفظ نبوي مكتوب باليد. المواصفات في
 adhkar_matrix_specs.py تحدد فقط: أي حديث، ومن أي كلمة مفتاحية إلى أي كلمة مفتاحية.
@@ -359,12 +359,17 @@ def build_item(corpus, sources, hisn, order, spec, preview, report):
         virtue = build_piece(quotes, spec["virtue"], item_id, "virtue")
         if not TASHKEEL.search(virtue):
             raise BuildError(f"{item_id}: virtue must be vocalized")
+    bab = spec.get("bab")
     count = spec["count"]
     proof = spec.get("proof")
     notes = []
     hisn_ref = spec.get("hisn")
     hisn_info = hisn_compare(hisn, hisn_ref, text) if hisn_ref else None
-    if count > 1:
+    if bab:
+        # سنة مهجورة: بطاقة مرجعية بلا عدّ؛ فلا يُدَّعى عدد ولا يُدوَّن في الملاحظات.
+        if count != 1 or proof or hisn_ref or spec.get("tracks") or spec.get("count_from"):
+            raise BuildError(f"{item_id}: a sunnah card carries no count, proof, hisn or tracks")
+    elif count > 1:
         if proof:
             if not any(ac.contains_plain(q, proof) for q in quotes):
                 raise BuildError(f"{item_id}: proof phrase {proof!r} not found in any quote")
@@ -419,9 +424,12 @@ def build_item(corpus, sources, hisn, order, spec, preview, report):
         "id": item_id,
         "order": order,
         "title": spec["title"],
-        "text": text,
-        "count": count,
     }
+    if bab:
+        result["bab"] = bab
+    result["text"] = text
+    if not bab:
+        result["count"] = count
     if virtue:
         result["virtue"] = virtue
     if spec.get("tracks"):
@@ -438,7 +446,7 @@ def build_item(corpus, sources, hisn, order, spec, preview, report):
     if hisn_info:
         report.append({"item": item_id, "title": spec["title"], "count": count, **hisn_info})
     if preview:
-        print(f"--- {item_id}  x{count}  tracks={spec.get('tracks')}  [{'; '.join(labels)}]")
+        print(f"--- {item_id}  {'bab=' + bab if bab else 'x' + str(count)}  tracks={spec.get('tracks')}  [{'; '.join(labels)}]")
         print("  text   :", text)
         if virtue:
             print("  virtue :", virtue)
@@ -473,6 +481,27 @@ def check_tracks(file_id, definition, items):
             raise BuildError(f"{file_id}: track {track!r} has no items")
 
 
+def check_babs(file_id, definition, items):
+    """ملف السنن: لكل بطاقة بابها، ولكل باب من أبواب الشريط بطاقة واحدة على الأقل؛ وملفات الأذكار لا أبواب فيها."""
+    import adhkar_spec_kit as kit
+    if definition.get("kind") != "sunan":
+        for item in items:
+            if "bab" in item:
+                raise BuildError(f"{file_id}:{item['id']}: only the sunan file carries babs")
+        return
+    used = set()
+    for item in items:
+        bab = item.get("bab")
+        if bab not in kit.BABS:
+            raise BuildError(f"{file_id}:{item['id']}: unknown or missing bab {bab!r}")
+        used.add(bab)
+    for bab in kit.BABS:
+        if bab not in used:
+            raise BuildError(f"{file_id}: bab {bab!r} has no items")
+    if len(items) < 30:
+        raise BuildError(f"{file_id}: expected at least 30 documented sunan, got {len(items)}")
+
+
 def build_file(corpus, sources, hisn, file_id, definition, preview, failures, report):
     items = []
     for order, spec in enumerate(definition["items"], start=1):
@@ -484,6 +513,7 @@ def build_file(corpus, sources, hisn, file_id, definition, preview, failures, re
         check_tracks(file_id, definition, items)
     except BuildError as error:
         failures.append(str(error))
+    check_babs(file_id, definition, items)
     return {"schemaVersion": "2.0.0", "id": file_id, "title": definition["title"], "items": items}
 
 
@@ -540,6 +570,7 @@ def main():
     parser.add_argument("--preview", action="store_true")
     parser.add_argument("--only")
     parser.add_argument("--out", default="assets/data/adhkar")
+    parser.add_argument("--sunan-out", default="assets/data/sunan")
     parser.add_argument("--sources", default="assets/data/catalogs/sources.json")
     parser.add_argument("--report")
     args = parser.parse_args()
@@ -572,9 +603,10 @@ def main():
         print("wrote", args.report, len(report), "rows")
     if args.preview:
         return
-    os.makedirs(args.out, exist_ok=True)
     for file_id, catalog in built.items():
-        path = os.path.join(args.out, f"{file_id}.json")
+        directory = args.sunan_out if specs.FILES[file_id].get("kind") == "sunan" else args.out
+        os.makedirs(directory, exist_ok=True)
+        path = os.path.join(directory, f"{file_id}.json")
         with open(path, "w", encoding="utf-8") as fh:
             json.dump(catalog, fh, ensure_ascii=False, indent=2)
             fh.write("\n")

@@ -9,9 +9,12 @@
 3. كل عدد أكبر من واحد مدعوم بعبارته في شاهد، أو بما ينص عليه حصن المسلم المقابل،
 4. لا علامة اتجاه ولا علامة اقتباس في أي نص،
 5. المسارات (tracks): إن وُجدت لذكر في ملف وُجدت لكل أذكاره، بلا تكرار، وبعدد مسارين لا أكثر،
-6. كل ذكر ضعّفه الألباني في شواهده له caution وgrading يذكران ذلك.
+6. كل ذكر ضعّفه الألباني في شواهده له caution وgrading يذكران ذلك،
+7. ملف السنن المهجورة (assets/data/sunan): بطاقاته بلا count ولا tracks، لكل بطاقة bab معروف،
+   ولكل باب من أبواب الشريط بطاقة، وعدد البطاقات ثلاثون فأكثر، وكل شاهد غير الصحيحين ليس ضعيفاً عند الألباني.
 
-الاستعمال: python3 tools/content/verify_adhkar_matrix.py <hadith-api checkout> [assets/data/adhkar]
+الاستعمال: python3 tools/content/verify_adhkar_matrix.py <hadith-api checkout> [مجلد ...]
+(الافتراضي: assets/data/adhkar ثم assets/data/sunan)
 """
 import glob
 import json
@@ -39,6 +42,8 @@ HISN_NOTE = re.compile(r"حصن المسلم \((الباب \d+، الذكر \d+)
 HISN_LOCATOR = re.compile(r"^الباب (\d+)، الذكر (\d+)$")
 OWNER_LOCATOR = re.compile(r"^طلب المالك، السطر (\d+)$")
 ALBANI_WEAK = re.compile(r"الألباني: (ضعيف|موضوع|منكر)")
+SUNAN_BABS = ("purity_prayer", "food_drink", "home_going_out", "sleep_clothing", "gatherings_manners")
+MIN_SUNAN = 30
 
 
 def skeleton(text):
@@ -126,19 +131,47 @@ def check_derivation(where, item, problems):
         problems.append(f"{where}: text with the original word restored is not inside any evidence quote")
 
 
+def weak_in_grading(item):
+    return bool(ALBANI_WEAK.search(item.get("grading") or ""))
+
+
+def check_sunan_file(name, catalog, problems):
+    """ملف السنن: بطاقات بأبواب، بلا عدّ ولا مسارات، وكل باب من أبواب الشريط ممثَّل."""
+    used = set()
+    for item in catalog["items"]:
+        where = f"{name}:{item['id']}"
+        if "count" in item or item.get("tracks"):
+            problems.append(f"{where}: a sunnah card carries no count and no tracks")
+        if item.get("bab") not in SUNAN_BABS:
+            problems.append(f"{where}: unknown bab {item.get('bab')!r}")
+        used.add(item.get("bab"))
+    for bab in SUNAN_BABS:
+        if bab not in used:
+            problems.append(f"{name}: bab {bab} has no cards")
+    if len(catalog["items"]) < MIN_SUNAN:
+        problems.append(f"{name}: expected at least {MIN_SUNAN} sunan, got {len(catalog['items'])}")
+    orders = [i["order"] for i in catalog["items"]]
+    if orders != list(range(1, len(orders) + 1)):
+        problems.append(f"{name}: orders must run 1..n without gaps")
+
+
 def main():
     root = sys.argv[1]
-    folder = sys.argv[2] if len(sys.argv) > 2 else "assets/data/adhkar"
+    folders = sys.argv[2:] or ["assets/data/adhkar", "assets/data/sunan"]
     cache = {}
     extras = Extras()
     problems = []
     total = 0
     weak_items = 0
-    for path in sorted(glob.glob(os.path.join(folder, "*.json"))):
+    paths = sorted(p for folder in folders for p in glob.glob(os.path.join(folder, "*.json")))
+    for path in paths:
         with open(path, encoding="utf-8") as fh:
             catalog = json.load(fh)
         if "items" not in catalog or catalog.get("id") == "adhkar_seed":
             continue
+        is_sunan = os.path.basename(os.path.dirname(os.path.abspath(path))) == "sunan"
+        if is_sunan:
+            check_sunan_file(os.path.basename(path), catalog, problems)
         tracked = [bool(i.get("tracks")) for i in catalog["items"]]
         if any(tracked) and not all(tracked):
             problems.append(f"{os.path.basename(path)}: tracks must be set on every item or on none")
@@ -174,7 +207,10 @@ def main():
                     problems.append(f"{where}: quote not inside {e['sourceId']} {e['locator']}")
                 if e["sourceId"] == "hisn_al_muslim":
                     hisn_counts.append(extras.hisn_count(e["locator"]))
-            if item["count"] > 1:
+            if is_sunan:
+                if weak_in_grading(item):
+                    problems.append(f"{where}: a sunnah card may not rest on a narration Albani weakened")
+            elif item["count"] > 1:
                 joined = " ".join(re.sub(" +", " ", re.sub("[^ء-ي ]", "", MARKS.sub("", q))) for q in quotes)
                 stated = any(skeleton(p) in skeleton(joined) for p in NUMBER_WORDS.get(item["count"], ()))
                 for note in item["review"]["notes"]:

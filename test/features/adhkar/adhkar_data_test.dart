@@ -1,4 +1,5 @@
-// اختبارات مصفوفة بيانات الأذكار: ستة ملفات في assets/data/adhkar/ مشكولة ومقتطعة
+// اختبارات مصفوفة بيانات الأذكار: خمسة ملفات في assets/data/adhkar/ (والسنن المهجورة ملف مستقل له اختباره في
+// test/features/sunan) مشكولة ومقتطعة
 // حرفياً من شواهدها (الخط الأحمر: لا لفظ نبوي من الذاكرة). كل ذكر وفضله جزء حرفي من
 // شاهد، والعدد الأكثر من واحد منصوص في الشاهد أو في طلب المالك وحصن المسلم، وكل مصدر
 // معروف في فهرس المصادر، وكل ذكر ضعّفه الألباني يحمل تنبيهه، ومسارات التبديل متسقة.
@@ -33,13 +34,12 @@ const Set<String> _sixBooks = <String>{
 /// المصادر الإضافية: آيات المالك، وعباراته المشكولة، وحصن المسلم.
 const Set<String> _extraSources = <String>{'quran_owner_text', 'owner_adhkar_v290', 'hisn_al_muslim'};
 
-/// عدد أذكار كل ملف كما بُني من المواصفات.
+/// عدد أذكار كل ملف كما بُني من المواصفات (ملف السنن المهجورة في assets/data/sunan وله اختباره).
 const Map<String, int> _expectedCounts = <String, int>{
   'adhkar_morning_evening': 30,
   'adhkar_sleep': 19,
   'adhkar_after_prayer': 12,
   'adhkar_home_masjid': 7,
-  'sunan_mahjoorah': 13,
   'adhkar_daily_life': 19,
 };
 
@@ -68,7 +68,6 @@ const List<String> _ownerMorningEvening = <String>[
   'surat_al_falaq_thalathan',
   'surat_an_nas_thalathan',
   'bismillah_la_yadurru',
-  'audhu_bikalimat_allah_thalathan',
   'as_alukal_afwa_wal_afiya',
   'allahumma_alim_al_ghayb_wash_shahada',
   'allahumma_afini_fi_badani',
@@ -82,6 +81,10 @@ const List<String> _ownerMorningEvening = <String>[
   'ya_rabbi_laka_al_hamd',
 ];
 
+/// ذكر طلبه المالك للصباح والمساء، لكن لفظ الحديث نفسه يقيّده بالمساء («حين يمسي»)،
+/// فهو في مسار المساء وحده؛ ولا يُنقل إلى الصباح بلا شاهد.
+const String _ownerEveningOnly = 'audhu_bikalimat_allah_thalathan';
+
 void main() {
   final SourceCatalog sources = SourceCatalog.fromJson(loadJson('assets/data/catalogs/sources.json'));
   final Map<AdhkarCategory, JsonMap> raws = <AdhkarCategory, JsonMap>{
@@ -92,9 +95,9 @@ void main() {
   };
   final List<DhikrItem> allItems = <DhikrItem>[for (final AdhkarCatalog c in catalogs.values) ...c.items];
 
-  group('the six data files', () {
-    test('the hub knows exactly six categories, each with its own file whose id is its file stem', () {
-      expect(AdhkarCategories.all, hasLength(6));
+  group('the five adhkar data files', () {
+    test('the hub knows exactly five adhkar categories, each with its own file whose id is its file stem', () {
+      expect(AdhkarCategories.all, hasLength(5));
       expect(AdhkarCategories.all.map((AdhkarCategory c) => c.id).toSet(), _expectedCounts.keys.toSet());
       for (final AdhkarCategory category in AdhkarCategories.all) {
         expect(File(category.assetPath).existsSync(), isTrue, reason: category.assetPath);
@@ -106,7 +109,7 @@ void main() {
       expect(AdhkarCategories.byId('nonexistent'), isNull);
     });
 
-    test('the folder holds those six files and nothing else (the old two-item seed is gone)', () {
+    test('the folder holds those five files and nothing else (the sunan moved to their own folder)', () {
       final List<String> names = Directory('assets/data/adhkar')
           .listSync()
           .whereType<File>()
@@ -123,16 +126,12 @@ void main() {
         expect(items.map((DhikrItem i) => i.order).toList(), List<int>.generate(items.length, (int i) => i + 1),
             reason: entry.key.id);
       }
-      expect(allItems, hasLength(100));
+      expect(allItems, hasLength(87));
     });
 
-    test('the requested content is present: sunan, supplications and the hub subjects', () {
+    test('the requested content is present: supplications and the hub subjects', () {
       final Set<String> ids = allItems.map((DhikrItem i) => i.id).toSet();
       const List<String> requested = <String>[
-        // السنن المهجورة المطلوبة: ركعتا الوضوء، لعق الأصابع، الابتداء باليمين.
-        'rakatan_ba_da_al_wudu',
-        'laq_al_asabi',
-        'at_tayammun',
         // الأدعية: الركوب، السفر، الكرب، نزول الغيث.
         'dua_ar_rukub',
         'dua_as_safar',
@@ -166,7 +165,7 @@ void main() {
       }
     });
 
-    test('item ids are unique across all six files, so no dhikr is listed twice', () {
+    test('item ids are unique across all five files, so no dhikr is listed twice', () {
       final List<String> ids = allItems.map((DhikrItem i) => i.id).toList();
       expect(ids.toSet(), hasLength(ids.length));
     });
@@ -338,10 +337,19 @@ void main() {
       }
     });
 
+    test('the one dhikr whose hadith says "when he reaches the evening" stays in the evening track only', () {
+      final DhikrItem item = morningEvening.singleWhere((DhikrItem i) => i.id == _ownerEveningOnly);
+      expect(item.inTrack('evening'), isTrue);
+      expect(item.inTrack('morning'), isFalse);
+      expect(item.count, 3);
+      expect(item.evidence.any((SourceRef r) => (r.quote ?? '').contains('يُمْسِي')), isTrue,
+          reason: 'the evidence itself restricts it to the evening');
+    });
+
     test('the counts the owner gave are the counts in the data', () {
       int countOf(String id) => morningEvening.singleWhere((DhikrItem i) => i.id == id).count;
       expect(countOf('bismillah_la_yadurru'), 3);
-      expect(countOf('audhu_bikalimat_allah_thalathan'), 3);
+      expect(countOf(_ownerEveningOnly), 3);
       expect(countOf('allahumma_afini_fi_badani'), 3);
       expect(countOf('radiytu_billahi_rabba'), 3);
       expect(countOf('hasbiyallah_la_ilaha_illa_huwa'), 7);

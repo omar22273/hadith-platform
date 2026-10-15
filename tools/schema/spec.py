@@ -119,6 +119,13 @@ ENUMS = [
         ("quranText", "quran_text", "نص قرآني مشكول أدخله مالك المشروع بنصه الحرفي."),
         ("ownerText", "owner_text", "نص مشكول أدخله مالك المشروع في طلبه."),
     ]),
+    Enum("SunnahBab", "sunan.dart", "باب من أبواب السنن المهجورة في شريط التصفية.", [
+        ("purityPrayer", "purity_prayer", "الطهارة والصلاة."),
+        ("foodDrink", "food_drink", "الطعام والشراب."),
+        ("homeGoingOut", "home_going_out", "المنزل والخروج."),
+        ("sleepClothing", "sleep_clothing", "النوم واللباس."),
+        ("gatheringsManners", "gatherings_manners", "المجالس والآداب."),
+    ]),
     Enum("UnlockAnchor", "curriculum_manifest.dart", "متى يُفتح وِرد اليوم التالي.", [
         ("fajr", "fajr", "عند دخول وقت الفجر محلياً."),
     ]),
@@ -533,6 +540,33 @@ MODELS = [
         F("toWord", "String", "الكلمة البديلة المنقولة بتشكيلها من الشاهد نفسه (مجرّدة هنا)."),
         F("note", "String", "سبب الإبدال ودلالة الشاهد عليه."),
     ]),
+    # ---------------------------------------------------------------- sunan
+    Model("SunanCatalog", "sunan.dart",
+          "ملف السنن النبوية المهجورة: بطاقات مرجعية تُقرأ وتُطبَّق، ليست أذكاراً للعدّ.", [
+        F("schemaVersion", "String", "إصدار المخطط.", **SEMVER),
+        F("id", "String", "معرّف الملف.", **ID),
+        F("title", "String", "العنوان."),
+        F("items", "List<SunnahItem>", "السنن بترتيب عرضها.", minItems=1),
+    ]),
+    Model("SunnahItem", "sunan.dart", "سنة نبوية ثابتة بدليلها المشكول ومصدره.", [
+        F("id", "String", "معرّف السنة.", **ID),
+        F("order", "int", "الترتيب في الشاشة.", minimum=1),
+        F("title", "String", "عنوان السنة."),
+        F("bab", "E:SunnahBab", "الباب الذي تُصفّى به السنة في الشريط العلوي."),
+        F("text", "String",
+          "وقتها وكيفية العمل بها: عبارة مشكولة منقولة حرفياً من لفظ الحديث، وهي جزء من نص أحد الشواهد."),
+        F("virtue", "String?",
+          "الفضل النبوي: عبارة منقولة حرفياً، وهي جزء من نص أحد الشواهد؛ تغيب إن لم يكن للسنة فضل منصوص في شواهدها.",
+          optional=True, minLength=1),
+        F("evidence", "List<SourceRef>", "الدليل: نص الحديث حرفياً من المصدر المعتمد مع موضعه.", minItems=1),
+        F("review", "ReviewInfo", "حالة المراجعة العلمية."),
+        F("grading", "String?",
+          "درجة الحديث كما سُجّلت في الإصدار المعتمد نفسه (سطر لكل حديث)، تُعرض على البطاقة؛ لا يكتبها المحرر بيده.",
+          optional=True, minLength=1),
+        F("caution", "String?",
+          "تنبيه قصير يظهر على البطاقة حين تكون درجة الحديث دون الصحيح؛ يُحسب آلياً من الدرجة المسجلة.",
+          optional=True, minLength=1),
+    ]),
     # ---------------------------------------------------------------- admin intake
     Model("HadithDraft", "hadith_draft.dart", "مسودة حديث من لوحة الإدخال، تُحوَّل لاحقاً إلى HadithDailyModel بعد التوثيق.", [
         F("schemaVersion", "String", "إصدار المخطط.", **SEMVER),
@@ -556,6 +590,7 @@ FILE_DOCS = {
     "review_info.dart": "حالة المراجعة العلمية المشتركة بين الحديث والسيرة.",
     "seerah_station.dart": "محطات رحلة السيرة ومشاهدها الثلاثة.",
     "adhkar.dart": "وِرد الأذكار النبوية: الأذكار بأعدادها المسنونة وشواهدها.",
+    "sunan.dart": "السنن النبوية المهجورة: بطاقات مرجعية بأدلتها المشكولة.",
     "hadith_draft.dart": "مسودات الإدخال المصدّرة من لوحة الإدارة.",
     "hadith_daily_model.dart": "النموذج الجذري للوِرد اليومي.",
     "historical_context.dart": "المرحلة الأولى: سياق الورود.",
@@ -583,5 +618,6 @@ FILE_DIRS = {
     "review_info.dart": "core/content/models",
     "seerah_station.dart": "features/seerah/data/models",
     "adhkar.dart": "features/adhkar/data/models",
+    "sunan.dart": "features/sunan/data/models",
     "hadith_draft.dart": "features/admin/data/models",
 }

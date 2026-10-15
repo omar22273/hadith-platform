@@ -15,6 +15,8 @@ import 'package:hadith_platform/core/storage/key_value_store.dart';
 import 'package:hadith_platform/features/adhkar/application/adhkar_providers.dart';
 import 'package:hadith_platform/features/adhkar/data/models/adhkar.dart';
 import 'package:hadith_platform/features/adhkar/domain/adhkar_category.dart';
+import 'package:hadith_platform/features/sunan/data/models/sunan.dart';
+import 'package:hadith_platform/features/sunan/domain/sunan_info.dart';
 
 import 'app_harness.dart';
 
@@ -23,6 +25,9 @@ JsonMap loadJson(String path) => asJsonMap(jsonDecode(File(path).readAsStringSyn
 
 /// ملف فئة بعد التحويل إلى النموذج.
 AdhkarCatalog loadCategory(AdhkarCategory category) => AdhkarCatalog.fromJson(loadJson(category.assetPath));
+
+/// ملف السنن المهجورة بعد التحويل إلى النموذج.
+SunanCatalog loadSunan() => SunanCatalog.fromJson(loadJson(SunanInfo.assetPath));
 
 /// أذكار مسار من فئة ذات تبديل بترتيب عرضها؛ وأذكار الفئة كلها إن لم تكن لها مسارات.
 /// بلا [trackId] يُؤخذ المسار الأول، وهو الذي يُفتح عليه المشغّل.
@@ -73,6 +78,9 @@ Finder navLabel(String label) {
 ValueKey<String> cardKey(AdhkarCategory category) => ValueKey<String>('adhkar-card-${category.id}');
 
 const ValueKey<String> sebhaCardKey = ValueKey<String>('adhkar-card-sebha');
+
+/// مفتاح بطاقة السنن المهجورة في المركز.
+const ValueKey<String> sunanCardKey = ValueKey<String>('adhkar-card-${SunanInfo.id}');
 
 /// يفتح التطبيق على تبويب الأذكار (المركز) ويعيد الحاوية.
 Future<ProviderContainer> openHub(

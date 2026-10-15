@@ -1,12 +1,13 @@
 // التبويب الثالث: مركز الأذكار الهادئ.
 //
-// سبع بطاقات كبيرة مرتبة رأسياً، كل منها بوابة إلى شاشة تركيز مستقلة:
-// الفئات الست التي لها ملفات بيانات مشكولة (أذكار الصباح والمساء، النوم والاستيقاظ،
-// أدبار الصلوات، دخول وخروج المنزل والمسجد، السنن المهجورة، جامع الأدعية المأثورة)
-// يفتح كل منها مشغّل التركيز AdhkarPlayerScreen، والسابعة السبحة الذكية.
+// سبع بطاقات كبيرة مرتبة رأسياً، كل منها بوابة إلى شاشة مستقلة:
+// فئات الأذكار الخمس التي لها ملفات بيانات مشكولة (أذكار الصباح والمساء، النوم والاستيقاظ،
+// أدبار الصلوات، دخول وخروج المنزل والمسجد، جامع الأدعية المأثورة) يفتح كل منها مشغّل
+// التركيز AdhkarPlayerScreen؛ والسنن المهجورة شاشة مرجعية مستقلة بشريط تصفية (SunanScreen)
+// لا عدّاد فيها؛ والسابعة السبحة الذكية.
 //
 // المركز لا يعرض أي نص نبوي ولا تخريج؛ عناوين البطاقات وأسطرها التعريفية واجهة فقط،
-// ونصوص الأذكار وشواهدها تُقرأ من ملفات assets/data/adhkar/ داخل المشغّل وحده.
+// ونصوص الأذكار وشواهدها تُقرأ من ملفات assets/data/adhkar/ وassets/data/sunan/ داخل الشاشات وحدها.
 
 import 'dart:async';
 
@@ -20,6 +21,9 @@ import '../../../core/ui/app_shapes.dart';
 import '../../../core/ui/smooth_surface.dart';
 import '../application/adhkar_providers.dart';
 import '../application/sebha_controller.dart';
+import '../../sunan/application/sunan_providers.dart';
+import '../../sunan/domain/sunan_info.dart';
+import '../../sunan/presentation/sunan_screen.dart';
 import '../domain/adhkar_category.dart';
 import 'adhkar_player_screen.dart';
 import 'sebha_screen.dart';
@@ -32,6 +36,14 @@ class AdhkarScreen extends StatelessWidget {
     unawaited(
       Navigator.of(context).push<void>(
         MaterialPageRoute<void>(builder: (BuildContext context) => AdhkarPlayerScreen(category: category)),
+      ),
+    );
+  }
+
+  void _openSunan(BuildContext context) {
+    unawaited(
+      Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(builder: (BuildContext context) => const SunanScreen()),
       ),
     );
   }
@@ -75,6 +87,11 @@ class AdhkarScreen extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             for (final AdhkarCategory category in AdhkarCategories.all) ...<Widget>[
+              // السنن المهجورة بين أذكار المنزل والمسجد وجامع الأدعية، كما كان ترتيبها دائماً.
+              if (category == AdhkarCategories.duas) ...<Widget>[
+                _SunanCard(onTap: () => _openSunan(context)),
+                const SizedBox(height: 12),
+              ],
               _CategoryCard(category: category, onTap: () => _openCategory(context, category)),
               const SizedBox(height: 12),
             ],
@@ -131,6 +148,59 @@ class _CategoryCard extends ConsumerWidget {
             const SizedBox(width: 10),
             _CountBadge(
               labelKey: ValueKey<String>('adhkar-card-count-${category.id}'),
+              label: arabicDigits(total),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// بطاقة السنن المهجورة: تفتح شاشتها المستقلة، وتعرض عدد البطاقات بعد تحميل ملفها.
+class _SunanCard extends ConsumerWidget {
+  const _SunanCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppPalette palette = AppPalette.of(context);
+    final TextTheme text = Theme.of(context).textTheme;
+    final int total = ref.watch(sunanItemsProvider).length;
+    return SmoothSurface(
+      key: const ValueKey<String>('adhkar-card-${SunanInfo.id}'),
+      onTap: onTap,
+      elevated: true,
+      borderColor: palette.line,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      semanticLabel: total == 0
+          ? '${SunanInfo.title}. ${SunanInfo.subtitle}'
+          : '${SunanInfo.title}. ${SunanInfo.subtitle}. ${arabicDigits(total)} بطاقة',
+      child: Row(
+        children: <Widget>[
+          _IconTile(icon: Icons.history_edu_outlined, background: palette.amberSoft, foreground: palette.amberText),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  SunanInfo.title,
+                  style: text.titleMedium?.copyWith(color: palette.ink, fontWeight: FontWeight.w700, height: 1.4),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  SunanInfo.subtitle,
+                  style: text.bodySmall?.copyWith(color: palette.inkSoft, height: 1.5),
+                ),
+              ],
+            ),
+          ),
+          if (total > 0) ...<Widget>[
+            const SizedBox(width: 10),
+            _CountBadge(
+              labelKey: const ValueKey<String>('adhkar-card-count-${SunanInfo.id}'),
               label: arabicDigits(total),
             ),
           ],
